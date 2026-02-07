@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraderA+</title>
+    <script src="libs/tailwind.js"></script>
+	<script src="libs/lucide.js"></script>
+	<script src="libs/xlsx.js"></script>
+	<script src="libs/chart.js"></script>
+    <style>
+        .active-student { background-color: #e0e7ff; border-right: 4px solid #4f46e5; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        dialog::backdrop { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(2px); }
+        .student-row .btn-delete { opacity: 0; transition: opacity 0.2s; }
+        .student-row:hover .btn-delete { opacity: 1; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
+
+    <div id="view-dashboard" class="h-full flex flex-col">
+        <header class="bg-slate-900 text-white p-6 shadow-md">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div>
+                    <h1 class="font-bold text-2xl flex items-center gap-3"><i data-lucide="layout-grid"></i> GraderA+</h1>
+                    <p class="text-slate-400 text-sm mt-1">DASHBOARD DOSEN</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="openSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-slate-700 transition-all">
+                        <i data-lucide="settings"></i> Aturan Nilai
+                    </button>
+                    <button onclick="bukaModalKelas()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-indigo-500 shadow-lg">
+                        <i data-lucide="plus"></i> Buat Kelas
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8">
+                    <input type="text" placeholder="Cari kelas..." oninput="renderDashboard(this.value)" class="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div id="class-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="dashboard-empty" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+                    <i data-lucide="folder-open" size="64" class="mb-4 text-slate-400"></i>
+                    <p class="text-xl font-bold text-slate-500">Belum ada kelas.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="view-grading" class="h-full flex flex-col hidden">
+		<header class="bg-indigo-800 text-white p-4 shadow-md flex justify-between items-center z-10">
+			<div class="flex items-center gap-4">
+				<button onclick="backToDashboard()" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors" title="Kembali ke Dashboard">
+					<i data-lucide="arrow-left"></i>
+				</button>
+				
+				<div>
+					<div class="flex items-center gap-2">
+						<h1 class="font-bold text-lg leading-tight" id="header-class-name">Nama Kelas</h1>
+						
+						<button onclick="bukaModalEditKelas()" class="text-indigo-300 hover:text-white hover:bg-white/10 p-1 rounded transition-all" title="Ubah Nama Kelas">
+							<i data-lucide="pencil" size="14"></i>
+						</button>
+					</div>
+					
+					<span id="save-status" class="text-[10px] text-emerald-300 font-bold opacity-0 transition-opacity block mt-0.5">✅ Tersimpan</span>
+				</div>
+			</div>
+
+			<div class="flex gap-2">
+				<button onclick="showStats()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg font-bold flex items-center gap-2 border border-purple-500 text-xs shadow-md">
+					<i data-lucide="bar-chart-2" size="14"></i> Stats
+				</button>
+				<div class="h-8 w-px bg-indigo-600 mx-1"></div>
+				<input type="file" id="fileInput" class="hidden" accept=".xlsx, .xls" onchange="handleFileImport(event)" />
+				<button onclick="document.getElementById('fileInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg font-bold flex items-center gap-2 border border-indigo-500 text-xs">
+					<i data-lucide="upload" size="14"></i> Import
+				</button>
+				<button onclick="downloadExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg font-bold flex items-center gap-2 border border-emerald-500 text-xs shadow-lg">
+					<i data-lucide="download" size="14"></i> Excel
+				</button>
+			</div>
+		</header>
+
+        <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+			
+			<aside class="w-full h-[30%] md:w-1/4 md:h-auto bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col shadow-lg z-0">
+				<div class="p-4 border-b border-slate-100 bg-slate-50 space-y-2">
+					<div class="flex justify-between items-center">
+						<h2 class="font-bold text-slate-500 text-xs uppercase tracking-wider">Peserta</h2>
+						<span class="text-[10px] bg-slate-200 px-2 rounded-full text-slate-600 font-bold" id="count-mhs">0</span>
+					</div>
+					<div class="flex gap-2" id="sidebar-actions">
+						<div id="btn-group-normal" class="flex gap-2 w-full">
+							<button onclick="tambahMahasiswa()" class="flex-1 bg-white border border-indigo-200 text-indigo-700 text-xs font-bold py-2 rounded hover:bg-indigo-50">+ Manual</button>
+							<button onclick="toggleDeleteMode(true)" class="px-3 bg-white border border-slate-300 text-slate-500 text-xs font-bold py-2 rounded hover:bg-slate-100" title="Pilih untuk dihapus">
+								<i data-lucide="check-square" size="14"></i>
+							</button>
+						</div>
+
+						<div id="btn-group-delete" class="hidden gap-2 w-full">
+							<button onclick="eksekusiHapus()" class="flex-1 bg-red-600 text-white text-xs font-bold py-2 rounded hover:bg-red-700 shadow-sm flex items-center justify-center gap-1">
+								<i data-lucide="trash-2" size="14"></i> Hapus (<span id="count-selected">0</span>)
+							</button>
+							<button onclick="toggleDeleteMode(false)" class="px-3 bg-white border border-slate-300 text-slate-600 text-xs font-bold py-2 rounded hover:bg-slate-100">
+								Batal
+							</button>
+						</div>
+					</div>								
+				</div>
+				<div id="student-list" class="flex-1 overflow-y-auto"></div>
+			</aside>
+
+			<main class="w-full md:w-3/4 flex flex-col bg-slate-50 relative h-full">
+				<div class="bg-white p-4 md:p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm z-10 gap-4">
+					<div class="flex-1 w-full md:w-auto mr-0 md:mr-8">
+						<div class="flex gap-4 mb-2">
+							<div class="w-1/3 md:w-1/4"><label class="block text-[10px] font-bold text-slate-400 uppercase">NIM</label><input type="text" id="input-nim-mhs" class="w-full font-mono font-bold text-slate-600 bg-slate-100 px-3 py-1.5 rounded border-none text-sm"></div>
+							<div class="w-2/3 md:w-3/4"><label class="block text-[10px] font-bold text-slate-400 uppercase">Nama Peserta</label><input type="text" id="input-nama-mhs" class="w-full font-bold text-xl text-slate-800 bg-transparent border-b border-dashed border-slate-300 focus:border-indigo-500 outline-none pb-1"></div>
+						</div>
+					</div>
+					
+					<div class="w-full md:w-auto text-right bg-indigo-50 px-5 py-3 rounded-xl border border-indigo-100 shadow-sm flex justify-between md:block items-center">
+						<div class="text-[10px] text-indigo-400 font-bold uppercase tracking-wider md:mb-1">Nilai Akhir</div>
+						<div class="flex items-baseline gap-2 md:block">
+							<div class="text-3xl md:text-4xl font-black text-indigo-600 leading-none" id="display-skor-main">0.00</div>
+							<div id="display-grade-main" class="text-center font-bold text-sm text-indigo-400 md:mt-1">E</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex-1 overflow-y-auto p-4 md:p-8 relative pb-24">
+					<div id="empty-state" class="hidden flex flex-col items-center justify-center h-full text-slate-400">
+						<i data-lucide="users" size="64" class="mb-4 opacity-30 text-indigo-300"></i>
+						<p class="font-medium">Pilih Peserta di Atas.</p>
+					</div>
+					<div id="alert-bobot" class="hidden mb-6 bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-lg flex items-center gap-3 shadow-sm">
+						<i data-lucide="alert-triangle" class="text-amber-500"></i><span class="text-xs font-bold">Total Bobot Belum 100%</span>
+					</div>
+					<div id="criteria-container" class="space-y-4 max-w-4xl mx-auto"></div>
+					<div id="feedback-section" class="max-w-4xl mx-auto mt-8 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+						<label class="flex items-center gap-2 text-sm font-bold text-slate-600 mb-2"><i data-lucide="message-square" size="16"></i> Catatan Evaluasi</label>
+						<textarea id="input-feedback" rows="3" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-sm"></textarea>
+					</div>
+					<div class="mt-12 max-w-4xl mx-auto border-t border-slate-200 pt-6 flex justify-between items-center opacity-60 hover:opacity-100 transition-opacity">
+						<button onclick="tambahKriteria()" class="text-indigo-600 font-bold text-xs hover:bg-indigo-50 px-3 py-1.5 rounded flex items-center gap-1"><i data-lucide="plus-circle" size="14"></i> Tambah Kriteria</button>
+						<span id="total-bobot-display" class="text-[10px] font-bold text-slate-500 bg-slate-200 px-2 py-1 rounded">Bobot: 0%</span>
+					</div>
+				</div>
+			</main>
+		</div>
+    </div>
+
+    <dialog id="newClassModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-md backdrop:bg-slate-900/50">
+        <div class="bg-indigo-700 text-white p-4 flex justify-between items-center">
+            <h2 class="font-bold text-lg">Buat Kelas Baru</h2>
+            <button onclick="document.getElementById('newClassModal').close()" class="hover:bg-indigo-600 p-1 rounded"><i data-lucide="x"></i></button>
+        </div>
+        <div class="p-6 bg-white">
+            <label class="block text-sm font-bold text-slate-600 mb-2">Nama Mata Kuliah / Kelas</label>
+            <input type="text" id="input-new-class-name" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none mb-6" placeholder="Contoh: Teknik Elektro A 2024">
+            <div class="flex justify-end gap-2">
+                <button onclick="document.getElementById('newClassModal').close()" class="px-4 py-2 text-slate-500 font-bold text-sm hover:bg-slate-100 rounded-lg">Batal</button>
+                <button onclick="simpanKelasBaru()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg">Buat Kelas</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="settingsModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-lg backdrop:bg-slate-900/50">
+        <div class="bg-slate-800 text-white p-4 flex justify-between items-center">
+            <h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="settings"></i> Konfigurasi Grade</h2>
+            <button onclick="closeSettings()" class="hover:bg-slate-700 p-1 rounded"><i data-lucide="x"></i></button>
+        </div>
+        <div class="p-6 bg-slate-50">
+            <p class="text-sm text-slate-500 mb-4">Tentukan label huruf dan batas minimum nilai.</p>
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden mb-4">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-100 text-slate-500 font-bold"><tr><td class="p-3">Label Grade</td><td class="p-3">Min Skor</td><td class="p-3">Warna</td><td class="p-3 text-center">Aksi</td></tr></thead>
+                    <tbody id="settings-table-body"></tbody>
+                </table>
+            </div>
+            <button onclick="addSettingRow()" class="text-indigo-600 font-bold text-xs hover:underline flex items-center gap-1 mb-6"><i data-lucide="plus-circle" size="14"></i> Tambah Aturan Grade</button>
+            <div class="flex justify-end gap-2 border-t border-slate-200 pt-4"><button onclick="resetSettings()" class="px-4 py-2 text-slate-400 hover:text-red-500 text-sm font-bold">Reset Default</button><button onclick="saveSettings()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold text-sm">Simpan Perubahan</button></div>
+        </div>
+    </dialog>
+
+    <dialog id="statsModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-2xl backdrop:bg-slate-900/50">
+			<div class="bg-purple-800 text-white p-4 flex justify-between items-center"><h2 class="font-bold text-lg flex items-center gap-2"><i data-lucide="bar-chart-2"></i> Statistik Kelas</h2><button onclick="document.getElementById('statsModal').close()" class="hover:bg-purple-700 p-1 rounded"><i data-lucide="x"></i></button></div>
+			<div class="p-6 bg-slate-50"><div class="grid grid-cols-3 gap-4 mb-6"><div class="bg-white p-4 rounded-xl shadow-sm text-center"><p class="text-xs text-slate-400 font-bold uppercase">Rata-rata</p><p class="text-3xl font-black text-indigo-600 mt-1" id="stat-avg">0.0</p></div><div class="bg-white p-4 rounded-xl shadow-sm text-center"><p class="text-xs text-slate-400 font-bold uppercase">Tertinggi</p><p class="text-3xl font-black text-emerald-500 mt-1" id="stat-max">0</p></div><div class="bg-white p-4 rounded-xl shadow-sm text-center"><p class="text-xs text-slate-400 font-bold uppercase">Terendah</p><p class="text-3xl font-black text-rose-500 mt-1" id="stat-min">0</p></div></div><div class="bg-white p-4 rounded-xl shadow-sm h-64"><canvas id="gradeChart"></canvas></div></div>
+		</dialog>
+		
+		<dialog id="editClassModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-sm backdrop:bg-slate-900/50">
+		<div class="bg-indigo-700 text-white p-4 flex justify-between items-center">
+			<h2 class="font-bold text-lg">Ubah Nama Kelas</h2>
+			<button onclick="document.getElementById('editClassModal').close()" class="hover:bg-indigo-600 p-1 rounded"><i data-lucide="x"></i></button>
+		</div>
+		<div class="p-6 bg-white">
+			<input type="text" id="input-edit-class-name" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none mb-6">
+			<div class="flex justify-end gap-2">
+				<button onclick="document.getElementById('editClassModal').close()" class="px-4 py-2 text-slate-500 font-bold text-sm hover:bg-slate-100 rounded-lg">Batal</button>
+				<button onclick="simpanEditKelas()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-lg">Simpan</button>
+			</div>
+		</div>
+	</dialog>
+	<dialog id="deleteConfirmModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-sm backdrop:bg-slate-900/50">
+		<div class="bg-red-600 text-white p-4 flex justify-between items-center">
+			<h2 class="font-bold text-lg flex items-center gap-2">
+				<i data-lucide="alert-triangle"></i> Konfirmasi Hapus
+			</h2>
+			<button onclick="document.getElementById('deleteConfirmModal').close()" class="hover:bg-red-700 p-1 rounded">
+				<i data-lucide="x"></i>
+			</button>
+		</div>
+		<div class="p-6 bg-white text-center">
+			<div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+				<i data-lucide="trash-2" size="32"></i>
+			</div>
+			<h3 class="font-bold text-slate-800 text-lg">Hapus Mahasiswa?</h3>
+			<p class="text-slate-500 text-sm mt-2 mb-6">
+				Anda akan menghapus <span id="del-count-display" class="font-bold text-red-600">0</span> data terpilih. <br>Tindakan ini tidak bisa dibatalkan.
+			</button>
+			
+			<div class="flex gap-3">
+				<button onclick="document.getElementById('deleteConfirmModal').close()" class="flex-1 px-4 py-2 border border-slate-300 text-slate-600 font-bold text-sm rounded-lg hover:bg-slate-50 transition-colors">
+					Batal
+				</button>
+				<button onclick="prosesHapusFinal()" class="flex-1 px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-lg hover:bg-red-700 shadow-md transition-colors">
+					Ya, Hapus
+				</button>
+			</div>
+		</div>
+	</dialog>
+
+	<script>
+        // ==========================================
+        // 1. GLOBAL STATE & CONFIG
+        // ==========================================
+        let classDB = []; 
+        let currentClass = null; 
+        let chartInstance = null;
+        let saveTimeout = null; // Variable untuk timer (Debounce)
+		let isDeleteMode = false;
+		let selectedToDelete = new Set(); // Menyimpan ID mahasiswa yang dicentang
+        
+		const defaultRules = [
+            { label: "A", min: 85, color: "green" }, 
+            { label: "B", min: 75, color: "blue" }, 
+            { label: "C", min: 60, color: "yellow" }, 
+            { label: "D", min: 50, color: "orange" }, 
+            { label: "E", min: 0, color: "red" }
+        ];
+        
+        const defaultTemplate = [
+            { id: 1, nama: "Kelengkapan Materi", bobot: 40 }, 
+            { id: 2, nama: "Metodologi", bobot: 30 }, 
+            { id: 3, nama: "Presentasi", bobot: 30 }
+        ];
+
+        let gradeRules = JSON.parse(localStorage.getItem('grader_rules') || JSON.stringify(defaultRules));
+
+        // ==========================================
+        // 2. PERFORMANCE HELPER (NEW!)
+        // ==========================================
+        
+        // FUNGSI PENTING: Menunda penyimpanan agar tidak berat saat mengetik
+        function triggerAutoSave() {
+            const elStatus = document.getElementById('save-status');
+            if(elStatus) elStatus.innerText = "⏳ Menyimpan...";
+            if(elStatus) elStatus.classList.remove('opacity-0');
+
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                saveDB(); // Simpan fisik
+                if(elStatus) {
+                    elStatus.innerText = "✅ Tersimpan";
+                    setTimeout(() => elStatus.classList.add('opacity-0'), 1000);
+                }
+            }, 800); // Tunggu 800ms setelah berhenti mengetik
+        }
+
+        // ==========================================
+        // 3. DATA MANAGEMENT
+        // ==========================================
+        function loadData() {
+            if (window.pywebview) {
+                window.pywebview.api.baca_db().then((dataString) => {
+                    try { classDB = JSON.parse(dataString); } catch(e) { classDB = []; }
+                    renderDashboard();
+                });
+            } else {
+                const localData = localStorage.getItem('grader_v6_db');
+                classDB = JSON.parse(localData || '[]');
+                renderDashboard();
+            }
+        }
+
+        function saveDB() {
+            const dataString = JSON.stringify(classDB);
+            if (window.pywebview) window.pywebview.api.simpan_db(dataString);
+            localStorage.setItem('grader_v6_db', dataString);
+        }
+
+        // ==========================================
+        // 4. UI LOGIC (DASHBOARD)
+        // ==========================================
+        function renderDashboard(term = "") {
+            const grid = document.getElementById('class-grid');
+            if(!grid) return;
+            
+            // Optimasi: Build string HTML dulu baru inject (lebih cepat drpd createElement berulang)
+            let htmlContent = '';
+            const filtered = classDB.filter(c => c.name.toLowerCase().includes(term.toLowerCase()));
+            
+            if (filtered.length === 0) {
+                document.getElementById('dashboard-empty').classList.remove('hidden');
+                grid.innerHTML = '';
+            } else {
+                document.getElementById('dashboard-empty').classList.add('hidden');
+                filtered.forEach(c => {
+                    htmlContent += `
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm card-hover transition-all flex flex-col justify-between h-48 group relative">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div class="bg-indigo-100 p-2 rounded-lg text-indigo-600 mb-3"><i data-lucide="book-open"></i></div>
+                                <button onclick="hapusKelas(${c.id})" class="text-slate-300 hover:text-red-500 p-1"><i data-lucide="trash-2" size="18"></i></button>
+                            </div>
+                            <h3 class="font-bold text-lg text-slate-800 mb-1 leading-tight line-clamp-2 cursor-pointer hover:text-indigo-600" onclick="openClass(${c.id})">${c.name}</h3>
+                            <p class="text-xs text-slate-400">Dibuat: ${new Date(c.id).toLocaleDateString('id-ID')}</p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-full">${c.students.length} Peserta</span>
+                            <button onclick="openClass(${c.id})" class="text-sm font-bold text-indigo-600 flex items-center gap-1 hover:gap-2 transition-all">Buka <i data-lucide="arrow-right" size="14"></i></button>
+                        </div>
+                    </div>`;
+                });
+                grid.innerHTML = htmlContent;
+                lucide.createIcons(); // Scan icons sekali saja di akhir
+            }
+        }
+
+        // MODAL NEW CLASS
+        function bukaModalKelas() {
+            document.getElementById('input-new-class-name').value = '';
+            document.getElementById('newClassModal').showModal();
+        }
+        function simpanKelasBaru() {
+            const nama = document.getElementById('input-new-class-name').value;
+            if (nama) {
+                const nc = { id: Date.now(), name: nama, template: JSON.parse(JSON.stringify(defaultTemplate)), students: [], activeStudentId: null };
+                classDB.push(nc); saveDB(); renderDashboard(); openClass(nc.id);
+                document.getElementById('newClassModal').close();
+            } else { alert("Wajib diisi!"); }
+        }
+        function hapusKelas(id) { if (confirm("Hapus permanen?")) { classDB = classDB.filter(c => c.id !== id); saveDB(); renderDashboard(); } }
+
+        // NAVIGATION
+        function openClass(id) {
+            currentClass = classDB.find(c => c.id === id);
+            if (!currentClass) return;
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-grading').classList.remove('hidden');
+            document.getElementById('header-class-name').innerText = currentClass.name;
+            renderStudentList();
+            renderMainView();
+        }
+        function backToDashboard() {
+            currentClass = null;
+            document.getElementById('view-grading').classList.add('hidden');
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            renderDashboard();
+        }
+
+        // ==========================================
+        // 5. GRADING ENGINE (OPTIMIZED)
+        // ==========================================
+        function getGrade(n) {
+            // Optimasi: Loop sederhana lebih cepat
+            for(let i=0; i<gradeRules.length; i++) {
+                if(n >= gradeRules[i].min) return gradeRules[i].label;
+            }
+            return "E";
+        }
+        function getGradeColor(label) {
+            const rule = gradeRules.find(r => r.label === label); 
+            const c = rule ? rule.color : 'gray';
+            const m = { 'green': 'bg-emerald-100 text-emerald-700', 'blue': 'bg-blue-100 text-blue-700', 'yellow': 'bg-yellow-100 text-yellow-700', 'orange': 'bg-orange-100 text-orange-700', 'red': 'bg-red-100 text-red-700', 'gray': 'bg-gray-100 text-gray-700' };
+            return m[c] || m['gray'];
+        }
+        function getGradeTextColor(label) {
+             const rule = gradeRules.find(r => r.label === label); 
+             const c = rule ? rule.color : 'gray';
+             const m = { 'green': 'text-emerald-500', 'blue': 'text-blue-500', 'yellow': 'text-yellow-500', 'orange': 'text-orange-500', 'red': 'text-red-500', 'gray': 'text-gray-500' };
+             return m[c] || m['gray'];
+        }
+        function hitungSkor(sc) {
+            let t = 0;
+            for(let k of currentClass.template) {
+                t += (sc[k.id] || 0) * (k.bobot / 100);
+            }
+            return t;
+        }
+
+        function renderStudentList() {
+			const el = document.getElementById('student-list');
+			if(!el) return;
+			
+			document.getElementById('count-mhs').innerText = currentClass.students.length;
+			
+			// Handle Tampilan Tombol Header (Normal vs Delete Mode)
+			const grpNormal = document.getElementById('btn-group-normal');
+			const grpDelete = document.getElementById('btn-group-delete');
+			if (grpNormal && grpDelete) {
+				if (isDeleteMode) {
+					grpNormal.classList.add('hidden');
+					grpDelete.classList.remove('hidden');
+					grpDelete.classList.add('flex');
+					document.getElementById('count-selected').innerText = selectedToDelete.size;
+				} else {
+					grpNormal.classList.remove('hidden');
+					grpDelete.classList.add('hidden');
+					grpDelete.classList.remove('flex');
+				}
+			}
+
+			// Handle Empty State
+			if (currentClass.students.length === 0) {
+				// ... (Kode empty state sama seperti sebelumnya) ...
+				el.innerHTML = '';
+				document.getElementById('criteria-container').innerHTML = '';
+				document.getElementById('feedback-section').classList.add('hidden');
+				document.getElementById('empty-state').classList.remove('hidden');
+				document.getElementById('input-nama-mhs').value = '';
+				return; // Stop disini
+			} else {
+				document.getElementById('empty-state').classList.add('hidden');
+				document.getElementById('feedback-section').classList.remove('hidden');
+			}
+
+			if (!currentClass.activeStudentId) currentClass.activeStudentId = currentClass.students[0].id;
+
+			let listHTML = '';
+			currentClass.students.forEach(s => {
+				const active = s.id === currentClass.activeStudentId;
+				const sc = hitungSkor(s.scores);
+				const g = getGrade(sc);
+				
+				// Cek apakah item ini sedang dipilih (dicentang)
+				const isChecked = selectedToDelete.has(s.id);
+				const bgClass = active ? 'active-student' : (isChecked ? 'bg-red-50' : '');
+				const borderClass = isChecked ? 'border-red-200' : 'border-slate-100';
+
+				// RENDER ROW BERDASARKAN MODE
+				if (isDeleteMode) {
+					// --- TAMPILAN CHECKBOX (MODE HAPUS) ---
+					listHTML += `
+					<div onclick="toggleSelectStudent('${s.id}')" class="p-3 cursor-pointer border-b ${borderClass} ${bgClass} hover:bg-slate-50 transition-all">
+						<div class="flex items-center gap-3">
+							<div class="w-5 h-5 flex items-center justify-center border-2 rounded ${isChecked ? 'bg-red-500 border-red-500' : 'border-slate-300'}">
+								${isChecked ? '<i data-lucide="check" class="text-white w-3 h-3"></i>' : ''}
+							</div>
+							<div class="flex-1 min-w-0">
+								<div class="text-[10px] text-slate-400 font-mono leading-none mb-1">${s.nim||'-'}</div>
+								<div class="font-bold text-sm text-slate-700 truncate">${s.nama}</div>
+							</div>
+						</div>
+					</div>`;
+				} else {
+					// --- TAMPILAN BIASA (MODE NORMAL) ---
+					listHTML += `
+					<div onclick="selectStudent('${s.id}')" class="student-row p-3 cursor-pointer border-b border-slate-100 hover:bg-slate-50 transition-all group relative ${active ? 'active-student' : ''}">
+						<div class="flex justify-between items-center">
+							<div class="flex-1 min-w-0 pr-2">
+								<div class="text-[10px] text-slate-400 font-mono leading-none mb-1 truncate">${s.nim||'-'}</div>
+								<div class="font-bold text-sm text-slate-700 truncate leading-tight">${s.nama}</div>
+							</div>
+							<div class="flex flex-col items-end gap-1 shrink-0">
+								<span class="text-[10px] font-bold px-1.5 py-0.5 rounded text-center w-8 ${getGradeColor(g)}">${g}</span>
+							</div>
+						</div>
+					</div>`;
+				}
+			});
+			
+			el.innerHTML = listHTML;
+			lucide.createIcons();
+		}
+
+        // Fungsi pembantu biar HTML di atas gak kepanjangan
+        function selectStudent(id) {
+            currentClass.activeStudentId = id;
+            triggerAutoSave(); // Save state posisi kursor
+            renderStudentList();
+            renderMainView();
+        }
+
+        function renderMainView() {
+			if (!currentClass || currentClass.students.length === 0) return;
+			const s = currentClass.students.find(m => m.id === currentClass.activeStudentId);
+			if (!s) return;
+
+			// Isi Input data diri
+			document.getElementById('input-nama-mhs').value = s.nama;
+			document.getElementById('input-nim-mhs').value = s.nim || '';
+			document.getElementById('input-feedback').value = s.feedback || '';
+
+			// Update Bobot Info
+			const totalBobot = currentClass.template.reduce((a, b) => a + Number(b.bobot), 0);
+			document.getElementById('alert-bobot').classList.toggle('hidden', totalBobot === 100);
+			document.getElementById('total-bobot-display').innerText = `Bobot: ${totalBobot}%`;
+
+			// --- RENDER KRITERIA DENGAN ANGKA BANTU ---
+			const container = document.getElementById('criteria-container');
+			let criteriaHTML = '';
+			
+			currentClass.template.forEach(k => {
+				const val = s.scores[k.id] || 0;
+				
+				criteriaHTML += `
+					<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-300 transition-all">
+						<div class="flex justify-between items-center mb-2">
+							<input type="text" value="${k.nama}" onchange="updateKriteria(1, ${k.id}, this.value)" class="font-bold text-slate-700 border-none p-0 focus:ring-0 w-full hover:bg-slate-50 rounded px-1 transition-colors">
+							<div class="flex items-center gap-2">
+								<span class="text-[10px] font-bold text-slate-400 uppercase">Bobot</span>
+								<input type="number" value="${k.bobot}" onchange="updateKriteria(2, ${k.id}, this.value)" class="w-12 text-center font-bold text-indigo-600 border border-slate-200 rounded p-1 text-sm">
+								<button onclick="hapusKriteria(${k.id})" class="text-slate-300 hover:text-red-500 ml-2"><i data-lucide="x" size="16"></i></button>
+							</div>
+						</div>
+
+						<div class="flex items-start gap-4">
+							
+							<div class="flex-grow pt-2">
+								<input type="range" min="0" max="100" step="0.5" value="${val}" id="sl-${k.id}" oninput="sync(${k.id}, this.value, 'sl')" class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-indigo-600 block">
+								
+								<div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1 px-0.5 select-none">
+									<span>0</span>						
+									<span>25</span>
+									<span class="text-[15px] text-indigo-300 font-bold">50</span>
+									<span>75</span>
+									<span>100</span>
+								</div>
+							</div>
+
+							<input type="number" min="0" max="100" step="0.5" value="${val}" id="tx-${k.id}" oninput="sync(${k.id}, this.value, 'tx')" class="w-20 text-right font-bold text-lg text-slate-700 border border-slate-200 rounded-lg px-2 py-1 outline-none h-10">
+						</div>
+					</div>`;
+			});
+			container.innerHTML = criteriaHTML;
+			
+			// Event Listeners Input
+			document.getElementById('input-nama-mhs').oninput = (e) => { s.nama = e.target.value; triggerAutoSave(); };
+			document.getElementById('input-nim-mhs').oninput = (e) => { s.nim = e.target.value; triggerAutoSave(); };
+			document.getElementById('input-feedback').oninput = (e) => { s.feedback = e.target.value; triggerAutoSave(); };
+
+			updateScoreDisplay(s);
+			lucide.createIcons();
+		}
+
+        // Sync Slider & Text (Optimized)
+        function sync(kid, val, src) {
+            let n = Number(val); if(n>100)n=100; if(n<0)n=0;
+            const s = currentClass.students.find(m => m.id === currentClass.activeStudentId);
+            s.scores[kid] = n;
+            
+            // Update UI langsung (Cepat)
+            document.getElementById(src==='sl'?`tx-${kid}`:`sl-${kid}`).value = n;
+            updateScoreDisplay(s);
+            
+            // Simpan ke DB nanti (Debounce)
+            triggerAutoSave();
+        }
+
+        function updateScoreDisplay(s) {
+            const sc = hitungSkor(s.scores);
+            const g = getGrade(sc);
+            document.getElementById('display-skor-main').innerText = sc.toFixed(2);
+            const gEl = document.getElementById('display-grade-main');
+            gEl.innerText = g;
+            gEl.className = `text-center font-bold text-sm text-indigo-400 md:mt-1 ${getGradeTextColor(g)}`;
+            // Tidak perlu renderStudentList() setiap geser slider, berat!
+        }
+
+        // ACTIONS
+        function updateKriteria(type, id, val) {
+            const k = currentClass.template.find(x=>x.id===id);
+            if(type===1) k.nama=val; else k.bobot=Number(val);
+            saveDB(); renderMainView();
+        }
+        function tambahKriteria() { currentClass.template.push({id:Date.now(), nama:"Baru", bobot:0}); saveDB(); renderMainView(); }
+        function hapusKriteria(id) { if(confirm("Hapus?")) { currentClass.template = currentClass.template.filter(x=>x.id!==id); saveDB(); renderMainView(); } }
+
+        function bukaModalEditKelas() { if(currentClass) { document.getElementById('input-edit-class-name').value = currentClass.name; document.getElementById('editClassModal').showModal(); } }
+        function simpanEditKelas() { 
+            const n = document.getElementById('input-edit-class-name').value; 
+            if(n && currentClass) { currentClass.name = n; document.getElementById('header-class-name').innerText = n; saveDB(); document.getElementById('editClassModal').close(); renderDashboard(); }
+        }
+
+        function tambahMahasiswa() {
+            currentClass.students.push({ id:'m_'+Date.now(), nim:'', nama:"Peserta Baru", scores:{}, feedback:'' });
+            currentClass.activeStudentId = currentClass.students[currentClass.students.length-1].id;
+            saveDB(); renderStudentList(); renderMainView();
+        }
+        function resetDataKelas() { if(confirm("Hapus SEMUA?")) { currentClass.students=[]; currentClass.activeStudentId=null; saveDB(); renderStudentList(); } }
+        function hapusMahasiswa(id, event) {
+            event.stopPropagation();
+            if(confirm("Hapus peserta ini?")) {
+                currentClass.students = currentClass.students.filter(s => s.id !== id);
+                if(currentClass.activeStudentId === id) currentClass.activeStudentId = currentClass.students.length > 0 ? currentClass.students[0].id : null;
+                saveDB(); renderStudentList(); renderMainView();
+            }
+        }
+
+		function toggleSelectStudent(id) {
+			// Pastikan id jadi string biar konsisten
+			const strId = String(id);
+			
+			if (selectedToDelete.has(strId)) {
+				selectedToDelete.delete(strId);
+			} else {
+				selectedToDelete.add(strId);
+			}
+			// Render ulang biar checklist-nya muncul/hilang
+			renderStudentList(); 
+		}
+
+		// 1. FUNGSI GANTI MODE (Normal <-> Hapus)
+		function toggleDeleteMode(active) {
+			isDeleteMode = active;      // Ubah status mode
+			selectedToDelete.clear();   // Bersihkan ingatan seleksi
+			renderStudentList();        // Gambar ulang sidebar
+		}
+
+		// 2. FUNGSI EKSEKUSI HAPUS (YANG DIPERBAIKI)
+		// A. TOMBOL HAPUS DIKLIK -> BUKA MODAL SAJA
+		function eksekusiHapus() { // Nama fungsinya tetap biar tombol HTML gak perlu diubah
+			if (selectedToDelete.size === 0) {
+				// Pake alert biasa gapapa kalau cuma warning seleksi
+				return alert("Pilih minimal satu mahasiswa dulu, Bro!"); 
+			}
+			
+			// Update teks jumlah di dalam modal
+			document.getElementById('del-count-display').innerText = selectedToDelete.size;
+			
+			// Tampilkan Modal Keren
+			document.getElementById('deleteConfirmModal').showModal();
+		}
+
+		function prosesHapusFinal() {
+			// 1. TUTUP MODAL DULUAN (Prioritas Utama)
+			// Biar animasi tutup modal jalan mulus sebelum proses berat dimulai
+			document.getElementById('deleteConfirmModal').close();
+
+			// 2. EKSEKUSI SETELAH JEDA SINGKAT (100ms)
+			setTimeout(() => {
+				// --- A. HAPUS DATA ---
+				// Filter: Buang yang ID-nya ada di daftar hapus
+				currentClass.students = currentClass.students.filter(s => !selectedToDelete.has(String(s.id)));
+
+				// --- B. AUTO-SELECT ITEM PERTAMA (IDE BRO ARIES) ---
+				// Kita paksa pilih mahasiswa urutan ke-0 (paling atas) yang tersisa.
+				// Ini memaksa sistem membaca ulang data baru.
+				if (currentClass.students.length > 0) {
+					currentClass.activeStudentId = currentClass.students[0].id;
+				} else {
+					currentClass.activeStudentId = null; // Kalau habis semua
+				}
+
+				// --- C. MATIKAN MODE HAPUS (RESET TOTAL) ---
+				isDeleteMode = false;
+				selectedToDelete.clear();
+
+				// --- D. UPDATE TOMBOL SIDEBAR MANUAL ---
+				// Kita paksa sembunyikan tombol hapus tanpa nunggu render
+				const btnNormal = document.getElementById('btn-group-normal');
+				const btnDelete = document.getElementById('btn-group-delete');
+				if(btnNormal) btnNormal.classList.remove('hidden');
+				if(btnDelete) {
+					btnDelete.classList.add('hidden');
+					btnDelete.classList.remove('flex');
+				}
+
+				// --- E. SIMPAN & RENDER ---
+				saveCurrentClass();
+				
+				// Bersihkan HTML list secara manual biar bener-bener kosong
+				const listEl = document.getElementById('student-list');
+				if(listEl) listEl.innerHTML = ''; 
+				
+				// Gambar Ulang Semuanya
+				renderStudentList();
+				renderMainView();
+				
+			}, 100); 
+		}
+
+		// Fungsi helper select biasa (tetap diperlukan)
+		function selectStudent(id) {
+			currentClass.activeStudentId = id;
+			renderStudentList();
+			renderMainView();
+		}
+        // STATS & DOWNLOAD (Kode Tetap Sama)
+        function showStats() {
+            if(!currentClass || currentClass.students.length===0) return alert("Belum ada data.");
+            const m = document.getElementById('statsModal');
+            let t=0, max=-1, min=101, c={}; gradeRules.forEach(r => c[r.label]=0);
+            currentClass.students.forEach(s=>{ const sc=hitungSkor(s.scores); t+=sc; if(sc>max)max=sc; if(sc<min)min=sc; const g=getGrade(sc); if(c[g]!==undefined)c[g]++; });
+            document.getElementById('stat-avg').innerText=(t/currentClass.students.length).toFixed(1);
+            document.getElementById('stat-max').innerText=max.toFixed(1);
+            document.getElementById('stat-min').innerText=min.toFixed(1);
+            if(chartInstance) chartInstance.destroy();
+            const lbls=gradeRules.map(r=>r.label); const dps=lbls.map(l=>c[l]);
+            const bgs=gradeRules.map(r=>{ const map={'green':'#10b981','blue':'#3b82f6','yellow':'#f59e0b','orange':'#f97316','red':'#ef4444'}; return map[r.color]||'#9ca3af'; });
+            chartInstance = new Chart(document.getElementById('gradeChart'), { type:'bar', data:{labels:lbls, datasets:[{label:'Jml', data:dps, backgroundColor:bgs}]} });
+            m.showModal();
+        }
+
+        // SETTINGS RULES (Kode Tetap Sama)
+        function openSettings() {
+            const m = document.getElementById('settingsModal'); const tb = document.getElementById('settings-table-body'); tb.innerHTML = '';
+            gradeRules.sort((a,b)=>b.min - a.min).forEach(r => {
+                const tr=document.createElement('tr'); tr.className="border-b border-slate-100";
+                tr.innerHTML=`<td class="p-2"><input type="text" value="${r.label}" class="w-16 p-1 border rounded text-center font-bold uppercase input-label"></td><td class="p-2"><input type="number" value="${r.min}" class="w-16 p-1 border rounded text-center input-min"></td><td class="p-2"><select class="p-1 border rounded text-xs input-color"><option value="green" ${r.color==='green'?'selected':''}>Hijau</option><option value="blue" ${r.color==='blue'?'selected':''}>Biru</option><option value="yellow" ${r.color==='yellow'?'selected':''}>Kuning</option><option value="orange" ${r.color==='orange'?'selected':''}>Jingga</option><option value="red" ${r.color==='red'?'selected':''}>Merah</option></select></td><td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" size="16"></i></button></td>`;
+                tb.appendChild(tr);
+            });
+            lucide.createIcons(); m.showModal();
+        }
+        function addSettingRow() { const tb = document.getElementById('settings-table-body'); const tr = document.createElement('tr'); tr.innerHTML = `<td class="p-2"><input type="text" value="?" class="w-16 p-1 border rounded text-center font-bold uppercase input-label"></td><td class="p-2"><input type="number" value="0" class="w-16 p-1 border rounded text-center input-min"></td><td class="p-2"><select class="p-1 border rounded text-xs input-color"><option value="green">Hijau</option><option value="blue">Biru</option><option value="yellow">Kuning</option><option value="orange">Jingga</option><option value="red">Merah</option></select></td><td class="p-2 text-center"><button onclick="this.closest('tr').remove()" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" size="16"></i></button></td>`; tb.appendChild(tr); lucide.createIcons(); }
+        function saveSettings() { const rows = document.querySelectorAll('#settings-table-body tr'); const nr = []; rows.forEach(r => { const l = r.querySelector('.input-label').value.trim(); const m = Number(r.querySelector('.input-min').value); const c = r.querySelector('.input-color').value; if(l) nr.push({label:l, min:m, color:c}); }); if(nr.length===0) return alert("Minimal 1 aturan grade!"); gradeRules = nr; localStorage.setItem('grader_rules', JSON.stringify(gradeRules)); document.getElementById('settingsModal').close(); if(currentClass) { renderStudentList(); renderMainView(); } }
+        function resetSettings() { if(confirm("Reset?")) { gradeRules=JSON.parse(JSON.stringify(defaultRules)); localStorage.setItem('grader_rules', JSON.stringify(gradeRules)); openSettings(); } }
+        function closeSettings(){ document.getElementById('settingsModal').close(); }
+
+        // DOWNLOAD EXCEL & IMPORT (Kode Tetap Sama)
+        function downloadExcel() {
+            if (!currentClass) return;
+            let h = ["No", "NIM", "Nama"]; currentClass.template.forEach(k => h.push(`${k.nama} (${k.bobot}%)`)); h.push("Total", "Grade", "Catatan");
+            let rows = currentClass.students.map((m, i) => { let r = [i+1, m.nim, m.nama]; currentClass.template.forEach(k => r.push(m.scores[k.id]||0)); const s = hitungSkor(m.scores); r.push(s.toFixed(2), getGrade(s), m.feedback||"-"); return r; });
+            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.aoa_to_sheet([h, ...rows]); XLSX.utils.book_append_sheet(wb, ws, "Rekap Nilai");
+            const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' }); const blob = new Blob([wbout], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+            const safeName = currentClass.name.replace(/[^a-zA-Z0-9 ]/g, "").trim(); const fileName = `${safeName}_Rekap_${Date.now()}.xlsx`;
+            const url = window.URL.createObjectURL(blob); const a = document.createElement("a"); document.body.appendChild(a); a.href = url; a.download = fileName; a.target = "_blank";
+            const clickEvent = new MouseEvent("click", { "view": window, "bubbles": true, "cancelable": false }); a.dispatchEvent(clickEvent);
+            setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 1000);
+        }
+        function handleFileImport(e) {
+            const f = e.target.files[0]; if(!f || !currentClass) return; const r = new FileReader();
+            r.onload = (e) => { const w = XLSX.read(new Uint8Array(e.target.result), {type:'array'}); const j = XLSX.utils.sheet_to_json(w.Sheets[w.SheetNames[0]], {header:1}); if(j.length > 1) { let c=0; for(let i=1; i<j.length; i++) { if(j[i].length > 1) { currentClass.students.push({ id: 'imp_'+Date.now()+i, nim: j[i][1]?String(j[i][1]):"", nama: j[i][2]?String(j[i][2]):"Tanpa Nama", scores:{}, feedback:'' }); c++; } } alert(`Import ${c} data berhasil!`); saveDB(); renderStudentList(); } }; r.readAsArrayBuffer(f); e.target.value = '';
+        }
+
+        // INITIALIZATION
+        window.addEventListener('pywebviewready', loadData);
+        loadData(); // Call direct for browser support
+    </script>
+</body>
+</html>

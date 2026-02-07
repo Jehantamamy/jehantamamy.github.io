@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio & Dashboard | Aries Jehan</title>
+    <title>Jehan's Zone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; scroll-behavior: smooth; }
@@ -18,7 +18,7 @@
 <body class="font-sans">
 
     <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto sticky top-0 bg-[#0f172a]/80 backdrop-blur-md z-40">
-        <h1 class="text-2xl font-bold text-sky-400 underline decoration-2">DevResearcher</h1>
+        <h1 class="text-2xl font-bold text-sky-400 underline decoration-2">Aries Media</h1>
         <div class="space-x-6 text-sm">
             <a href="#about" class="hover:text-sky-400">About</a>
             <a href="#projects" class="hover:text-sky-400 font-bold text-sky-500" onclick="closeApp()">Dashboard</a>
@@ -30,7 +30,7 @@
 
     <div id="main-content">
         <header class="py-12 px-6 max-w-6xl mx-auto text-center md:text-left">
-            <h2 class="text-5xl md:text-7xl font-extrabold mb-4">Lector & <span class="text-sky-500 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">Robotics Engineer.</span></h2>
+            <h2 class="text-5xl md:text-7xl font-extrabold mb-4">Lecturer & <span class="text-sky-500 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">Robotics Engineer.</span></h2>
             <p class="text-gray-400 text-lg max-w-2xl">Dashboard manajemen aplikasi dan proyek penelitian otonom.</p>
         </header>
 
@@ -96,9 +96,9 @@
         // Di GitHub Pages, data ini bisa Anda simpan di sini secara manual 
         // atau simpan di LocalStorage agar tersimpan di browser Anda.
         let programs = [
-            { name: "Secure Finance System", file: "finance.html", category: "Desktop App", icon: "$$$", color: "sky" },
-            { name: "Control System UAV", file: "uav_control.html", category: "Research", icon: "🚁", color: "emerald" },
-            { name: "Transcript Analyzer", file: "transkrip.html", category: "Utility", icon: "📊", color: "purple" }
+            { name: "Secure Finance System", file: "finance.html", ket: "Program Keuangan", category: "Desktop App", icon: "$$$", color: "sky" },
+            { name: "GraderA", file: "GraderA/index.html", ket: "Program Penilaian Presentasi",category: "Utility", icon: "📊", color: "sky" },
+            { name: "Transcript Analyzer", file: "transkrip.html", ket: "Analisis dan Simulasi Nilai Transkrip Mahasiswa", category: "Utility", icon: "📊", color: "purple" }
         ];
 
         // Load programs on start
@@ -111,7 +111,7 @@
                     <div class="card p-6 rounded-xl border border-gray-700 shadow-xl cursor-pointer" onclick="openApp('${p.file}', '${p.name}')">
                         <div class="text-${p.color || 'sky'}-500 mb-4 font-mono text-sm uppercase tracking-widest">${p.category}</div>
                         <h4 class="text-xl font-bold mb-2">${p.name}</h4>
-                        <p class="text-gray-400 text-sm mb-4">Akses modul program langsung dari dashboard ini.</p>
+                        <p class="text-gray-400 text-sm mb-4">${p.ket}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-xs font-bold text-sky-400">Open Module →</span>
                             <span class="text-2xl">${p.icon || '📁'}</span>
