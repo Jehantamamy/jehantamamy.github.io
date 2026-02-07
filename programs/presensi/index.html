@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>PENTOL - Presensi & Nilai Terpadu Online</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="app-bar">
+        <button id="btn-back" class="nav-icon" style="display: none;">←</button>
+        <h1 id="app-title">PENTOL</h1>
+        <div id="user-display" class="user-info"></div>
+    </header>
+
+    <main id="app-content">
+
+        <section id="page-login" class="page active">
+            <div class="card login-box">
+                <h2>Selamat Datang</h2>
+                <p>Silakan masuk ke sistem PENTOL</p>
+                <input type="text" id="username" placeholder="Username/NIP">
+                <input type="password" id="password" placeholder="Password">
+                <select id="role-select">
+                    <option value="guru">Guru / Dosen</option>
+                    <option value="waka">Waka Kurikulum / SekProdi</option>
+                    <option value="kepsek">Kepsek / Kaprodi</option>
+                </select>
+                <button onclick="handleLogin()" class="btn-main">Masuk ke Sistem</button>
+            </div>
+        </section>
+
+        <section id="page-guru" class="page">
+            <div class="card">
+                <h3>Pilih Jadwal Mengajar</h3>
+                <select id="jadwal-select">
+                    <option value="">-- Pilih Kelas & Mata Pelajaran --</option>
+                </select>
+                <hr>
+                <div class="quick-action">
+                    <button onclick="startScan()" class="btn-scan">SCAN QR CODE</button>
+                    <input type="text" id="manual-input" placeholder="Input Nama Siswa...">
+                </div>
+            </div>
+            <div class="card">
+                <h3>List Kehadiran Siswa</h3>
+                <ul id="attendance-list" class="list-group"></ul>
+                <button onclick="goToPage('page-penilaian')" class="btn-secondary">Lanjut ke Penilaian Harian →</button>
+            </div>
+        </section>
+
+        <section id="page-penilaian" class="page">
+            <div class="card">
+                <h3>Penilaian Keaktifan Siswa</h3>
+                <p id="target-student">Pilih siswa dari list...</p>
+                <div class="grade-input-group">
+                    <input type="number" id="daily-grade" placeholder="Nilai (0-100)">
+                    <textarea id="daily-note" placeholder="Catatan keaktifan..."></textarea>
+                </div>
+                <button onclick="saveDailyGrade()" class="btn-main">Simpan Nilai Pertemuan</button>
+            </div>
+        </section>
+
+        <section id="page-waka" class="page">
+            <div class="card">
+                <h3>Manajemen Kelas & Pengajar</h3>
+                <button class="btn-secondary">Buat Identitas Kelas Baru</button>
+                <hr>
+                <h4>Import Data Kelas</h4>
+                <input type="file" id="excel-import" accept=".xls,.xlsx" style="display: none;">
+                <button onclick="document.getElementById('excel-import').click()" class="btn-outline">Import via Excel (List Siswa)</button>
+                <p class="hint">*Mendukung format .xlsx untuk satu kelas sekaligus</p>
+            </div>
+            <div class="card">
+                <h3>Distribusi Pengajar</h3>
+                <div id="distribusi-list"></div>
+            </div>
+        </section>
+
+        <section id="page-kepsek" class="page">
+            <div class="card">
+                <h3>Laporan KBM Terpadu</h3>
+                <div class="report-filter">
+                    <select id="filter-guru"><option>Semua Guru/Dosen</option></select>
+                </div>
+                <div id="report-viewer" class="stats-box">
+                    <div class="stat-item"><h4>Kuantitatif</h4><p id="stat-porsen">95% Kehadiran</p></div>
+                    <div class="stat-item"><h4>Kualitatif</h4><p id="stat-desc">Sangat Baik</p></div>
+                </div>
+                <button onclick="printReport()" class="btn-main">Cetak Laporan Lengkap (PDF)</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="app.js" type="module"></script>
+</body>
+</html>

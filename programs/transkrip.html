@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulator & Analisis Transkrip</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #166534;
+            --danger: #dc2626;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: #1e293b;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-card p { margin: 10px 0 0; font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 0.5s; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 0.85rem; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+
+        /* Styling Select untuk Nilai */
+        .select-nilai {
+            padding: 5px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-weight: bold;
+            cursor: pointer;
+            width: 70px;
+        }
+        .bg-danger { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
+        .bg-safe { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2 style="text-align:center; color: var(--primary);">Simulator IPK Transkrip</h2>
+
+    <div class="upload-area">
+        <input type="file" id="pdf-upload" accept="application/pdf">
+        <p style="font-size: 0.8rem; color: #64748b;">Unggah PDF -> Ubah nilai di tabel untuk simulasi</p>
+    </div>
+
+    <div id="stats-dashboard" class="stats-grid" style="display: none;">
+        <div class="stat-card"><h3>IPK</h3><p id="stat-ipk">0.00</p></div>
+        <div class="stat-card">
+            <h3>SKS</h3><p id="stat-sks">0/144</p>
+            <div class="progress-container"><div class="progress-bar" id="sks-progress"></div></div>
+        </div>
+        <div class="stat-card"><h3>Total Poin</h3><p id="stat-poin">0</p></div>
+    </div>
+
+    <table id="result-table" style="display:none;">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Mata Kuliah</th>
+                <th style="width: 60px;">SKS</th>
+                <th style="width: 100px;">Nilai (Edit)</th>
+                <th style="width: 80px;">Poin</th>
+            </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+    </table>
+</div>
+
+<script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
+
+    const bobotNilai = { 'A': 4, 'A-': 3.75, 'AB': 3.5, 'B+': 3.25, 'B': 3, 'B-': 2.75, 'BC': 2.5, 'C+': 2.25, 'C': 2, 'D': 1, 'E': 0 };
+
+    document.getElementById('pdf-upload').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            let fullText = "";
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                fullText += content.items.map(item => item.str).join("  ") + " \n";
+            }
+            parseData(fullText);
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    // Ganti fungsi parseData di dalam tag <script> dengan versi ini:
+
+	function parseData(text) {
+		// Regex yang lebih toleran terhadap karakter unik dan baris baru
+		// Menambahkan pencarian untuk nama yang sangat panjang
+		const regex = /(?!\bHalaman\b|\bPage\b)([A-Z][A-Z0-9\s\/\-\(\)]{7,})\s+([1-6])\s+([A-E][ABCDE+\-]?)/g;
+		
+		// Membersihkan teks dari line break yang tidak perlu agar nama panjang tersambung
+		const cleanedText = text.replace(/\n/g, " "); 
+		
+		let match, count = 1;
+		const tbody = document.getElementById('table-body');
+		tbody.innerHTML = "";
+
+		while ((match = regex.exec(cleanedText)) !== null) {
+			const nama = match[1].trim();
+			const sks = match[2];
+			const nilaiAwal = match[3];
+
+			const row = document.createElement('tr');
+			row.innerHTML = `
+				<td>${count++}</td>
+				<td style="font-size: 0.85rem; max-width: 300px;">${nama}</td>
+				<td class="sks-val">${sks}</td>
+				<td>
+					<select class="select-nilai" onchange="hitungUlang()">
+						${Object.keys(bobotNilai).map(n => `<option value="${n}" ${n === nilaiAwal ? 'selected' : ''}>${n}</option>`).join('')}
+					</select>
+				</td>
+				<td class="poin-row">0</td>
+			`;
+			tbody.appendChild(row);
+		}
+		document.getElementById('result-table').style.display = "table";
+		document.getElementById('stats-dashboard').style.display = "grid";
+		hitungUlang();
+	}
+
+    function hitungUlang() {
+        let totalSks = 0;
+        let totalPoin = 0;
+        
+        document.querySelectorAll('#table-body tr').forEach(row => {
+            const sks = parseInt(row.querySelector('.sks-val').textContent);
+            const nilai = row.querySelector('.select-nilai').value;
+            const selectEl = row.querySelector('.select-nilai');
+            
+            const poinMK = bobotNilai[nilai] || 0;
+            const subTotal = sks * poinMK;
+            
+            // Update Tampilan Poin per Baris
+            row.querySelector('.poin-row').textContent = subTotal.toFixed(1);
+            
+            // Update Warna Dropdown
+            if(['C','D','E','BC','C+'].includes(nilai)) {
+                selectEl.className = 'select-nilai bg-danger';
+            } else {
+                selectEl.className = 'select-nilai bg-safe';
+            }
+
+            totalSks += sks;
+            totalPoin += subTotal;
+        });
+
+        const ipk = totalSks > 0 ? (totalPoin / totalSks).toFixed(2) : 0;
+        document.getElementById('stat-ipk').textContent = ipk;
+        document.getElementById('stat-sks').textContent = `${totalSks} / 144`;
+        document.getElementById('stat-poin').textContent = totalPoin.toFixed(1);
+        document.getElementById('sks-progress').style.width = Math.min((totalSks / 144) * 100, 100) + "%";
+    }
+</script>
+</body>
+</html>

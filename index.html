@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio & Dashboard | Aries Jehan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; scroll-behavior: smooth; }
+        .card { background: #1e293b; transition: transform 0.3s; }
+        .card:hover { transform: translateY(-5px); border-color: #38bdf8; }
+        /* Style untuk Iframe Wrapper */
+        .iframe-container { height: calc(100vh - 80px); width: 100%; border: none; }
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow: hidden; }
+    </style>
+</head>
+<body class="font-sans">
+
+    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto sticky top-0 bg-[#0f172a]/80 backdrop-blur-md z-40">
+        <h1 class="text-2xl font-bold text-sky-400 underline decoration-2">DevResearcher</h1>
+        <div class="space-x-6 text-sm">
+            <a href="#about" class="hover:text-sky-400">About</a>
+            <a href="#projects" class="hover:text-sky-400 font-bold text-sky-500" onclick="closeApp()">Dashboard</a>
+            <button onclick="toggleModal()" class="bg-sky-600 hover:bg-sky-500 px-4 py-2 rounded-lg text-xs font-bold transition">
+                + Tambah Program
+            </button>
+        </div>
+    </nav>
+
+    <div id="main-content">
+        <header class="py-12 px-6 max-w-6xl mx-auto text-center md:text-left">
+            <h2 class="text-5xl md:text-7xl font-extrabold mb-4">Lector & <span class="text-sky-500 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">Robotics Engineer.</span></h2>
+            <p class="text-gray-400 text-lg max-w-2xl">Dashboard manajemen aplikasi dan proyek penelitian otonom.</p>
+        </header>
+
+        <section id="projects" class="py-10 px-6 max-w-6xl mx-auto">
+            <h3 class="text-2xl font-bold mb-10 inline-block border-b-4 border-sky-500">App Launcher Dashboard</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="project-grid">
+                </div>
+        </section>
+    </div>
+
+    <div id="viewer-area" class="hidden">
+        <div class="bg-slate-900 p-4 flex justify-between items-center border-b border-gray-700">
+            <button onclick="closeApp()" class="text-gray-400 hover:text-white flex items-center gap-2">
+                ← Kembali ke Dashboard
+            </button>
+            <h3 id="active-app-title" class="text-sky-400 font-bold"></h3>
+            <div class="text-xs text-gray-500" id="active-app-path"></div>
+        </div>
+        <iframe id="app-frame" class="iframe-container"></iframe>
+    </div>
+
+    <div id="modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
+        <div class="modal-overlay absolute w-full h-full bg-black opacity-70"></div>
+        <div class="modal-container bg-[#1e293b] w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-y-auto border border-gray-700">
+            <div class="modal-content py-6 text-left px-8">
+                <h3 class="text-xl font-bold text-sky-400 mb-4">Register New Program</h3>
+                <p class="text-gray-400 text-sm mb-6">Masukkan detail file HTML yang berada di folder program Anda.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Nama Program</label>
+                        <input type="text" id="prog-name" placeholder="Contoh: Analisis Transkrip" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Nama File (.html)</label>
+                        <input type="text" id="prog-file" placeholder="Contoh: transkrip.html" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">Kategori</label>
+                        <select id="prog-cat" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
+                            <option value="Desktop App">Desktop App</option>
+                            <option value="Research">Research</option>
+                            <option value="Utility">Utility</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-8 gap-3">
+                    <button onclick="toggleModal()" class="px-4 py-2 bg-transparent text-gray-400 hover:text-white transition text-sm">Batal</button>
+                    <button onclick="addNewProgram()" class="px-6 py-2 bg-sky-600 rounded-xl font-bold hover:bg-sky-500 transition text-sm">Simpan ke List</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="py-10 text-center border-t border-gray-800 text-gray-500 text-sm">
+        <p>&copy; 2026 Aries Jehan Tamamy. Crafted with code and passion.</p>
+    </footer>
+
+    <script>
+        // Database Program (JSON)
+        // Di GitHub Pages, data ini bisa Anda simpan di sini secara manual 
+        // atau simpan di LocalStorage agar tersimpan di browser Anda.
+        let programs = [
+            { name: "Secure Finance System", file: "finance.html", category: "Desktop App", icon: "$$$", color: "sky" },
+            { name: "Control System UAV", file: "uav_control.html", category: "Research", icon: "🚁", color: "emerald" },
+            { name: "Transcript Analyzer", file: "transkrip.html", category: "Utility", icon: "📊", color: "purple" }
+        ];
+
+        // Load programs on start
+        function renderPrograms() {
+            const grid = document.getElementById('project-grid');
+            grid.innerHTML = '';
+            
+            programs.forEach((p, index) => {
+                const card = `
+                    <div class="card p-6 rounded-xl border border-gray-700 shadow-xl cursor-pointer" onclick="openApp('${p.file}', '${p.name}')">
+                        <div class="text-${p.color || 'sky'}-500 mb-4 font-mono text-sm uppercase tracking-widest">${p.category}</div>
+                        <h4 class="text-xl font-bold mb-2">${p.name}</h4>
+                        <p class="text-gray-400 text-sm mb-4">Akses modul program langsung dari dashboard ini.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-sky-400">Open Module →</span>
+                            <span class="text-2xl">${p.icon || '📁'}</span>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += card;
+            });
+        }
+
+        function openApp(fileName, title) {
+            window.history.pushState({view: 'app'}, title, `#app/${fileName}`);
+			document.getElementById('main-content').classList.add('hidden');
+            document.getElementById('viewer-area').classList.remove('hidden');
+            document.getElementById('app-frame').src = "programs/" + fileName; // Membuka file di folder 'programs'
+            document.getElementById('active-app-title').innerText = title;
+            document.getElementById('active-app-path').innerText = "path: /programs/" + fileName;
+            window.scrollTo(0,0);
+        }
+
+        function closeApp() {
+            document.getElementById('main-content').classList.remove('hidden');
+            document.getElementById('viewer-area').classList.add('hidden');
+            document.getElementById('app-frame').src = "";
+        }
+
+        // Modal Logic
+        function toggleModal() {
+            const body = document.querySelector('body');
+            const modal = document.querySelector('#modal');
+            modal.classList.toggle('opacity-0');
+            modal.classList.toggle('pointer-events-none');
+            body.classList.toggle('modal-active');
+        }
+
+        function addNewProgram() {
+            const name = document.getElementById('prog-name').value;
+            const file = document.getElementById('prog-file').value;
+            const cat = document.getElementById('prog-cat').value;
+
+            if(name && file) {
+                programs.push({
+                    name: name,
+                    file: file,
+                    category: cat,
+                    icon: "⚙️",
+                    color: cat === 'Research' ? 'emerald' : 'sky'
+                });
+                renderPrograms();
+                toggleModal();
+                // Reset form
+                document.getElementById('prog-name').value = '';
+                document.getElementById('prog-file').value = '';
+            } else {
+                alert("Mohon isi nama dan file program.");
+            }
+        }
+		
+		window.onpopstate = function(event) {
+			closeApp();
+		};
+        // Inisialisasi
+        renderPrograms();
+    </script>
+</body>
+</html>
