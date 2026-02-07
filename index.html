@@ -3,178 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jehan's Zone</title>
+    <title>Aries Tech Lab | Robotics & Software Engineering</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
     <style>
-        body { background-color: #0f172a; color: #f8fafc; scroll-behavior: smooth; }
-        .card { background: #1e293b; transition: transform 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: #38bdf8; }
-        /* Style untuk Iframe Wrapper */
-        .iframe-container { height: calc(100vh - 80px); width: 100%; border: none; }
-        .modal { transition: opacity 0.25s ease; }
-        body.modal-active { overflow: hidden; }
+        :root { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+        .iframe-view { height: calc(100vh - 64px); width: 100%; border: none; }
+        .nav-link { transition: all 0.3s ease; }
+        /* Animasi Transisi */
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="font-sans">
+<body class="antialiased">
 
-    <nav class="p-6 flex justify-between items-center max-w-6xl mx-auto sticky top-0 bg-[#0f172a]/80 backdrop-blur-md z-40">
-        <h1 class="text-2xl font-bold text-sky-400 underline decoration-2">Aries Media</h1>
-        <div class="space-x-6 text-sm">
-            <a href="#about" class="hover:text-sky-400">About</a>
-            <a href="#projects" class="hover:text-sky-400 font-bold text-sky-500" onclick="closeApp()">Dashboard</a>
-            <button onclick="toggleModal()" class="bg-sky-600 hover:bg-sky-500 px-4 py-2 rounded-lg text-xs font-bold transition">
-                + Tambah Program
-            </button>
+    <nav class="fixed top-0 w-full z-50 bg-[#0f172a]/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium">
+                <a href="#about" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Tentang</a>
+                <a href="#dashboard" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Dashboard</a>
+                <a href="#catalog" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Katalog</a>
+				<a href="#services" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Jenis Pelayanan</a>
+                <a href="#custom" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Jasa Custom</a>
+                
+            </div>
+
+            <div class="md:hidden text-sky-400 text-xs font-bold">MENU</div>
         </div>
     </nav>
 
-    <div id="main-content">
-        <header class="py-12 px-6 max-w-6xl mx-auto text-center md:text-left">
-            <h2 class="text-5xl md:text-7xl font-extrabold mb-4">Lecturer & <span class="text-sky-500 text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">Robotics Engineer.</span></h2>
-            <p class="text-gray-400 text-lg max-w-2xl">Dashboard manajemen aplikasi dan proyek penelitian otonom.</p>
+    <main id="landing-page" class="pt-16 fade-in">
+        
+        <header id="about" class="relative overflow-hidden py-24 px-6">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full -z-10 opacity-20">
+                <div class="absolute top-0 left-1/4 w-72 h-72 bg-sky-500 rounded-full blur-[120px]"></div>
+                <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500 rounded-full blur-[150px]"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 text-center md:text-left">
+                    <div class="inline-block px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-mono font-bold mb-6 tracking-widest uppercase">
+                        University Lecturer, Writer, Illustrator & Robotics Engineer
+                    </div>
+                    <h2 class="text-5xl md:text-7xl font-extrabold leading-[1.1] mb-6">
+                        Menjembatani Riset dengan <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400 italic">Solusi Nyata.</span>
+                    </h2>
+                    <p class="text-slate-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
+                        Dosen universitas yang berfokus pada <span class="text-white font-semibold">Embedded Systems</span>, Senior Developer aplikasi desktop cerdas, dan penulis yang berdedikasi mengembangkan ekosistem teknologi inovatif.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4 justify-center md:justify-start">
+                        <a href="#catalog" class="px-8 py-3 bg-white text-slate-900 rounded-full font-bold hover:bg-sky-400 hover:text-white transition-all shadow-xl">
+                            Lihat Katalog Produk
+                        </a>
+                        <a href="#custom" class="px-8 py-3 border border-slate-700 rounded-full font-bold hover:bg-slate-800 transition-all">
+                            Diskusi Proyek Kustom
+                        </a>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-auto grid grid-cols-2 gap-4">
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-sky-500/50 transition-colors">
+                        <div class="text-3xl mb-2">🤖</div>
+                        <div class="text-sm font-bold">Robotics</div>
+                        <div class="text-[10px] text-slate-500 font-mono">Control & Robotic Systems</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-emerald-500/50 transition-colors">
+                        <div class="text-3xl mb-2">💻</div>
+                        <div class="text-sm font-bold">Electron.js</div>
+                        <div class="text-[10px] text-slate-500 font-mono">Enterprise Desktop</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
+                        <div class="text-3xl mb-2">⚙️</div>
+                        <div class="text-sm font-bold">Embedded</div>
+                        <div class="text-[10px] text-slate-500 font-mono">C++ & Microcontroller</div>
+                    </div>
+                    <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-amber-500/50 transition-colors">
+                        <div class="text-3xl mb-2">📚</div>
+                        <div class="text-sm font-bold">Academic</div>
+                        <div class="text-[10px] text-slate-500 font-mono">Mentoring & Writing</div>
+                    </div>
+                </div>
+            </div>
         </header>
 
-        <section id="projects" class="py-10 px-6 max-w-6xl mx-auto">
-            <h3 class="text-2xl font-bold mb-10 inline-block border-b-4 border-sky-500">App Launcher Dashboard</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="project-grid">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-slate-800 to-transparent"></div>
+        </div>
+
+        <section id="dashboard" class="py-20 px-6 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div>
+                    <h3 class="text-3xl font-bold text-white mb-2">Engineering and Academic Sandbox</h3>
+                    <p class="text-slate-400">Kumpulan alat bantu dan simulasi teknis untuk riset & akademik.</p>
+                </div>
+                <div class="flex gap-3">
+                    <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded text-[10px] font-mono text-slate-500 uppercase">Total: <span id="app-count" class="text-sky-400">0</span> Programs</span>
+                </div>
+            </div>
+
+            <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 </div>
         </section>
-    </div>
-
-    <div id="viewer-area" class="hidden">
-        <div class="bg-slate-900 p-4 flex justify-between items-center border-b border-gray-700">
-            <button onclick="closeApp()" class="text-gray-400 hover:text-white flex items-center gap-2">
-                ← Kembali ke Dashboard
-            </button>
-            <h3 id="active-app-title" class="text-sky-400 font-bold"></h3>
-            <div class="text-xs text-gray-500" id="active-app-path"></div>
-        </div>
-        <iframe id="app-frame" class="iframe-container"></iframe>
-    </div>
-
-    <div id="modal" class="modal opacity-0 pointer-events-none fixed w-full h-full top-0 left-0 flex items-center justify-center z-50">
-        <div class="modal-overlay absolute w-full h-full bg-black opacity-70"></div>
-        <div class="modal-container bg-[#1e293b] w-11/12 md:max-w-md mx-auto rounded-2xl shadow-2xl z-50 overflow-y-auto border border-gray-700">
-            <div class="modal-content py-6 text-left px-8">
-                <h3 class="text-xl font-bold text-sky-400 mb-4">Register New Program</h3>
-                <p class="text-gray-400 text-sm mb-6">Masukkan detail file HTML yang berada di folder program Anda.</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs text-gray-500 block mb-1">Nama Program</label>
-                        <input type="text" id="prog-name" placeholder="Contoh: Analisis Transkrip" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 block mb-1">Nama File (.html)</label>
-                        <input type="text" id="prog-file" placeholder="Contoh: transkrip.html" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 block mb-1">Kategori</label>
-                        <select id="prog-cat" class="w-full bg-slate-900 border border-gray-700 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
-                            <option value="Desktop App">Desktop App</option>
-                            <option value="Research">Research</option>
-                            <option value="Utility">Utility</option>
-                        </select>
-                    </div>
+		
+		<section id="catalog" class="py-24 px-6 bg-slate-900/50">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Products</h3>
+                    <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Software siap pakai dengan standar keamanan tinggi dan arsitektur desktop modern untuk kebutuhan institusi Anda.</p>
                 </div>
 
-                <div class="flex justify-end pt-8 gap-3">
-                    <button onclick="toggleModal()" class="px-4 py-2 bg-transparent text-gray-400 hover:text-white transition text-sm">Batal</button>
-                    <button onclick="addNewProgram()" class="px-6 py-2 bg-sky-600 rounded-xl font-bold hover:bg-sky-500 transition text-sm">Simpan ke List</button>
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl">
+                    <div class="flex flex-col lg:flex-row">
+                        <div class="lg:w-2/5 bg-slate-950 p-8 flex items-center justify-center relative overflow-hidden group">
+                            <img src="assets/accountant.png" alt="Screenshot Secure Finance" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700">
+                            
+                            <div class="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/60 group-hover:bg-transparent transition-all pointer-events-none">
+                                <span class="text-4xl mb-2">📸</span>
+                                <span class="text-[10px] font-mono text-sky-500 uppercase tracking-widest">Preview Screenshot</span>
+                            </div>
+                        </div>
+                        
+                        <div class="lg:w-3/5 p-8 md:p-12">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h4 class="text-2xl font-bold text-white mb-1">Secure School Finance Management</h4>
+                                    <p class="text-sky-400 font-mono text-xs uppercase tracking-widest">Enterprise Desktop Solution</p>
+                                </div>
+                                <span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-3 py-1 rounded-full border border-emerald-500/20 font-bold uppercase">Ready to Deploy</span>
+                            </div>
+
+                            <p class="text-slate-400 text-sm mb-8 leading-relaxed">
+                                Solusi manajemen keuangan sekolah berbasis Electron.js dengan fokus utama pada kedaulatan data. Sistem berjalan sepenuhnya offline dengan sistem lisensi berbasis hardware ID untuk memastikan keamanan investasi perangkat lunak Anda.
+                            </p>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                                <div class="space-y-3">
+                                    <h5 class="text-xs font-bold text-slate-300 uppercase tracking-wider italic">Security Engine:</h5>
+                                    <ul class="text-xs text-slate-500 space-y-2">
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> AES-256 Encrypted Local Database</li>
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> Hardware Machine-ID Locking</li>
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> Anti-DevTools Production Hardening</li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-3">
+                                    <h5 class="text-xs font-bold text-slate-300 uppercase tracking-wider italic">Business Core:</h5>
+                                    <ul class="text-xs text-slate-500 space-y-2">
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> Automated Data Backup/Restore</li>
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> Excel Import/Export Integration</li>
+                                        <li class="flex items-center gap-2"> <span class="text-sky-500">✔</span> Transaction Limit Trial Mode</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-4">
+                                <a href="https://wa.me/6285869418606?text=Halo%20Aries%20Tech%20Lab,%20saya%20tertarik%20dengan%20produk%20Secure%20Finance" target="_blank" class="px-8 py-3 bg-sky-600 hover:bg-sky-500 rounded-xl font-bold text-sm transition-all shadow-lg text-white">
+                                    Minta Demo
+                                </a>
+                                <a href="mailto:aries.media@email.com?subject=Tanya%20Produk%20Secure%20Finance" class="px-8 py-3 border border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all text-white text-center">
+                                    Email Diskusi
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+		
+		<section id="services" class="py-24 px-6 max-w-7xl mx-auto">
+			<div class="text-center mb-16">
+				<h3 class="text-3xl font-bold text-white mb-4">Layanan Konsultasi & Pengembangan</h3>
+				<p class="text-slate-400">Pilih skema kerjasama yang paling sesuai dengan kebutuhan riset atau bisnis Anda.</p>
+			</div>
+
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-sky-500 transition-all group">
+					<h4 class="text-sky-400 font-bold mb-4 uppercase tracking-widest text-xs">Research Support</h4>
+					<div class="text-3xl font-bold text-white mb-6">Konsultasi</div>
+					<ul class="text-xs text-slate-500 space-y-4 mb-10">
+						<li>• Review Metodologi & Arsitektur</li>
+						<li>• Troubleshooting Firmware</li>
+						<li>• Sesi Diskusi 1-on-1 (60 Menit)</li>
+					</ul>
+					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Mulai Diskusi</a>
+				</div>
+
+				<div class="p-8 rounded-2xl bg-sky-600 border border-sky-400 shadow-2xl shadow-sky-600/20 transform scale-105">
+					<h4 class="text-white font-bold mb-4 uppercase tracking-widest text-xs opacity-80">Full Development</h4>
+					<div class="text-3xl font-bold text-white mb-6">Custom Project</div>
+					<ul class="text-xs text-white/80 space-y-4 mb-10">
+						<li>• Pembuatan Prototype Fisik</li>
+						<li>• Software Desktop + Hardware</li>
+						<li>• Dokumentasi & Garansi Sistem</li>
+					</ul>
+					<a href="#custom" class="block text-center py-3 rounded-lg bg-white text-sky-600 font-bold text-sm hover:bg-slate-100 transition">Pesan Sekarang</a>
+				</div>
+
+				<div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-emerald-500 transition-all">
+					<h4 class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-xs">Bulk License</h4>
+					<div class="text-3xl font-bold text-white mb-6">Enterprise</div>
+					<ul class="text-xs text-slate-500 space-y-4 mb-10">
+						<li>• Lisensi Multi-Perangkat</li>
+						<li>• Custom Branding Instansi</li>
+						<li>• Support Prioritas 24/7</li>
+					</ul>
+					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Hubungi Sales</a>
+				</div>
+			</div>
+		</section>
+
+        <section id="custom" class="py-24 px-6 max-w-7xl mx-auto">
+            <div class="bg-gradient-to-r from-sky-600 to-emerald-600 rounded-3xl p-1 md:p-px shadow-2xl overflow-hidden">
+                <div class="bg-slate-900 rounded-[22px] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12">
+                    <div class="lg:w-1/2">
+                        <h3 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Butuh Solusi <br><span class="text-sky-400">Teknikal Khusus?</span></h3>
+                        <p class="text-slate-400 mb-8 leading-relaxed">
+                            Menerima pesanan kustom untuk pengembangan sistem embedded, prototipe robotika, hingga aplikasi desktop spesifik untuk kebutuhan riset akademik atau operasional bisnis Anda.
+                        </p>
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                                <span class="text-2xl">📟</span>
+                                <div>
+                                    <h5 class="text-sm font-bold text-white">Firmware & Hardware Design</h5>
+                                    <p class="text-[10px] text-slate-500 uppercase font-mono">STM32 / ESP32 / Arduino / AVR</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-800/50 border border-slate-800">
+                                <span class="text-2xl">🖥️</span>
+                                <div>
+                                    <h5 class="text-sm font-bold text-white">Custom Desktop Software</h5>
+                                    <p class="text-[10px] text-slate-500 uppercase font-mono">Security Focus / Data Monitoring / Automation</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="lg:w-1/2 w-full">
+                        <div class="bg-slate-800/30 p-8 rounded-2xl border border-slate-700 backdrop-blur-sm">
+                            <h4 class="text-lg font-bold text-white mb-6">Mulai Diskusi Proyek</h4>
+                            <div class="space-y-4">
+                                <input type="text" placeholder="Nama Lengkap / Instansi" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
+                                <textarea placeholder="Ceritakan kebutuhan sistem Anda secara singkat..." rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all"></textarea>
+                                <a href="https://wa.me/NOMOR_WHATSAPP_ANDA" class="w-full py-4 bg-white text-slate-900 rounded-xl font-extrabold text-center block hover:bg-sky-400 hover:text-white transition-all">
+                                    Kirim Via WhatsApp
+                                </a>
+                            </div>
+                            <p class="text-[10px] text-center text-slate-500 mt-4 uppercase tracking-widest font-mono italic">Respond Time: ± 24 Hours</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+		
+        <div id="modal-add" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
+            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleModal()"></div>
+            <div class="relative bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden fade-in">
+                <div class="p-6 border-b border-slate-800">
+                    <h3 class="text-xl font-bold text-white">Register New Module</h3>
+                    <p class="text-xs text-slate-500 mt-1 font-mono uppercase tracking-tighter">Environment: /root/programs/</p>
+                </div>
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-2">Nama Program</label>
+                        <input type="text" id="prog-name" placeholder="Misal: PID Tuner Pro" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-2">Nama File (.html)</label>
+                        <input type="text" id="prog-file" placeholder="Misal: pid_tuner.html" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-2">Icon (Emoji)</label>
+                            <input type="text" id="prog-icon" value="⚙️" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-2">Warna</label>
+                            <select id="prog-color" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
+                                <option value="sky">Blue</option>
+                                <option value="emerald">Green</option>
+                                <option value="purple">Purple</option>
+                                <option value="amber">Orange</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 bg-slate-800/50 flex justify-end gap-3">
+                    <button onclick="toggleModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white">Batal</button>
+                    <button onclick="addNewProgram()" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-sm font-bold shadow-lg shadow-sky-600/20">Simpan Program</button>
                 </div>
             </div>
         </div>
-    </div>
+		
+		<footer class="bg-slate-950 pt-20 pb-10 px-6 border-t border-slate-900">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                    <div class="col-span-1 md:col-span-2">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg">A</div>
+                            <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+                        </div>
+                        <p class="text-slate-500 text-sm max-w-sm leading-relaxed mb-6">
+                            Laboratorium inovasi digital yang berfokus pada sistem robotika, keamanan, perangkat lunak desktop, dan pengembangan akademik yang berkelanjutan.
+                        </p>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/50 transition-all">GH</a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/50 transition-all">LN</a>
+                            <a href="#" class="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-sky-400 hover:border-sky-500/50 transition-all">YT</a>
+                        </div>
+                    </div>
 
-    <footer class="py-10 text-center border-t border-gray-800 text-gray-500 text-sm">
-        <p>&copy; 2026 Aries Jehan Tamamy. Crafted with code and passion.</p>
-    </footer>
+                    <div>
+                        <h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Navigation</h5>
+                        <ul class="space-y-4 text-sm text-slate-500">
+                            <li><a href="#about" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Tentang</a></li>
+                            <li><a href="#dashboard" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Dashboard</a></li>
+                            <li><a href="#catalog" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Katalog Produk</a></li>
+                            <li><a href="#custom" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Jasa Custom</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Contact</h5>
+                        <ul class="space-y-4 text-sm text-slate-500">
+                            <li class="flex items-start gap-3">
+                                <span class="text-sky-500 font-mono">E:</span>
+                                <span>tammyjehan@gmail.com</span>
+                            </li>
+                            
+                            <li class="text-[10px] italic leading-relaxed">
+                                Tersedia untuk konsultasi proyek pada hari kerja (09.00 - 17.00 WIB).
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-[10px] text-slate-600 font-mono uppercase tracking-widest">
+                        &copy; 2026 Aries Jehan Tamamy. Crafted with Code & Passion.
+                    </p>
+                    <div class="flex gap-6 text-[10px] text-slate-600 font-mono uppercase tracking-widest">
+                        <a href="#" class="hover:text-sky-400">Privacy Policy</a>
+                        <a href="#" class="hover:text-sky-400">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <div id="mobile-menu" class="fixed inset-0 bg-slate-950 z-[100] hidden flex flex-col items-center justify-center space-y-8">
+            <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-sky-400 font-bold">✕ CLOSE</button>
+            <a href="#about" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">TENTANG</a>
+            <a href="#dashboard" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">DASHBOARD</a>
+            <a href="#catalog" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">KATALOG</a>
+            <a href="#custom" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">CUSTOM ORDER</a>
+        </div>
+
+    </main>
+
+    <section id="app-viewer" class="hidden pt-16 h-screen bg-slate-900">
+        <div class="bg-slate-800 px-6 py-2 flex justify-between items-center border-b border-slate-700">
+            <div class="flex items-center gap-3">
+                <button onclick="closeApp()" class="text-slate-400 hover:text-white text-sm">✕ Tutup</button>
+                <span class="h-4 w-[1px] bg-slate-600"></span>
+                <span id="active-app-name" class="text-sky-400 text-xs font-mono font-bold uppercase tracking-widest"></span>
+            </div>
+            <div class="hidden md:block text-[10px] text-slate-500 font-mono italic" id="active-app-path"></div>
+        </div>
+        <iframe id="app-frame" class="iframe-view"></iframe>
+    </section>
 
     <script>
-        // Database Program (JSON)
-        // Di GitHub Pages, data ini bisa Anda simpan di sini secara manual 
-        // atau simpan di LocalStorage agar tersimpan di browser Anda.
-        let programs = [
-            { name: "Secure Finance System", file: "finance.html", ket: "Program Keuangan", category: "Desktop App", icon: "$$$", color: "sky" },
-            { name: "GraderA", file: "GraderA/index.html", ket: "Program Penilaian Presentasi",category: "Utility", icon: "📊", color: "sky" },
-            { name: "Transcript Analyzer", file: "transkrip.html", ket: "Analisis dan Simulasi Nilai Transkrip Mahasiswa", category: "Utility", icon: "📊", color: "purple" }
+        // GLOBAL STATE & FUNCTIONS
+        function openApp(url, name) {
+            document.getElementById('landing-page').classList.add('hidden');
+            document.getElementById('app-viewer').classList.remove('hidden');
+            document.getElementById('app-frame').src = "programs/" + url;
+            document.getElementById('active-app-name').innerText = name;
+            document.getElementById('active-app-path').innerText = "root/programs/" + url;
+            window.scrollTo(0,0);
+        }
+
+        function closeApp() {
+            document.getElementById('landing-page').classList.remove('hidden');
+            document.getElementById('app-viewer').classList.add('hidden');
+            document.getElementById('app-frame').src = "";
+            // Reset URL hash if needed
+        }
+
+        function toggleModal() {
+            // Akan diimplementasikan di Sub 3
+            alert("Sistem Modal akan aktif di Sub 3");
+        }
+		
+		let programs = [
+            { name: "GraderA+", file: "GraderA/index.html", category: "Academic", icon: "📊️", color: "emerald", desc: "Penilaian presentasi mahasiswa dengan custom instrument dan export to .xlsx" },
+            { name: "Transcript Analyzer", file: "transkrip.html", category: "Academic", icon: "📊", color: "sky", desc: "Ekstraksi data transkrip PDF & simulasi IPK kelulusan." }
         ];
 
-        // Load programs on start
+        // RENDER DASHBOARD
         function renderPrograms() {
             const grid = document.getElementById('project-grid');
+            const countLabel = document.getElementById('app-count');
             grid.innerHTML = '';
             
-            programs.forEach((p, index) => {
+            programs.forEach((p) => {
                 const card = `
-                    <div class="card p-6 rounded-xl border border-gray-700 shadow-xl cursor-pointer" onclick="openApp('${p.file}', '${p.name}')">
-                        <div class="text-${p.color || 'sky'}-500 mb-4 font-mono text-sm uppercase tracking-widest">${p.category}</div>
-                        <h4 class="text-xl font-bold mb-2">${p.name}</h4>
-                        <p class="text-gray-400 text-sm mb-4">${p.ket}</p>
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs font-bold text-sky-400">Open Module →</span>
-                            <span class="text-2xl">${p.icon || '📁'}</span>
+                    <div class="group relative p-1 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-800 hover:border-sky-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onclick="openApp('${p.file}', '${p.name}')">
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <span class="text-3xl group-hover:scale-110 transition-transform duration-300">${p.icon}</span>
+                                <span class="text-[10px] font-mono font-bold px-2 py-1 rounded bg-${p.color}-500/10 text-${p.color}-400 border border-${p.color}-500/20 uppercase tracking-widest">${p.category}</span>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">${p.name}</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed mb-6">${p.desc || 'Modul aplikasi untuk mendukung produktivitas riset dan akademik.'}</p>
+                            <div class="flex items-center text-sky-400 text-[10px] font-bold uppercase tracking-wider">
+                                Launch Module 
+                                <svg class="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </div>
                         </div>
                     </div>
                 `;
                 grid.innerHTML += card;
             });
+            countLabel.innerText = programs.length;
         }
 
-        function openApp(fileName, title) {
-            window.history.pushState({view: 'app'}, title, `#app/${fileName}`);
-			document.getElementById('main-content').classList.add('hidden');
-            document.getElementById('viewer-area').classList.remove('hidden');
-            document.getElementById('app-frame').src = "programs/" + fileName; // Membuka file di folder 'programs'
-            document.getElementById('active-app-title').innerText = title;
-            document.getElementById('active-app-path').innerText = "path: /programs/" + fileName;
-            window.scrollTo(0,0);
-        }
-
-        function closeApp() {
-            document.getElementById('main-content').classList.remove('hidden');
-            document.getElementById('viewer-area').classList.add('hidden');
-            document.getElementById('app-frame').src = "";
-        }
-
-        // Modal Logic
+        // MODAL LOGIC (OVERRIDE DARI SUB 1)
         function toggleModal() {
-            const body = document.querySelector('body');
-            const modal = document.querySelector('#modal');
-            modal.classList.toggle('opacity-0');
-            modal.classList.toggle('pointer-events-none');
-            body.classList.toggle('modal-active');
+            const modal = document.getElementById('modal-add');
+            modal.classList.toggle('hidden');
         }
 
         function addNewProgram() {
             const name = document.getElementById('prog-name').value;
             const file = document.getElementById('prog-file').value;
-            const cat = document.getElementById('prog-cat').value;
+            const icon = document.getElementById('prog-icon').value;
+            const color = document.getElementById('prog-color').value;
 
             if(name && file) {
-                programs.push({
-                    name: name,
-                    file: file,
-                    category: cat,
-                    icon: "⚙️",
-                    color: cat === 'Research' ? 'emerald' : 'sky'
-                });
+                programs.push({ name, file, icon, color, category: "Custom", desc: "Aplikasi tambahan yang didaftarkan melalui dashboard." });
                 renderPrograms();
                 toggleModal();
-                // Reset form
+                // Reset Fields
                 document.getElementById('prog-name').value = '';
                 document.getElementById('prog-file').value = '';
             } else {
-                alert("Mohon isi nama dan file program.");
+                alert("Lengkapi Nama dan File Program!");
             }
         }
 		
-		window.onpopstate = function(event) {
-			closeApp();
-		};
-        // Inisialisasi
-        renderPrograms();
+		function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Script tambahan untuk menanggapi menu navigasi desktop pada tampilan mobile
+        document.querySelector('.md\\:hidden').addEventListener('click', toggleMobileMenu);
+
+        // Inisialisasi Smooth Scroll Perbaikan
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if(this.getAttribute('href') !== "#") {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if(target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+        // Inisialisasi awal saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', renderPrograms);
+		
     </script>
+
 </body>
 </html>
