@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aries Media - Interactive Background</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* Supaya tidak ada scrollbar di demo ini */
+            background-color: #020617; /* Slate-950 */
+        }
+
+        /* Canvas diposisikan di paling belakang */
+        #bg-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Di belakang konten */
+        }
+
+        /* Konten Website ditaruh di atas canvas */
+        .content-overlay {
+            position: relative;
+            z-index: 10; /* Di depan canvas */
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            pointer-events: none; /* Agar mouse tembus ke canvas */
+        }
+
+        /* Agar tombol/teks bisa diklik/seleksi, kembalikan pointer-events */
+        .content-overlay h1, .content-overlay p, .content-overlay button {
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="content-overlay px-4">
+        <h1 class="text-5xl md:text-7xl font-bold text-white mb-4 tracking-tight">
+            ARIES <span class="text-sky-500">MEDIA</span>
+        </h1>
+        <p class="text-slate-400 text-lg md:text-xl max-w-2xl mb-8">
+            Digital Laboratory of Aries Jehan Tamamy.<br>
+            <span class="text-sky-400/80 font-mono text-sm">Software Engineering • Illustration • Education • IoT</span>
+        </p>
+        <div class="flex gap-4">
+            <button class="px-6 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-full font-bold transition shadow-lg shadow-sky-500/30">
+                View Portfolio
+            </button>
+            <button class="px-6 py-2 border border-slate-600 hover:bg-slate-800 text-slate-300 rounded-full transition">
+                Contact Me
+            </button>
+        </div>
+    </div>
+
+<script>
+    /**
+     * GENERATIVE CONSTELLATION EFFECT
+     * Ringan, Responsif, dan Interaktif.
+     */
+    
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let particles = [];
+    
+    // --- KONFIGURASI ---
+    const CONFIG = {
+        particleCount: 80,       // Jumlah titik (sesuaikan beban)
+        connectionDist: 150,     // Jarak maksimum untuk garis terhubung
+        mouseDist: 200,          // Jarak interaksi mouse
+        speed: 0.5,              // Kecepatan gerakan partikel
+        color: '14, 165, 233'    // Warna Sky-500 (RGB format)
+    };
+
+    // Objek Mouse
+    const mouse = { x: null, y: null };
+
+    // --- CLASS PARTICLE ---
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * CONFIG.speed;
+            this.vy = (Math.random() - 0.5) * CONFIG.speed;
+            this.size = Math.random() * 2 + 1; // Ukuran 1-3px
+        }
+
+        update() {
+            // Gerakan Konstan
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Pantulan Tembok (Bounce)
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+
+            // Interaksi Mouse (Partikel kabur jika didekati mouse)
+            // Uncomment blok di bawah ini jika ingin efek "Repel" (Menolak)
+            /*
+            let dx = mouse.x - this.x;
+            let dy = mouse.y - this.y;
+            let distance = Math.sqrt(dx*dx + dy*dy);
+            if (distance < 100) {
+                const forceDirectionX = dx / distance;
+                const forceDirectionY = dy / distance;
+                const force = (100 - distance) / 100;
+                this.vx -= forceDirectionX * force * 0.5;
+                this.vy -= forceDirectionY * force * 0.5;
+            }
+            */
+        }
+
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${CONFIG.color}, 0.8)`;
+            ctx.fill();
+        }
+    }
+
+    // --- UTILS ---
+    function init() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        particles = [];
+        
+        // Responsif: Jumlah partikel menyesuaikan lebar layar
+        const count = window.innerWidth < 768 ? 40 : CONFIG.particleCount;
+
+        for (let i = 0; i < count; i++) {
+            particles.push(new Particle());
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. Update & Draw Particles
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+        }
+
+        // 2. Draw Lines (Connections)
+        connectParticles();
+    }
+
+    function connectParticles() {
+        let opacityValue = 1;
+        
+        // Loop ganda untuk cek jarak antar semua partikel
+        for (let a = 0; a < particles.length; a++) {
+            for (let b = a; b < particles.length; b++) {
+                let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x)) +
+                               ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+                
+                // Jika jarak cukup dekat, gambar garis
+                if (distance < (CONFIG.connectionDist * CONFIG.connectionDist)) {
+                    // Semakin jauh semakin transparan
+                    opacityValue = 1 - (distance / (20000)); 
+                    ctx.strokeStyle = `rgba(${CONFIG.color}, ${opacityValue * 0.15})`; // 0.15 opacity max
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(particles[a].x, particles[a].y);
+                    ctx.lineTo(particles[b].x, particles[b].y);
+                    ctx.stroke();
+                }
+            }
+            
+            // Cek koneksi ke Mouse (Keren untuk interaktifitas)
+            if (mouse.x) {
+                let distMouse = ((particles[a].x - mouse.x) ** 2) + ((particles[a].y - mouse.y) ** 2);
+                if (distMouse < (CONFIG.mouseDist * CONFIG.mouseDist)) {
+                     opacityValue = 1 - (distMouse / (40000));
+                     ctx.strokeStyle = `rgba(${CONFIG.color}, ${opacityValue * 0.3})`; // Lebih terang ke mouse
+                     ctx.lineWidth = 1;
+                     ctx.beginPath();
+                     ctx.moveTo(particles[a].x, particles[a].y);
+                     ctx.lineTo(mouse.x, mouse.y);
+                     ctx.stroke();
+                }
+            }
+        }
+    }
+
+    // --- EVENTS ---
+    window.addEventListener('resize', init);
+    
+    window.addEventListener('mousemove', (e) => {
+        mouse.x = e.x;
+        mouse.y = e.y;
+    });
+
+    window.addEventListener('mouseout', () => {
+        mouse.x = null;
+        mouse.y = null;
+    });
+
+    // Start
+    init();
+    animate();
+
+</script>
+</body>
+</html>

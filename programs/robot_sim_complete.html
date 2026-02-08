@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Universal Robot Navigation Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Styles agar UI rapi */
+        canvas { touch-action: none; cursor: crosshair; }
+        .panel-section { @apply mb-4 border-b border-slate-700 pb-4; }
+        .control-label { @apply text-[10px] uppercase font-bold text-slate-400 mb-1 block; }
+        .input-range { @apply w-full h-1 bg-slate-700 rounded appearance-none cursor-pointer; }
+        
+        /* Scrollbar custom */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans h-screen flex flex-col overflow-hidden">
+
+    <header class="p-3 bg-slate-900 border-b border-slate-800 flex justify-between items-center z-10">
+        <div>
+            <h1 class="text-lg font-bold text-sky-400 font-mono tracking-tight">NAV-SIM <span class="text-slate-500 text-xs">v1.0</span></h1>
+            <p class="text-[10px] text-slate-500">Hybrid Planner: Global (A*) + Local (PID/APF)</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="SIM_CORE.toggleRun()" id="btn-run" class="px-4 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-xs font-bold transition">
+                ▶ RUN SIMULATION
+            </button>
+            <button onclick="MAP_ENGINE.reset()" class="px-3 py-1 bg-rose-900/50 hover:bg-rose-800 text-rose-300 border border-rose-800 rounded text-xs font-bold transition">
+                🗑 RESET MAP
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-grow flex overflow-hidden">
+        
+        <aside class="w-64 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto flex flex-col gap-2 shadow-xl z-20">
+            
+            <div class="panel-section">
+                <label class="control-label text-sky-500">Map & Global Planner</label>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <button onclick="MAP_ENGINE.setMode('wall')" class="bg-slate-800 hover:bg-slate-700 text-xs py-1 rounded border border-slate-700 active:bg-sky-900">🧱 Wall</button>
+                    <button onclick="MAP_ENGINE.setMode('eraser')" class="bg-slate-800 hover:bg-slate-700 text-xs py-1 rounded border border-slate-700 active:bg-sky-900">🧽 Erase</button>
+                    <button onclick="MAP_ENGINE.setMode('start')" class="bg-slate-800 hover:bg-slate-700 text-xs py-1 rounded border border-slate-700 text-emerald-400">🟢 Start</button>
+                    <button onclick="MAP_ENGINE.setMode('goal')" class="bg-slate-800 hover:bg-slate-700 text-xs py-1 rounded border border-slate-700 text-rose-400">🚩 Goal</button>
+                </div>
+                <div class="mt-2">
+                    <label class="text-[9px] text-slate-500">Algorithm</label>
+                    <select id="global-algo" class="w-full bg-slate-950 text-xs p-1 rounded border border-slate-700 text-slate-300">
+                        <option value="astar">A* (A-Star)</option>
+                        <option value="dijkstra">Dijkstra</option>
+                        <option value="none">None (Manual/Direct)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <label class="control-label text-amber-500">Local Planner</label>
+                <select id="local-algo" class="w-full bg-slate-950 text-xs p-1 rounded border border-slate-700 text-slate-300 mb-3" onchange="UI.updatePanel()">
+                    <option value="pid">PID Path Following</option>
+                    <option value="apf">Artificial Potential Field (APF)</option>
+                </select>
+
+                <div id="params-pid" class="space-y-2">
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Kp (Steering)</span> <span id="val-kp" class="text-[9px]">1.5</span></div>
+                        <input type="range" class="input-range" min="0" max="10" step="0.1" value="1.5" oninput="SimState.params.pid.kp = this.value; document.getElementById('val-kp').innerText=this.value">
+                    </div>
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Kd (Damping)</span> <span id="val-kd" class="text-[9px]">0.5</span></div>
+                        <input type="range" class="input-range" min="0" max="50" step="0.5" value="0.5" oninput="SimState.params.pid.kd = this.value; document.getElementById('val-kd').innerText=this.value">
+                    </div>
+                </div>
+
+                <div id="params-apf" class="space-y-2 hidden">
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Attraction (Goal)</span> <span id="val-katt" class="text-[9px]">2.0</span></div>
+                        <input type="range" class="input-range" min="0" max="10" step="0.1" value="2.0" oninput="SimState.params.apf.k_att = this.value; document.getElementById('val-katt').innerText=this.value">
+                    </div>
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Repulsion (Wall)</span> <span id="val-krep" class="text-[9px]">50</span></div>
+                        <input type="range" class="input-range" min="0" max="200" step="10" value="50" oninput="SimState.params.apf.k_rep = this.value; document.getElementById('val-krep').innerText=this.value">
+                    </div>
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Influence Dist</span> <span id="val-dist" class="text-[9px]">60</span></div>
+                        <input type="range" class="input-range" min="10" max="100" step="5" value="60" oninput="SimState.params.apf.dist_limit = this.value; document.getElementById('val-dist').innerText=this.value">
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section border-none">
+                <label class="control-label text-purple-500">Robot Specs</label>
+                <div class="space-y-2">
+                    <div>
+                        <div class="flex justify-between"><span class="text-[9px]">Max Speed</span> <span id="val-speed" class="text-[9px]">3.0</span></div>
+                        <input type="range" class="input-range" min="1" max="10" step="0.5" value="3.0" oninput="SimState.robot.maxSpeed = parseFloat(this.value); document.getElementById('val-speed').innerText=this.value">
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-auto bg-black/30 p-2 rounded border border-slate-800 text-[9px] font-mono text-slate-400">
+                <div id="debug-status">State: IDLE</div>
+                <div id="debug-pos">X:0 Y:0</div>
+            </div>
+        </aside>
+
+        <main class="flex-grow bg-[#050505] relative flex items-center justify-center overflow-hidden">
+            <canvas id="simCanvas" class="shadow-2xl border border-slate-800"></canvas>
+            
+            <div id="start-hint" class="absolute top-4 left-4 text-slate-600 text-xs pointer-events-none select-none">
+                Draw Walls or Drag Start/Goal
+            </div>
+        </main>
+    </div>
+
+<script>
+    /** * GLOBAL STATE MANAGEMENT
+     * Objek ini bisa diakses oleh semua Bagian selanjutnya.
+     */
+    const SimState = {
+        isRunning: false,
+        dt: 0.05, // Delta time simulation
+        
+        // Konfigurasi Peta
+        map: {
+            cols: 40,
+            rows: 25,
+            cellSize: 25, // pixel
+            grid: [],     // 2D Array (0=Free, 1=Wall)
+            width: 0,
+            height: 0
+        },
+
+        // Objek Interaktif
+        objects: {
+            start: { x: 2, y: 2 },
+            goal: { x: 35, y: 20 },
+            robot: { x: 0, y: 0, theta: 0, v: 0, w: 0 } // Real pixel coordinates
+        },
+
+        // Parameter Algoritma
+        params: {
+            globalAlgo: 'astar',
+            localAlgo: 'pid',
+            pid: { kp: 1.5, kd: 0.5, ki: 0.0 },
+            apf: { k_att: 2.0, k_rep: 50.0, dist_limit: 60 },
+            robot: { maxSpeed: 3.0, radius: 10 }
+        },
+
+        // Path Data
+        path: [] // Array of {x, y} coordinates (Global Path)
+    };
+
+    // UI Helper Controller
+    const UI = {
+        updatePanel: function() {
+            const mode = document.getElementById('local-algo').value;
+            SimState.params.localAlgo = mode;
+            
+            // Toggle visibility parameter
+            if(mode === 'pid') {
+                document.getElementById('params-pid').classList.remove('hidden');
+                document.getElementById('params-apf').classList.add('hidden');
+            } else {
+                document.getElementById('params-pid').classList.add('hidden');
+                document.getElementById('params-apf').classList.remove('hidden');
+            }
+        },
+        log: function(msg) {
+            document.getElementById('debug-status').innerText = msg;
+        }
+    };
+	
+	/** * ==========================================
+     * BAGIAN 2: MAP ENGINE & GLOBAL PLANNER
+     * ==========================================
+     */
+
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // --- MAP ENGINE (Visual & Grid Logic) ---
+    const MAP_ENGINE = {
+        mode: 'wall', // wall, eraser, start, goal
+        isMouseDown: false,
+
+        init: function() {
+            // Setup Ukuran Canvas
+            const m = SimState.map;
+            canvas.width = m.cols * m.cellSize;
+            canvas.height = m.rows * m.cellSize;
+            m.width = canvas.width;
+            m.height = canvas.height;
+
+            // Init Grid Array (0 = Free, 1 = Wall)
+            this.reset();
+            
+            // Event Listeners
+            canvas.addEventListener('mousedown', e => { this.isMouseDown = true; this.handleInput(e); });
+            canvas.addEventListener('mousemove', e => { if(this.isMouseDown) this.handleInput(e); });
+            canvas.addEventListener('mouseup', () => this.isMouseDown = false);
+            
+            // Render Loop Awal
+            this.draw();
+        },
+
+        reset: function() {
+            const m = SimState.map;
+            m.grid = new Array(m.cols).fill(0).map(() => new Array(m.rows).fill(0));
+            SimState.path = []; // Reset path
+            this.draw();
+        },
+
+        setMode: function(mode) {
+            this.mode = mode;
+            console.log("Mode changed to:", mode);
+        },
+
+        handleInput: function(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / SimState.map.cellSize);
+            const y = Math.floor((e.clientY - rect.top) / SimState.map.cellSize);
+
+            if (x < 0 || x >= SimState.map.cols || y < 0 || y >= SimState.map.rows) return;
+
+            // Logic Drawing
+            if (this.mode === 'wall') SimState.map.grid[x][y] = 1;
+            else if (this.mode === 'eraser') SimState.map.grid[x][y] = 0;
+            else if (this.mode === 'start') { 
+                SimState.objects.start = {x, y}; 
+                // Reset posisi robot ke start
+                SimState.objects.robot.x = x * SimState.map.cellSize + SimState.map.cellSize/2;
+                SimState.objects.robot.y = y * SimState.map.cellSize + SimState.map.cellSize/2;
+            }
+            else if (this.mode === 'goal') SimState.objects.goal = {x, y};
+
+            // Jika ada perubahan peta, hitung ulang path (Real-time replanning)
+            GLOBAL_PLANNER.plan();
+            this.draw();
+        },
+
+        draw: function() {
+            // Clear Screen
+            ctx.fillStyle = "#050505";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const m = SimState.map;
+            const cs = m.cellSize;
+
+            // 1. Draw Grid & Walls
+            for(let x=0; x<m.cols; x++) {
+                for(let y=0; y<m.rows; y++) {
+                    // Grid Lines (Tipis)
+                    ctx.strokeStyle = "#1e293b";
+                    ctx.lineWidth = 0.5;
+                    ctx.strokeRect(x*cs, y*cs, cs, cs);
+
+                    // Wall Block
+                    if(m.grid[x][y] === 1) {
+                        ctx.fillStyle = "#334155";
+                        ctx.fillRect(x*cs, y*cs, cs, cs);
+                        ctx.strokeStyle = "#475569";
+                        ctx.strokeRect(x*cs, y*cs, cs, cs);
+                    }
+                }
+            }
+
+            // 2. Draw Path (Global Path from A*)
+            if(SimState.path.length > 0) {
+                ctx.beginPath();
+                ctx.strokeStyle = "#059669"; // Emerald 600
+                ctx.lineWidth = 2;
+                // Path adalah koordinat tengah grid
+                SimState.path.forEach((p, i) => {
+                    const px = p.x * cs + cs/2;
+                    const py = p.y * cs + cs/2;
+                    if(i===0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                });
+                ctx.stroke();
+
+                // Draw Waypoints (Dots)
+                ctx.fillStyle = "#34d399";
+                SimState.path.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x * cs + cs/2, p.y * cs + cs/2, 2, 0, Math.PI*2);
+                    ctx.fill();
+                });
+            }
+
+            // 3. Draw Start & Goal Icons
+            this.drawIcon("S", SimState.objects.start, "#10b981");
+            this.drawIcon("G", SimState.objects.goal, "#f43f5e");
+        },
+
+        drawIcon: function(label, pos, color) {
+            const cs = SimState.map.cellSize;
+            const cx = pos.x * cs + cs/2;
+            const cy = pos.y * cs + cs/2;
+            
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(cx, cy, cs/2 - 2, 0, Math.PI*2);
+            ctx.fill();
+            
+            ctx.fillStyle = "white";
+            ctx.font = "bold 10px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(label, cx, cy);
+        }
+    };
+
+    // --- GLOBAL PLANNER (A* & Dijkstra) ---
+    const GLOBAL_PLANNER = {
+        plan: function() {
+            const algo = document.getElementById('global-algo').value; // 'astar' or 'dijkstra'
+            if (algo === 'none') {
+                SimState.path = []; 
+                return;
+            }
+
+            const start = SimState.objects.start;
+            const goal = SimState.objects.goal;
+            const map = SimState.map;
+
+            // A* Structures
+            let openSet = [start];
+            let cameFrom = {};
+            let gScore = {}; 
+            let fScore = {};
+
+            const id = p => `${p.x},${p.y}`; // Unique ID helper
+
+            gScore[id(start)] = 0;
+            // Jika Dijkstra, Heuristic selalu 0. Jika A*, hitung Manhattan Distance.
+            fScore[id(start)] = (algo === 'astar') ? this.heuristic(start, goal) : 0;
+
+            while(openSet.length > 0) {
+                // Cari node dengan fScore terendah
+                let current = openSet.reduce((a, b) => 
+                    (fScore[id(a)] || Infinity) < (fScore[id(b)] || Infinity) ? a : b
+                );
+
+                // Goal Reached
+                if(current.x === goal.x && current.y === goal.y) {
+                    this.reconstructPath(cameFrom, current);
+                    return;
+                }
+
+                openSet = openSet.filter(n => id(n) !== id(current));
+
+                // Neighbors (4 Arah)
+                const dirs = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
+                
+                for(let d of dirs) {
+                    let neighbor = {x: current.x + d.x, y: current.y + d.y};
+                    
+                    // Boundary & Wall Check
+                    if(neighbor.x < 0 || neighbor.x >= map.cols || 
+                       neighbor.y < 0 || neighbor.y >= map.rows) continue;
+                    if(map.grid[neighbor.x][neighbor.y] === 1) continue;
+
+                    let tentativeG = (gScore[id(current)] || Infinity) + 1;
+
+                    if(tentativeG < (gScore[id(neighbor)] || Infinity)) {
+                        cameFrom[id(neighbor)] = current;
+                        gScore[id(neighbor)] = tentativeG;
+                        // Magic switch A* vs Dijkstra ada di sini:
+                        let h = (algo === 'astar') ? this.heuristic(neighbor, goal) : 0;
+                        fScore[id(neighbor)] = tentativeG + h;
+
+                        if(!openSet.some(n => id(n) === id(neighbor))) {
+                            openSet.push(neighbor);
+                        }
+                    }
+                }
+            }
+            
+            // No Path found
+            SimState.path = [];
+            UI.log("Path not found!");
+        },
+
+        heuristic: function(a, b) {
+            // Manhattan Distance
+            return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+        },
+
+        reconstructPath: function(cameFrom, current) {
+            const id = p => `${p.x},${p.y}`;
+            let totalPath = [current];
+            while(id(current) in cameFrom) {
+                current = cameFrom[id(current)];
+                totalPath.unshift(current);
+            }
+            SimState.path = totalPath;
+            UI.log(`Path Found: ${totalPath.length} steps`);
+        }
+    };
+	
+	/** * ==========================================
+     * BAGIAN 3: ROBOT PHYSICS & KINEMATICS
+     * ==========================================
+     */
+
+    const ROBOT_PHYSICS = {
+        // Reset robot ke posisi Start
+        reset: function() {
+            const startNode = SimState.objects.start;
+            const cs = SimState.map.cellSize;
+            
+            // Konversi dari Grid (kotak) ke Pixel (tengah kotak)
+            SimState.objects.robot.x = startNode.x * cs + cs/2;
+            SimState.objects.robot.y = startNode.y * cs + cs/2;
+            SimState.objects.robot.theta = 0; // Menghadap kanan (0 radian)
+            SimState.objects.robot.v = 0;
+            SimState.objects.robot.w = 0;
+        },
+
+        // Update Posisi berdasarkan Kecepatan (v, w)
+        update: function(dt) {
+            const r = SimState.objects.robot;
+            
+            // 1. Update Heading (Arah Hadap)
+            // theta_baru = theta_lama + kecepatan_putar * waktu
+            r.theta += r.w * dt;
+
+            // Normalisasi sudut agar tetap di range -PI sampai PI
+            // Ini penting agar kalkulasi error sudut tidak "gila" (misal 370 derajat)
+            while(r.theta > Math.PI) r.theta -= 2 * Math.PI;
+            while(r.theta < -Math.PI) r.theta += 2 * Math.PI;
+
+            // 2. Update Posisi X, Y
+            // x_baru = x_lama + (kecepatan * cos(theta)) * waktu
+            r.x += r.v * Math.cos(r.theta) * dt;
+            r.y += r.v * Math.sin(r.theta) * dt;
+
+            // 3. Wall Collision (Sederhana: Stop jika nabrak tembok)
+            this.checkCollision();
+        },
+
+        checkCollision: function() {
+            const r = SimState.objects.robot;
+            const m = SimState.map;
+            
+            // Cek Boundary Canvas
+            if(r.x < 0) r.x = 0;
+            if(r.x > m.width) r.x = m.width;
+            if(r.y < 0) r.y = 0;
+            if(r.y > m.height) r.y = m.height;
+
+            // Cek Grid Wall
+            const gridX = Math.floor(r.x / m.cellSize);
+            const gridY = Math.floor(r.y / m.cellSize);
+
+            // Safety check array bounds
+            if(gridX >= 0 && gridX < m.cols && gridY >= 0 && gridY < m.rows) {
+                if(m.grid[gridX][gridY] === 1) {
+                    // Jika masuk tembok, mundur sedikit (bounce) & stop
+                    r.v = 0;
+                    r.x -= Math.cos(r.theta) * 2; 
+                    r.y -= Math.sin(r.theta) * 2;
+                    // Visual feedback bisa ditambahkan di sini (misal warna merah)
+                }
+            }
+        },
+
+        draw: function() {
+            const r = SimState.objects.robot;
+            const size = SimState.params.robot.radius; // Radius visual
+
+            ctx.save();
+            ctx.translate(r.x, r.y);
+            ctx.rotate(r.theta);
+
+            // Draw Body (Triangle)
+            ctx.beginPath();
+            ctx.moveTo(size, 0);          // Hidung
+            ctx.lineTo(-size, size/1.5);  // Kiri Belakang
+            ctx.lineTo(-size, -size/1.5); // Kanan Belakang
+            ctx.closePath();
+            
+            ctx.fillStyle = "#38bdf8"; // Sky Blue
+            ctx.shadowColor = "#0ea5e9";
+            ctx.shadowBlur = 15;
+            ctx.fill();
+
+            // Draw Sensor Direction (Garis Kecil di depan)
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size + 10, 0); // Garis heading
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw Axis (Titik Pusat)
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(0, 0, 2, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.restore();
+            
+            // Debug text di pojok kiri bawah (Update UI real-time)
+            document.getElementById('debug-pos').innerText = 
+                `X:${r.x.toFixed(0)} Y:${r.y.toFixed(0)} θ:${(r.theta*57.3).toFixed(0)}°`;
+        }
+    };
+    
+	/** * ==========================================
+     * BAGIAN 4: LOCAL PLANNER ALGORITHMS
+     * ==========================================
+     */
+
+    const LOCAL_PLANNER = {
+        // Main Loop untuk Local Planner
+        run: function(dt) {
+            const algo = SimState.params.localAlgo;
+            const r = SimState.objects.robot;
+
+            if (algo === 'pid') {
+                this.runPID(dt);
+            } else if (algo === 'apf') {
+                this.runAPF(dt);
+            } else {
+                // Stop jika tidak ada algo
+                r.v = 0; r.w = 0;
+            }
+        },
+
+        // --- 1. PID PATH FOLLOWING (Pure Pursuit Logic) ---
+        runPID: function(dt) {
+            const r = SimState.objects.robot;
+            const path = SimState.path;
+            
+            // Jika tidak ada jalur, berhenti
+            if (!path || path.length === 0) {
+                r.v = 0; r.w = 0;
+                UI.log("PID: No path to follow");
+                return;
+            }
+
+            // A. Cari Titik Target (Look Ahead Point)
+            // Kita cari titik di jalur yang jaraknya ~20-30 pixel di depan robot
+            let target = null;
+            let lookAheadDist = 30;
+            let minDist = Infinity;
+            let closestIndex = 0;
+
+            // 1. Cari titik jalur terdekat dengan robot dulu
+            path.forEach((p, i) => {
+                const cs = SimState.map.cellSize;
+                const px = p.x * cs + cs/2;
+                const py = p.y * cs + cs/2;
+                const d = Math.hypot(px - r.x, py - r.y);
+                if (d < minDist) { minDist = d; closestIndex = i; }
+            });
+
+            // 2. Ambil titik beberapa langkah di depan titik terdekat (Look Ahead)
+            // Semakin ngebut, semakin jauh kita harus melihat ke depan
+            let lookIndex = closestIndex + 2; 
+            if (lookIndex >= path.length) lookIndex = path.length - 1;
+            
+            const p = path[lookIndex];
+            const cs = SimState.map.cellSize;
+            const targetX = p.x * cs + cs/2;
+            const targetY = p.y * cs + cs/2;
+
+            // B. Cek apakah sudah sampai Goal
+            const distToGoal = Math.hypot(targetX - r.x, targetY - r.y);
+            if (distToGoal < 10 && lookIndex === path.length - 1) {
+                r.v = 0; r.w = 0;
+                UI.log("Arrived at Goal!");
+                return;
+            }
+
+            // C. Hitung Heading Error (Sudut yang diinginkan vs Sudut Robot)
+            const desiredTheta = Math.atan2(targetY - r.y, targetX - r.x);
+            let errorTheta = desiredTheta - r.theta;
+            
+            // Normalisasi error (-PI sampai PI) agar robot putar lewat jalan pendek
+            while (errorTheta > Math.PI) errorTheta -= 2 * Math.PI;
+            while (errorTheta < -Math.PI) errorTheta += 2 * Math.PI;
+
+            // D. PID Calculation
+            const params = SimState.params.pid;
+            // Di sini kita pakai P-Only untuk steering (sudah cukup bagus untuk simulasi)
+            // Output PID adalah kecepatan putar (w)
+            const outputW = params.kp * errorTheta; 
+
+            // E. Speed Control
+            // Jika error sudut besar (tikungan tajam), pelankan robot
+            let maxV = SimState.params.robot.maxSpeed * 20; // Skala pixel
+            if (Math.abs(errorTheta) > 0.5) maxV *= 0.2; // Rem saat belok tajam
+
+            r.w = outputW;
+            r.v = maxV;
+
+            UI.log(`PID: Tracking point [${p.x},${p.y}] Err:${errorTheta.toFixed(2)}`);
+        },
+
+        // --- 2. ARTIFICIAL POTENTIAL FIELD (APF) ---
+        runAPF: function(dt) {
+            const r = SimState.objects.robot;
+            const goal = SimState.objects.goal;
+            const map = SimState.map;
+            const params = SimState.params.apf;
+            const cs = map.cellSize;
+
+            // Goal dalam pixel
+            const goalX = goal.x * cs + cs/2;
+            const goalY = goal.y * cs + cs/2;
+
+            // A. Gaya Tarik (Attractive Force) menuju Goal
+            // F_att = k_att * (PosisiGoal - PosisiRobot)
+            const dx = goalX - r.x;
+            const dy = goalY - r.y;
+            const distGoal = Math.hypot(dx, dy);
+
+            // Cek sampai
+            if (distGoal < 15) {
+                r.v = 0; r.w = 0;
+                UI.log("APF: Arrived!");
+                return;
+            }
+
+            // Vektor gaya tarik (dinormalisasi lalu dikali konstanta)
+            let fX = (dx / distGoal) * params.k_att;
+            let fY = (dy / distGoal) * params.k_att;
+
+            // B. Gaya Tolak (Repulsive Force) dari Tembok
+            // Kita cek area sekitar robot (Radius pengaruh)
+            const influence = params.dist_limit;
+            
+            // Optimasi: Hanya cek sel grid di sekitar robot
+            const gridRX = Math.floor(r.x / cs);
+            const gridRY = Math.floor(r.y / cs);
+            const searchRange = Math.ceil(influence / cs);
+
+            for (let x = gridRX - searchRange; x <= gridRX + searchRange; x++) {
+                for (let y = gridRY - searchRange; y <= gridRY + searchRange; y++) {
+                    // Cek bound
+                    if (x < 0 || x >= map.cols || y < 0 || y >= map.rows) continue;
+                    
+                    // Jika ada tembok
+                    if (map.grid[x][y] === 1) {
+                        const wallX = x * cs + cs/2;
+                        const wallY = y * cs + cs/2;
+                        const distWall = Math.hypot(r.x - wallX, r.y - wallY);
+
+                        if (distWall < influence && distWall > 0) {
+                            // Rumus Repulsive: F = k_rep * (1/d - 1/d0) * (1/d^2)
+                            // Versi Sederhana: Semakin dekat, tolak semakin kuat
+                            const repFactor = params.k_rep * (1.0 / distWall - 1.0 / influence) / (distWall * distWall);
+                            
+                            // Vektor tolak (menjauhi tembok)
+                            fX += (r.x - wallX) * repFactor * 1000; // Skala diperbesar biar terasa
+                            fY += (r.y - wallY) * repFactor * 1000;
+                        }
+                    }
+                }
+            }
+
+            // C. Konversi Gaya Total (Resultan) menjadi Gerakan Robot
+            // Total Force Vector = fX, fY
+            const desiredTheta = Math.atan2(fY, fX);
+            let errorTheta = desiredTheta - r.theta;
+
+            while (errorTheta > Math.PI) errorTheta -= 2 * Math.PI;
+            while (errorTheta < -Math.PI) errorTheta += 2 * Math.PI;
+
+            // Steering sederhana (P-Controller)
+            r.w = 4.0 * errorTheta; 
+            
+            // Kecepatan maju sebanding dengan besarnya gaya total, tapi di-clamp
+            const totalForce = Math.hypot(fX, fY);
+            let speed = Math.min(totalForce * 20, SimState.params.robot.maxSpeed * 20);
+            
+            // Jangan mundur (robot ini cuma bisa maju di demo ini)
+            if (Math.abs(errorTheta) > Math.PI/2) speed = 0;
+
+            r.v = speed;
+
+            UI.log(`APF: Force [${fX.toFixed(1)}, ${fY.toFixed(1)}]`);
+        }
+    };
+	
+	/** * ==========================================
+     * BAGIAN 5: MAIN LOOP & INTEGRATION
+     * ==========================================
+     */
+
+    const SIM_CORE = {
+        lastTime: 0,
+        animationId: null,
+
+        toggleRun: function() {
+            SimState.isRunning = !SimState.isRunning;
+            const btn = document.getElementById('btn-run');
+            
+            if (SimState.isRunning) {
+                // UI Update: Jadi tombol Pause
+                btn.innerText = "⏸ PAUSE";
+                btn.classList.replace('bg-emerald-600', 'bg-amber-600');
+                btn.classList.replace('hover:bg-emerald-500', 'hover:bg-amber-500');
+                
+                // Auto-Plan: Jika path kosong, hitung dulu
+                if (SimState.path.length === 0) {
+                    GLOBAL_PLANNER.plan();
+                }
+
+                this.lastTime = performance.now();
+                this.loop(performance.now());
+            } else {
+                // UI Update: Jadi tombol Run
+                btn.innerText = "▶ RUN SIMULATION";
+                btn.classList.replace('bg-amber-600', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-amber-500', 'hover:bg-emerald-500');
+                cancelAnimationFrame(this.animationId);
+            }
+        },
+
+        loop: function(timestamp) {
+            if (!SimState.isRunning) return;
+
+            // 1. Calculate Delta Time (dt)
+            // Menghitung waktu antara frame ini dan sebelumnya (dalam detik)
+            // Ini penting agar kecepatan robot konsisten di komputer lambat vs cepat
+            let dt = (timestamp - this.lastTime) / 1000;
+            if (dt > 0.1) dt = 0.1; // Cap lag spike (maksimal 100ms)
+            this.lastTime = timestamp;
+            SimState.dt = dt;
+
+            // 2. Run Local Planner (THE BRAIN)
+            // Robot berpikir: "Berdasarkan posisi saya dan path, roda harus putar berapa?"
+            LOCAL_PLANNER.run(dt);
+
+            // 3. Update Physics (THE BODY)
+            // Robot bergerak: Posisi x,y,theta berubah berdasarkan kecepatan v,w
+            ROBOT_PHYSICS.update(dt);
+
+            // 4. Render (THE EYES)
+            // Gambar ulang layar: Peta dulu, baru Robot di atasnya
+            MAP_ENGINE.draw();     
+            ROBOT_PHYSICS.draw();  
+
+            // 5. Update Debug UI
+            document.getElementById('debug-status').innerText = 
+                `State: RUNNING | Algo: ${SimState.params.localAlgo.toUpperCase()} | FPS: ${(1/dt).toFixed(0)}`;
+
+            // Request frame selanjutnya
+            this.animationId = requestAnimationFrame(t => this.loop(t));
+        }
+    };
+      
+    MAP_ENGINE.init();
+	ROBOT_PHYSICS.reset();
+	// Initial Render
+    MAP_ENGINE.draw();
+    ROBOT_PHYSICS.draw();
+    // Placeholder Objects (Akan diisi di Part selanjutnya)
+    //const MAP_ENGINE = { reset: () => {}, setMode: () => {} };
+    //const SIM_CORE = { toggleRun: () => {} };
+
+</script>
+</body>
+</html>

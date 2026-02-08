@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aries Media - TCG Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- 3D PERSPECTIVE SETUP --- */
+        .card-container {
+            perspective: 1000px;
+        }
+
+        .card-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 140%; /* Aspect Ratio 5:7 (Standar TCG) */
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out; /* Smooth movement tracking */
+            cursor: pointer;
+        }
+
+        /* Saat kartu diklik (class flipped ditambahkan via JS) */
+        .card-wrapper.flipped {
+            transform: rotateY(180deg) !important; /* Force flip, ignore tilt temporarily */
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+
+        /* --- SISI KARTU (DEPAN & BELAKANG) --- */
+        .card-face {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 16px;
+            backface-visibility: hidden; /* Sembunyikan sisi belakang saat diputar */
+            overflow: hidden;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            border: 2px solid #334155;
+        }
+
+        /* --- DESAIN DEPAN --- */
+        .card-front {
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Frame Art */
+        .art-frame {
+            margin: 10px;
+            height: 55%;
+            background: #1e293b;
+            border: 2px solid #475569;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .art-image {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+
+        /* Teks Info */
+        .card-info {
+            padding: 0 16px;
+            color: #cbd5e1;
+        }
+
+        /* --- DESAIN BELAKANG (DETAIL) --- */
+        .card-back {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            transform: rotateY(180deg); /* Awalnya menghadap belakang */
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            justify-content: center;
+            border: 2px solid #64748b;
+        }
+
+        /* --- EFEK HOLO / SHINY (THE JUICE!) --- */
+        .holo-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 16px;
+            /* Gradient Transparan yang bergerak */
+            background: linear-gradient(
+                115deg, 
+                transparent 20%, 
+                rgba(255, 255, 255, 0.1) 40%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0.1) 60%, 
+                transparent 80%
+            );
+            background-size: 200% 200%;
+            background-position: var(--holo-pos-x, 50%) var(--holo-pos-y, 50%);
+            mix-blend-mode: overlay; /* Kunci efek menyatu dengan gambar */
+            opacity: 0; /* Muncul hanya saat hover */
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .card-wrapper:hover .holo-overlay {
+            opacity: 1;
+        }
+        
+        /* Bingkai Rarity */
+        .rarity-legendary { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.2); }
+        .rarity-epic { border-color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.2); }
+        .rarity-rare { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+
+    </style>
+</head>
+<body class="bg-slate-950 min-h-screen flex flex-col font-sans text-slate-200">
+
+    <header class="p-8 text-center">
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400 mb-2 font-mono">
+            ARIES MEDIA TCG
+        </h1>
+        <p class="text-slate-500">Collect the Skills. Build the Future.</p>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 w-full max-w-6xl">
+
+            <div class="card-container group">
+                <div class="card-wrapper" onclick="this.classList.toggle('flipped')">
+                    
+                    <div class="card-face card-front rarity-legendary">
+                        <div class="p-3 flex justify-between items-center bg-slate-900/50 border-b border-slate-800">
+                            <span class="font-bold text-amber-400 text-sm">The Architect</span>
+                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full">LEGENDARY</span>
+                        </div>
+                        
+                        <div class="art-frame">
+                            <img src="https://ui-avatars.com/api/?name=Dev&background=0f172a&color=38bdf8&size=512" class="art-image" alt="Code Art">
+                            <div class="holo-overlay"></div>
+                        </div>
+
+                        <div class="card-info mt-2">
+                            <p class="text-[10px] italic text-slate-500 mb-2">"Structuring logic into reality."</p>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span>Intelligence</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-sky-500 h-full" style="width: 95%"></div></div>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span>Creativity</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-emerald-500 h-full" style="width: 80%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-auto p-3 bg-slate-900/80 border-t border-slate-800 flex justify-between items-center">
+                            <span class="text-xs font-mono text-sky-400">CLASS: DEV</span>
+                            <span class="text-[10px] text-slate-500">#001</span>
+                        </div>
+                        <div class="holo-overlay"></div> </div>
+
+                    <div class="card-face card-back rarity-legendary">
+                        <h3 class="text-xl font-bold text-amber-400 mb-4 border-b border-slate-600 pb-2">Full Stack Dev</h3>
+                        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+                            Specialized in building complex web simulators and robotics control systems. Expert in JavaScript, PID Control logic, and Interactive UI.
+                        </p>
+                        <div class="mb-6">
+                            <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Tech Stack</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-slate-800 rounded text-[10px] border border-slate-700">JavaScript</span>
+                                <span class="px-2 py-1 bg-slate-800 rounded text-[10px] border border-slate-700">HTML5 Canvas</span>
+                                <span class="px-2 py-1 bg-slate-800 rounded text-[10px] border border-slate-700">Tailwind</span>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-amber-600 hover:bg-amber-500 text-white rounded text-sm font-bold transition">
+                            View GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-container group">
+                <div class="card-wrapper" onclick="this.classList.toggle('flipped')">
+                    <div class="card-face card-front rarity-epic">
+                        <div class="p-3 flex justify-between items-center bg-slate-900/50 border-b border-slate-800">
+                            <span class="font-bold text-purple-400 text-sm">The Visionary</span>
+                            <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full">EPIC</span>
+                        </div>
+                        <div class="art-frame">
+                            <img src="https://ui-avatars.com/api/?name=Art&background=0f172a&color=a855f7&size=512" class="art-image">
+                            <div class="holo-overlay"></div>
+                        </div>
+                        <div class="card-info mt-2">
+                            <p class="text-[10px] italic text-slate-500 mb-2">"Visualizing the unseen."</p>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span>Imagination</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-purple-500 h-full" style="width: 98%"></div></div>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span>Detail</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-pink-500 h-full" style="width: 85%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-auto p-3 bg-slate-900/80 border-t border-slate-800 flex justify-between items-center">
+                            <span class="text-xs font-mono text-purple-400">CLASS: ART</span>
+                            <span class="text-[10px] text-slate-500">#002</span>
+                        </div>
+                        <div class="holo-overlay"></div>
+                    </div>
+                    <div class="card-face card-back rarity-epic">
+                        <h3 class="text-xl font-bold text-purple-400 mb-4 border-b border-slate-600 pb-2">Illustrator</h3>
+                        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+                            Focusing on character design, TCG assets, and digital painting. Bringing concepts to life with vibrant colors and dynamic compositions.
+                        </p>
+                        <button class="w-full py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm font-bold transition">
+                            View Gallery
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+             <div class="card-container group">
+                <div class="card-wrapper" onclick="this.classList.toggle('flipped')">
+                    <div class="card-face card-front rarity-rare">
+                        <div class="p-3 flex justify-between items-center bg-slate-900/50 border-b border-slate-800">
+                            <span class="font-bold text-blue-400 text-sm">The Mentor</span>
+                            <span class="text-[10px] bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full">RARE</span>
+                        </div>
+                        <div class="art-frame">
+                            <img src="https://ui-avatars.com/api/?name=Edu&background=0f172a&color=3b82f6&size=512" class="art-image">
+                            <div class="holo-overlay"></div>
+                        </div>
+                        <div class="card-info mt-2">
+                            <p class="text-[10px] italic text-slate-500 mb-2">"Sharing knowledge, building wisdom."</p>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span>Logic</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-blue-500 h-full" style="width: 90%"></div></div>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span>Patience</span>
+                                    <div class="w-24 bg-slate-800 h-2 rounded overflow-hidden"><div class="bg-teal-500 h-full" style="width: 100%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-auto p-3 bg-slate-900/80 border-t border-slate-800 flex justify-between items-center">
+                            <span class="text-xs font-mono text-blue-400">CLASS: EDU</span>
+                            <span class="text-[10px] text-slate-500">#003</span>
+                        </div>
+                        <div class="holo-overlay"></div>
+                    </div>
+                    <div class="card-face card-back rarity-rare">
+                        <h3 class="text-xl font-bold text-blue-400 mb-4 border-b border-slate-600 pb-2">Academic</h3>
+                        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+                            Lecturer in Electrical Engineering. Author of "Mental Fitness". Dedicated to simplifying complex concepts for students.
+                        </p>
+                         <div class="mb-6">
+                            <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2">Focus</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2 py-1 bg-slate-800 rounded text-[10px] border border-slate-700">Robotics</span>
+                                <span class="px-2 py-1 bg-slate-800 rounded text-[10px] border border-slate-700">Control Systems</span>
+                            </div>
+                        </div>
+                        <button class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded text-sm font-bold transition">
+                            Read Publications
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+<script>
+    /**
+     * 3D TILT & HOLO EFFECT LOGIC
+     * Menghitung posisi mouse relatif terhadap kartu
+     * dan menerapkan rotasi CSS serta posisi gradient.
+     */
+    const cards = document.querySelectorAll('.card-wrapper');
+
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            // Jangan jalankan efek jika kartu sedang dibalik
+            if (card.classList.contains('flipped')) return;
+
+            const rect = card.getBoundingClientRect();
+            
+            // Koordinat mouse di dalam kartu (0 sampai width/height)
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Hitung titik tengah
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            // Kalkulasi Rotasi (Maksimal 20 derajat)
+            // X axis rotation dipengaruhi oleh posisi Y mouse (atas/bawah)
+            // Y axis rotation dipengaruhi oleh posisi X mouse (kiri/kanan)
+            const rotateX = ((y - centerY) / centerY) * -15; // Invert biar natural
+            const rotateY = ((x - centerX) / centerX) * 15;
+
+            // Terapkan Transformasi
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+            // Update posisi Holo Effect (Gradient)
+            // Kita geser background position sesuai gerakan mouse
+            const holoX = (x / rect.width) * 100;
+            const holoY = (y / rect.height) * 100;
+            
+            // Set CSS Variable untuk elemen .holo-overlay
+            card.style.setProperty('--holo-pos-x', `${holoX}%`);
+            card.style.setProperty('--holo-pos-y', `${holoY}%`);
+        });
+
+        // Reset saat mouse keluar
+        card.addEventListener('mouseleave', () => {
+            if (card.classList.contains('flipped')) return;
+            
+            // Kembalikan ke posisi semula dengan transisi smooth
+            card.style.transition = 'transform 0.5s ease';
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            
+            // Hapus transisi setelah selesai agar mousemove berikutnya tidak lag
+            setTimeout(() => {
+                card.style.transition = 'transform 0.1s ease-out';
+            }, 500);
+        });
+    });
+</script>
+</body>
+</html>

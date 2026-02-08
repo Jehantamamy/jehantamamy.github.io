@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Motor Torque & Gearbox Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animasi Putaran */
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* Visual Tali Tegang (Normal) */
+        .rope-tension {
+            position: absolute;
+            left: 50%;
+            top: 50%; /* Mulai dari tengah katrol */
+            width: 4px;
+            height: 140px; /* Panjang tali fix */
+            background: linear-gradient(to bottom, #475569 0%, #cbd5e1 100%);
+            transform: translateX(-50%);
+            z-index: 0; /* Di belakang katrol */
+            transform-origin: top;
+        }
+
+        /* Visual Tali Kendor (Stall/Putus) */
+        .rope-slack {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 4px;
+            height: 140px;
+            border-left: 2px dashed #ef4444;
+            background: transparent;
+            transform: translateX(-50%) rotate(5deg);
+            z-index: 0;
+            opacity: 0.7;
+        }
+
+        /* Container Visual agar tidak tumpang tindih */
+        .sim-container {
+            height: 600px; /* Tinggi fix agar aman */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #0f172a; /* Slate-900 */
+            border: 1px solid #1e293b;
+            border-radius: 1.5rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="p-4 bg-slate-950 text-slate-200 font-sans">
+    <div class="max-w-6xl mx-auto">
+        
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-xl font-bold text-amber-400 font-mono uppercase italic">Motor Lab: Custom Specs</h2>
+                <p class="text-[10px] text-slate-500 font-mono">Physics Engine: Linear Torque-Speed Drop</p>
+            </div>
+            <div id="status-badge" class="text-[10px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded text-emerald-500 font-mono uppercase">System: Ready</div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div class="lg:col-span-1 space-y-5 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl h-fit">
+                
+                <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 mb-4">
+                    <h4 class="text-[10px] text-amber-500 font-bold uppercase mb-3 border-b border-slate-800 pb-1">1. Input Spesifikasi Motor</h4>
+                    
+                    <div class="mb-3">
+                        <label class="block text-[9px] font-mono text-slate-400 mb-1">No-Load Speed (RPM)</label>
+                        <input type="number" id="base-rpm" value="6000" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white outline-none focus:border-amber-500 text-right">
+                        <p class="text-[8px] text-slate-600 italic">Cek datasheet: "No-load Speed"</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-[9px] font-mono text-slate-400 mb-1">Stall Torque (Kg.cm)</label>
+                        <input type="number" id="stall-torque" value="10" class="w-full bg-slate-900 border border-slate-700 rounded p-1 text-xs text-white outline-none focus:border-amber-500 text-right">
+                        <p class="text-[8px] text-slate-600 italic">Cek datasheet: "Stall Torque"</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase italic">Beban (Load) - Kg</label>
+                    <input type="range" id="load-kg" min="0.5" max="20" step="0.5" value="2" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-rose-500">
+                    <div id="load-val" class="text-right text-rose-400 font-bold text-xs mt-1">2 Kg</div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase italic">Jari-jari Katrol (R) - cm</label>
+                    <input type="range" id="radius-cm" min="1" max="10" step="0.5" value="5" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500">
+                    <div id="radius-val" class="text-right text-sky-400 font-bold text-xs mt-1">5 cm</div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800">
+                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase italic text-amber-500">Gearbox Ratio (1:X)</label>
+                    <input type="range" id="gear-ratio" min="1" max="200" step="1" value="10" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    <div id="gear-val" class="text-right text-amber-500 font-bold text-xs mt-1">1:10 (Reducer)</div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-800">
+                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase italic text-emerald-500">Efisiensi Sistem (%)</label>
+                    <input type="range" id="efficiency" min="50" max="100" step="5" value="90" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                    <div id="eff-val" class="text-right text-emerald-500 font-bold text-xs mt-1">90%</div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 space-y-4">
+                <div class="sim-container">
+                    
+                    <div class="absolute top-4 left-4 text-[9px] font-mono text-slate-500 border border-slate-800 p-2 rounded bg-slate-950/50">
+                        <div class="font-bold text-slate-400 mb-1">CURRENT MOTOR:</div>
+                        <div>Base: <span id="disp-base">6000</span> RPM</div>
+                        <div>Stall: <span id="disp-stall">10</span> Kg.cm</div>
+                    </div>
+
+                    <div id="pulley-disc" class="w-32 h-32 border-[6px] border-slate-700 rounded-full flex items-center justify-center relative shadow-2xl bg-slate-800 z-10">
+                        <div class="w-1 h-full bg-slate-700 absolute"></div>
+                        <div class="h-1 w-full bg-slate-700 absolute"></div>
+                        <div class="w-3 h-3 bg-amber-500 rounded-full z-20 border border-slate-900"></div>
+                        <div class="w-2 h-2 bg-rose-500 rounded-full absolute top-2"></div>
+                    </div>
+                    
+                    <div id="rope" class="rope-tension"></div>
+                    
+                    <div id="load-box" class="absolute w-12 h-12 bg-rose-600 rounded flex flex-col items-center justify-center text-white shadow-lg shadow-rose-900/50 z-20 transition-all" style="top: calc(50% + 100px);">
+                        <span id="box-label" class="text-[10px] font-bold">2kg</span>
+                    </div>
+
+                    <div class="absolute bottom-4 left-4 right-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-slate-950 p-2 rounded-xl border border-rose-900/30">
+                            <div class="text-[9px] text-slate-500 uppercase font-mono">Beban Torsi</div>
+                            <div class="text-base font-bold text-rose-400 font-mono"><span id="req-torque">0.0</span> <span class="text-[9px]">Kg.cm</span></div>
+                        </div>
+                        
+                        <div class="bg-slate-950 p-2 rounded-xl border border-emerald-900/30">
+                            <div class="text-[9px] text-slate-500 uppercase font-mono">Kekuatan Sistem</div>
+                            <div class="text-base font-bold text-emerald-400 font-mono"><span id="sys-torque">0.0</span> <span class="text-[9px]">Kg.cm</span></div>
+                        </div>
+
+                        <div class="bg-slate-950 p-2 rounded-xl border border-amber-900/30">
+                            <div class="text-[9px] text-slate-500 uppercase font-mono">Output Speed</div>
+                            <div class="text-base font-bold text-amber-400 font-mono"><span id="rpm-out">0</span> <span class="text-[9px]">RPM</span></div>
+                        </div>
+
+                        <div class="bg-slate-950 p-2 rounded-xl border border-slate-800">
+                            <div class="text-[9px] text-slate-500 uppercase font-mono">Status</div>
+                            <div id="speed-cat" class="text-[10px] font-bold text-white mt-1 uppercase tracking-wider">Stopped</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+		</div>
+
+        <section class="mt-12 space-y-8 pb-20">
+            
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-xl">
+                <div class="flex flex-col md:flex-row gap-8 items-start">
+                    <div class="flex-1">
+                        <h3 class="text-sky-400 font-bold text-lg uppercase mb-4 flex items-center gap-2 italic">
+                            <span>📚</span> Fisika Motor DC: Kurva Torsi vs Speed
+                        </h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Simulasi ini menggunakan model matematika linear yang digunakan di industri. Performa motor dibatasi oleh dua titik ekstrem:
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-3 list-disc ml-5 mb-4">
+                            <li>
+                                <b class="text-white">No-Load Speed (RPM Dasar):</b> Kecepatan maksimal motor saat berputar bebas tanpa beban. Torsi di titik ini adalah 0.
+                            </li>
+                            <li>
+                                <b class="text-white">Stall Torque (Torsi Macet):</b> Kekuatan maksimal motor untuk menahan beban diam. Saat beban mencapai titik ini, motor berhenti berputar (RPM = 0) dan arus listrik melonjak maksimal (berbahaya).
+                            </li>
+                            <li>
+                                <b class="text-amber-400">Operating Point:</b> Area aman dimana motor bekerja efisien, biasanya di 50% dari Stall Torque.
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3 bg-slate-950 p-2 rounded-xl border border-slate-800 text-center group">
+                        <img src="../assets/torque-curve.png" alt="Grafik Kurva Torsi vs RPM" class="w-full h-auto rounded-lg shadow-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                        <p class="text-[10px] text-slate-500 mt-2 italic">Grafik Linear Drop: RPM turun seiring naiknya Torsi.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 p-8 rounded-3xl border border-slate-700 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-6 opacity-5 text-8xl font-black text-white">ROBOT</div>
+                
+                <h3 class="text-emerald-400 font-bold text-lg uppercase mb-6 flex items-center gap-2 italic">
+                    <span>🤖</span> Penerapan: Mobile Robot 2 Roda
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Pada robot beroda (Differential Drive), motor tidak "mengangkat" beban vertikal seperti katrol, tetapi <b>mendorong</b> massa robot melawan inersia dan gesekan. Namun, perhitungan torsi tetap sama:
+                        </p>
+                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-600 font-mono text-emerald-300 text-xs mb-4">
+                            Torsi Per Motor = (Gaya Dorong × Jari-jari Roda) / Efisiensi
+                        </div>
+                        <p class="text-xs text-slate-400 mb-2">
+                            <b>Studi Kasus:</b> Robot Line Follower berat 2Kg dengan 2 motor.
+                            <br>Jika robot menanjak terjal (worst case), tiap motor menanggung beban kira-kira 1Kg.
+                        </p>
+                        <ul class="text-xs text-slate-400 list-disc ml-5 space-y-1">
+                            <li><b>Jari-jari (R):</b> Ukuran ban robot (semakin besar ban, robot makin kencang tapi torsi turun).</li>
+                            <li><b>Gear Ratio:</b> Robot Sumo butuh rasio besar (Torsi), Robot Balap butuh rasio kecil (Speed).</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-slate-950/50 p-2 rounded-xl flex flex-col items-center justify-center border border-slate-700 group">
+                        <img src="../assets/wheel-torque.png" alt="Ilustrasi Pengaruh Roda Besar vs Kecil" class="w-full h-auto rounded-lg shadow-lg opacity-90 group-hover:opacity-100 transition-opacity duration-500">
+                        <p class="text-[10px] text-slate-500 mt-2 text-center">
+                            Besar roda mempengaruhi torsi yang dibutuhkan motor secara langsung.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-8 rounded-3xl border border-slate-800 shadow-xl">
+                <h3 class="text-amber-400 font-bold text-sm uppercase mb-6 flex items-center gap-2 italic">
+                    <span>📝</span> Tugas Praktikum: Desain Sistem Penggerak
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 hover:border-sky-500 transition-colors">
+                        <div class="text-sky-500 font-bold text-xs mb-2 uppercase">Percobaan 1: Validasi Datasheet</div>
+                        <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                            Ambil spesifikasi motor <b>JGA25-370</b> (misal: 1000 RPM, Stall 4 Kg.cm). Masukkan angka tersebut ke panel "Input Spesifikasi".
+                            <br><br>
+                            <b>Tugas:</b> Berikan beban 2 Kg dengan jari-jari 1 cm. Berapa RPM output yang terbaca? Apakah sesuai dengan teori penurunan linear?
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 hover:border-emerald-500 transition-colors">
+                        <div class="text-emerald-500 font-bold text-xs mb-2 uppercase">Percobaan 2: Robot Sumo</div>
+                        <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                            Anda merancang Robot Sumo 3Kg (menggunakan 2 motor, @1.5Kg beban per motor). Anda ingin dorongan kuat, bukan kecepatan.
+                            <br><br>
+                            <b>Tugas:</b> Gunakan Motor Base 6000 RPM. Cari kombinasi <b>Gear Ratio</b> yang membuat robot tetap sanggup mendorong beban (tidak Stall) namun masih memiliki torsi sisa yang besar (Safety Factor).
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 hover:border-rose-500 transition-colors">
+                        <div class="text-rose-500 font-bold text-xs mb-2 uppercase">Percobaan 3: Analisis Roda</div>
+                        <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
+                            Set beban tetap di 2Kg. Bandingkan penggunaan roda diameter kecil (R=2cm) vs roda besar (R=8cm).
+                            <br><br>
+                            <b>Analisis:</b> Mengapa robot beroda besar seringkali gagal menanjak (Stall) meskipun menggunakan motor yang sama? Jelaskan hubungannya dengan rumus $T = F \times r$.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+				
+    </div>
+
+    <script>
+        function updateSim() {
+            // 1. Ambil Custom Specs (Input User)
+            const baseRPM = parseFloat(document.getElementById('base-rpm').value) || 0;
+            const stallTorque = parseFloat(document.getElementById('stall-torque').value) || 0;
+
+            // Update Display Spec
+            document.getElementById('disp-base').innerText = baseRPM;
+            document.getElementById('disp-stall').innerText = stallTorque;
+
+            // 2. Ambil Variable Input
+            const load = parseFloat(document.getElementById('load-kg').value);
+            const radius = parseFloat(document.getElementById('radius-cm').value);
+            const ratio = parseInt(document.getElementById('gear-ratio').value);
+            const efficiency = parseInt(document.getElementById('efficiency').value) / 100;
+
+            // Update Labels
+            document.getElementById('load-val').innerText = load + " Kg";
+            document.getElementById('radius-val').innerText = radius + " cm";
+            document.getElementById('gear-val').innerText = "1:" + ratio;
+            document.getElementById('eff-val').innerText = (efficiency * 100) + "%";
+            document.getElementById('box-label').innerText = load + "kg";
+
+            // 3. Kalkulasi Fisika
+            const loadTorque = load * radius; // Torsi yang diminta beban
+            
+            // Torsi Maksimal Sistem (Jika Motor dipaksa sampai berhenti)
+            const systemMaxTorque = stallTorque * ratio * efficiency;
+
+            // 4. Hitung RPM
+            // LoadAtMotor adalah beban torsi yang dirasakan poros motor sebelum gear
+            const loadAtMotorShaft = loadTorque / (ratio * efficiency);
+            
+            // Faktor Beban (0.0 = Tanpa Beban, 1.0 = Macet)
+            let loadFactor = loadAtMotorShaft / stallTorque;
+            
+            let motorRPM = 0;
+            if (loadFactor >= 1) {
+                motorRPM = 0; // Stall
+            } else {
+                motorRPM = baseRPM * (1 - loadFactor); // Penurunan RPM Linear
+            }
+
+            const outputRPM = motorRPM / ratio;
+
+            // 5. Update Output UI
+            document.getElementById('req-torque').innerText = loadTorque.toFixed(1);
+            document.getElementById('sys-torque').innerText = systemMaxTorque.toFixed(1);
+            document.getElementById('rpm-out').innerText = Math.floor(outputRPM);
+
+            // 6. Visual Animation & Status
+            const pulley = document.getElementById('pulley-disc');
+            const rope = document.getElementById('rope');
+            const status = document.getElementById('status-badge');
+            const catLabel = document.getElementById('speed-cat');
+
+            if (outputRPM > 0) {
+                // NORMAL OPERATION
+                let animDuration = 60 / outputRPM;
+                if(animDuration < 0.05) animDuration = 0.05; // Cap speed visual
+                
+                pulley.style.animation = `spin ${animDuration}s linear infinite`;
+                pulley.style.borderColor = "#334155";
+                
+                rope.className = "rope-tension";
+                
+                status.innerText = "System: Running";
+                status.className = "text-[10px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded text-emerald-500 font-mono uppercase";
+
+                if (outputRPM > 500) {
+                    catLabel.innerHTML = "<span class='text-sky-400'>⚡ SUPER FAST</span>";
+                } else if (outputRPM > 100) {
+                    catLabel.innerHTML = "<span class='text-emerald-400'>🚀 FAST</span>";
+                } else {
+                    catLabel.innerHTML = "<span class='text-amber-400'>🐢 SLOW (TORQUE)</span>";
+                }
+
+            } else {
+                // STALLED / OVERLOAD
+                pulley.style.animation = "none";
+                pulley.style.borderColor = "#ef4444";
+                
+                rope.className = "rope-slack"; // Tali visual putus/kendor
+                
+                status.innerText = "MOTOR STALLED";
+                status.className = "text-[10px] bg-rose-500/10 border border-rose-500/20 px-2 py-1 rounded text-rose-500 font-mono uppercase blink";
+                
+                catLabel.innerHTML = "<span class='text-rose-500 blink'>⛔ OVERLOAD</span>";
+            }
+        }
+
+        // Listeners
+        document.querySelectorAll('input').forEach(i => i.addEventListener('input', updateSim));
+        updateSim();
+    </script>
+</body>
+</html>

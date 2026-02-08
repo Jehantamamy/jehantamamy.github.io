@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Ultimate Differential Drive Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .motor-bar-container { height: 100px; background: #0f172a; border-radius: 6px; position: relative; overflow: hidden; border: 1px solid #334155; }
+        .motor-bar { bottom: 0; position: absolute; width: 100%; transition: height 0.05s linear; }
+        
+        input[type=range] { 
+            -webkit-appearance: none; 
+            background: transparent; 
+            cursor: pointer; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px; width: 16px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #38bdf8;
+            margin-top: -6px;
+            box-shadow: 0 0 5px rgba(56, 189, 248, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="p-4 bg-slate-950 text-slate-200 font-sans h-screen flex flex-col">
+    <div class="max-w-7xl w-full mx-auto flex-grow flex flex-col gap-4">
+        
+        <div class="flex justify-between items-center">
+            <div>
+                <h2 class="text-xl font-bold text-sky-400 font-mono uppercase italic">Differential Drive Pro</h2>
+                <p class="text-[10px] text-slate-500 font-mono">Physics: Friction, Inertia, & PID</p>
+            </div>
+            <div class="flex gap-2">
+                <div class="text-[10px] bg-sky-900/30 border border-sky-500/30 px-3 py-1 rounded text-sky-400 font-mono">
+                    System: <span id="disp-physics">Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-grow">
+            
+            <div class="lg:col-span-3 space-y-5 bg-slate-900 p-5 rounded-xl border border-slate-800 h-fit overflow-y-auto max-h-full">
+                
+                <div class="space-y-3 pb-4 border-b border-slate-700">
+                    <h3 class="text-[10px] text-purple-400 font-bold uppercase tracking-wider">⚙️ Physical Properties</h3>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] text-slate-400 font-bold">Base Speed</label>
+                            <span id="val-base" class="text-[10px] text-white font-mono">150</span>
+                        </div>
+                        <input type="range" id="base-speed" min="50" max="255" step="5" value="150" class="w-full">
+                    </div>
+					<div>
+						<div class="flex justify-between mb-1">
+							<label class="text-[10px] text-yellow-400 font-bold">Control Mode</label>
+						</div>
+						<select id="control-mode" class="w-full bg-slate-800 text-[10px] text-white p-1 rounded border border-slate-600 focus:outline-none">
+							<option value="direct">Direct Mapping (Instan)</option>
+							<option value="accel">Acceleration Based (Halus)</option>
+						</select>
+						<p class="text-[9px] text-slate-500 italic mt-1">
+							Direct = Agresif. Acceleration = Seperti mobil (butuh waktu ngegas).
+						</p>
+					</div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] text-purple-300 font-bold">Inertia (Massa)</label>
+                            <span id="val-inertia" class="text-[10px] text-white font-mono">50%</span>
+                        </div>
+                        <input type="range" id="inertia" min="0" max="100" step="1" value="50" class="w-full bg-slate-800 rounded">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] text-orange-400 font-bold">Friction (Gesekan)</label>
+                            <span id="val-friction" class="text-[10px] text-white font-mono">50%</span>
+                        </div>
+                        <input type="range" id="friction" min="0" max="100" step="1" value="50" class="w-full bg-slate-800 rounded">
+                        <p class="text-[9px] text-slate-500 italic mt-1">
+                            0% = Es Licin (Drift), 100% = Karpet Kasar (Rem Pakem)
+                        </p>
+                    </div>
+
+                     <div>
+                        <div class="flex justify-between mb-1">
+                            <label class="text-[10px] text-emerald-300 font-bold">Sensor Width</label>
+                            <span id="val-sensor" class="text-[10px] text-white font-mono">200px</span>
+                        </div>
+                        <input type="range" id="sensor-limit" min="50" max="400" step="10" value="200" class="w-full bg-slate-800 rounded">
+                    </div>
+					
+					<div>
+						<div class="flex justify-between mb-1">
+							<label class="text-[10px] text-teal-400 font-bold">Sensor Type</label>
+						</div>
+						<select id="sensor-type" class="w-full bg-slate-800 text-[10px] text-white p-1 rounded border border-slate-600 focus:outline-none">
+							<option value="analog">Analog (Ideal/Infinite)</option>
+							<option value="digital-8">Digital 8-Channel (Kasar)</option>
+							<option value="digital-16">Digital 16-Channel (Halus)</option>
+						</select>
+						<p class="text-[9px] text-slate-500 italic mt-1">
+							Digital membuat error "patah-patah" yang memicu osilasi natural.
+						</p>
+					</div>
+                </div>
+
+                <div class="space-y-3 pb-4 border-b border-slate-700">
+                    <h3 class="text-[10px] text-sky-400 font-bold uppercase tracking-wider">🧠 PID Controller</h3>
+                    <div>
+                        <label class="flex justify-between text-[10px] text-rose-400 font-bold">Kp <span id="val-kp" class="text-white">1.0</span></label>
+                        <input type="range" id="kp" min="0" max="10" step="0.1" value="1.0" class="w-full">
+                    </div>
+                    <div>
+                        <label class="flex justify-between text-[10px] text-emerald-400 font-bold">Ki <span id="val-ki" class="text-white">0.00</span></label>
+                        <input type="range" id="ki" min="0" max="0.1" step="0.001" value="0.0" class="w-full">
+                    </div>
+                    <div>
+                        <label class="flex justify-between text-[10px] text-amber-400 font-bold">Kd <span id="val-kd" class="text-white">0.0</span></label>
+                        <input type="range" id="kd" min="0" max="50" step="0.2" value="0.0" class="w-full">
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-[10px] text-amber-400 font-bold uppercase tracking-wider">🎯 Line Position</h3>
+                    <div>
+                        <input type="range" id="line-pos" min="0" max="100" step="1" value="50" class="w-full accent-amber-500">
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="setLine(20)" class="flex-1 py-1 bg-slate-800 border border-slate-600 rounded text-[9px] hover:bg-slate-700">Left</button>
+                        <button onclick="setLine(50)" class="flex-1 py-1 bg-slate-800 border border-slate-600 rounded text-[9px] hover:bg-slate-700">Center</button>
+                        <button onclick="setLine(80)" class="flex-1 py-1 bg-slate-800 border border-slate-600 rounded text-[9px] hover:bg-slate-700">Right</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-9 flex flex-col gap-4 h-full">
+                
+                <div class="flex-grow bg-slate-900 rounded-xl border border-slate-800 relative overflow-hidden flex items-center justify-center min-h-[300px]">
+                    <canvas id="simCanvas"></canvas>
+                    
+                    <div class="absolute top-4 left-4 bg-slate-950/90 p-3 rounded border border-slate-800 text-[10px] font-mono text-slate-400 shadow-lg">
+                        <div class="mb-1">PID Error: <span id="disp-error" class="text-rose-400 font-bold">0.0</span> <span id="sat-indicator" class="hidden text-amber-500 font-bold">(SATURATED)</span></div>
+                        <div>Angle: <span id="disp-angle" class="text-sky-400 font-bold">0.0</span>°</div>
+                    </div>
+                    
+                    <div class="absolute bottom-4 right-4 flex gap-3 bg-slate-950/80 p-3 rounded-lg border border-slate-800">
+                        <div class="text-center w-8">
+                            <div class="h-24 bg-slate-900 rounded relative border border-slate-700 overflow-hidden">
+                                <div class="absolute w-full h-[1px] bg-slate-500 top-1/2"></div>
+                                <div id="bar-left" class="absolute bottom-0 w-full bg-sky-500 transition-all duration-75" style="height: 50%"></div>
+                            </div>
+                            <span class="text-[9px] text-sky-400 font-bold mt-1 block">L</span>
+                        </div>
+                        <div class="text-center w-8">
+                            <div class="h-24 bg-slate-900 rounded relative border border-slate-700 overflow-hidden">
+                                <div class="absolute w-full h-[1px] bg-slate-500 top-1/2"></div>
+                                <div id="bar-right" class="absolute bottom-0 w-full bg-rose-500 transition-all duration-75" style="height: 50%"></div>
+                            </div>
+                            <span class="text-[9px] text-rose-400 font-bold mt-1 block">R</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-[250px] bg-slate-900 rounded-xl border border-slate-800 p-3 relative">
+                    <h4 class="absolute top-3 left-3 text-[10px] text-slate-500 font-bold uppercase z-10">Tracking Response</h4>
+                    <canvas id="chartCanvas"></canvas>
+                </div>
+            </div>
+        </div>
+		
+		<section class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 pb-12">
+            
+            <div class="space-y-4">
+                <h3 class="text-sky-400 font-bold text-sm uppercase flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <span>📚</span> Landasan Teori
+                </h3>
+
+                <details class="group bg-slate-900 border border-slate-800 rounded-lg open:border-sky-500/50 transition-all">
+                    <summary class="flex justify-between items-center p-4 cursor-pointer font-bold text-slate-300 hover:text-white">
+                        <span>1. Kinematika Differential Drive</span>
+                        <span class="text-sky-500 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="p-4 pt-0 text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/50 mt-2">
+                        <p class="mb-2">
+                            Robot ini tidak memiliki kemudi (stir). Ia berbelok dengan membedakan kecepatan roda:
+                        </p>
+                        <ul class="list-disc pl-4 space-y-1 mb-2 marker:text-sky-500">
+                            <li><b>Lurus:</b> $V_{kiri} = V_{kanan}$</li>
+                            <li><b>Belok Kanan:</b> $V_{kiri} > V_{kanan}$ (Roda kiri memutar lebih banyak).</li>
+                            <li><b>Pivot (Putar di tempat):</b> $V_{kiri} = -V_{kanan}$.</li>
+                        </ul>
+                        
+                        <div class="bg-slate-950 p-2 rounded mt-2 border border-slate-800">
+                            <strong class="text-sky-400">Konsep "Look-Ahead":</strong>
+                            Simulator ini menghitung error bukan di titik roda, tapi di "Hidung" robot (Sensor Offset). Ini memberikan efek antisipasi alami, mirip seperti pengemudi mobil yang melihat jalan jauh ke depan, bukan melihat aspal tepat di bawah ban.
+                        </div>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-900 border border-slate-800 rounded-lg open:border-rose-500/50 transition-all">
+                    <summary class="flex justify-between items-center p-4 cursor-pointer font-bold text-slate-300 hover:text-white">
+                        <span>2. Anatomi PID Controller</span>
+                        <span class="text-rose-500 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="p-4 pt-0 text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/50 mt-2">
+                        
+                        <div class="grid grid-cols-1 gap-2 mt-2">
+                            <div class="p-2 bg-rose-900/10 border border-rose-900/20 rounded">
+                                <b class="text-rose-400">Kp (Proportional) - "Si Kuat"</b><br>
+                                Menghasilkan tenaga koreksi utama. Semakin jauh dari garis, semakin keras ia membelokkan robot. 
+                                <br><i>Efek Samping:</i> Jika terlalu besar, robot akan berosilasi (zigzag) karena momentum.
+                            </div>
+                            <div class="p-2 bg-amber-900/10 border border-amber-900/20 rounded">
+                                <b class="text-amber-400">Kd (Derivative) - "Si Peredam"</b><br>
+                                Melihat <i>kecepatan perubahan error</i>. Jika robot melesat cepat ke arah garis, Kd akan melawan (mengerem putaran) agar robot tidak kebablasan (overshoot). Ini adalah kunci kestabilan.
+                            </div>
+                            <div class="p-2 bg-emerald-900/10 border border-emerald-900/20 rounded">
+                                <b class="text-emerald-400">Ki (Integral) - "Si Penumpuk"</b><br>
+                                Menjumlahkan error masa lalu. Berguna jika robot punya cacat mekanik (misal roda kiri macet). Di robot balap cepat, Ki seringkali diset 0 karena bikin respon lambat.
+                            </div>
+                        </div>
+                    </div>
+                </details>
+
+                 <details class="group bg-slate-900 border border-slate-800 rounded-lg open:border-purple-500/50 transition-all">
+                    <summary class="flex justify-between items-center p-4 cursor-pointer font-bold text-slate-300 hover:text-white">
+                        <span>3. Pengaruh Fisika (Inersia & Gesekan)</span>
+                        <span class="text-purple-500 group-open:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div class="p-4 pt-0 text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/50 mt-2">
+                        <p class="mb-2">PID Matematika murni menganggap motor merespon instan. Di dunia nyata, ada Hukum Newton:</p>
+                        <ul class="list-disc pl-4 space-y-2 marker:text-purple-500">
+                            <li>
+                                <b>Inersia (Massa):</b> Benda diam malas bergerak, benda bergerak malas berhenti. 
+                                <br><i>Di Simulator:</i> Saat Slider Inertia tinggi, robot akan "telat mikir" (Lag). Anda butuh Kd lebih besar untuk menghentikan putarannya.
+                            </li>
+                            <li>
+                                <b>Friction (Gesekan):</b> 
+                                <br><i>Rendah (Es):</i> Robot gampang tergelincir (Drift). Butuh Kd sangat besar.
+                                <br><i>Tinggi (Karpet):</i> Robot cepat berhenti, tapi butuh Kp besar untuk mulai berbelok.
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-emerald-400 font-bold text-sm uppercase flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <span>🧪</span> Skenario Praktikum (Lab Guide)
+                </h3>
+
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 relative overflow-hidden group hover:border-sky-500/30 transition-all">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 text-5xl font-black text-sky-500">01</div>
+                    <h4 class="text-sky-400 font-bold text-xs uppercase mb-2">Kalibrasi Osilasi (Ziegler-Nichols Method)</h4>
+                    <p class="text-[11px] text-slate-400 mb-2">Tujuan: Menemukan batas kestabilan sistem.</p>
+                    <ol class="list-decimal pl-4 text-[10px] text-slate-300 space-y-1">
+                        <li>Set <b>Inertia = 20%</b>, <b>Friction = 80%</b> (Kondisi Ideal).</li>
+                        <li>Set Ki = 0, Kd = 0.</li>
+                        <li>Naikkan <b>Kp</b> perlahan sambil menggeser garis kiri-kanan secara cepat.</li>
+                        <li>Cari nilai Kp dimana robot bergetar konstan (tidak berhenti, tidak bertambah parah). Ini disebut <i>Ultimate Gain ($K_u$)</i>.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 relative overflow-hidden group hover:border-amber-500/30 transition-all">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 text-5xl font-black text-amber-500">02</div>
+                    <h4 class="text-amber-400 font-bold text-xs uppercase mb-2">Tuning Kd (Damping)</h4>
+                    <p class="text-[11px] text-slate-400 mb-2">Tujuan: Menghilangkan overshoot pada tikungan tajam.</p>
+                    <ol class="list-decimal pl-4 text-[10px] text-slate-300 space-y-1">
+                        <li>Gunakan Kp yang didapat dari Skenario 1.</li>
+                        <li>Robot pasti bergetar hebat. Sekarang naikkan <b>Kd</b> perlahan.</li>
+                        <li>Perhatikan grafik: Garis merah (Robot) harus mulai menempel ke garis kuning (Target) tanpa lonjakan berlebih.</li>
+                        <li><b>Tantangan:</b> Coba set <b>Inertia 0%</b> (Direct). Anda akan melihat Kd menjadi sangat sensitif.</li>
+                    </ol>
+                </div>
+
+                <div class="bg-slate-900 p-4 rounded-lg border border-slate-800 relative overflow-hidden group hover:border-rose-500/30 transition-all">
+                    <div class="absolute top-0 right-0 p-2 opacity-10 text-5xl font-black text-rose-500">03</div>
+                    <h4 class="text-rose-400 font-bold text-xs uppercase mb-2">Uji Ekstrem (Drift & Saturation)</h4>
+                    <p class="text-[11px] text-slate-400 mb-2">Tujuan: Memahami batas fisik robot.</p>
+                    <ol class="list-decimal pl-4 text-[10px] text-slate-300 space-y-1">
+                        <li>Set <b>Friction = 10%</b> (Lantai Licin). Robot akan nge-drift. Bisakah Anda menstabilkannya dengan Kd tinggi?</li>
+                        <li>Kecilkan <b>Sensor Width</b> ke 50px. Geser garis jauh secara tiba-tiba.</li>
+                        <li>Perhatikan indikator <span class="text-amber-500 font-bold text-[9px]">SATURATED</span>. Robot akan kehilangan arah ("Buta") sesaat. Ini mensimulasikan robot yang keluar lintasan.</li>
+                    </ol>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // --- CONFIG ---
+        const CANVAS_W = 1000;
+        const CANVAS_H = 400;
+        
+        // --- STATE ---
+        let robotX = CANVAS_W / 2;
+        let robotAngle = 0;
+        let lineX = CANVAS_W / 2;
+        let trackOffset = 0;
+        let lastTime = performance.now();
+        
+        let lastError = 0;
+        let integral = 0;
+        let currentAngularVel = 0;
+		
+		// [BARU] Simpan kecepatan aktual untuk mode Akselerasi
+		let actualLeftSpeed = 0;
+		let actualRightSpeed = 0;
+        // --- DOM ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = CANVAS_W;
+        canvas.height = CANVAS_H;
+
+        // --- CHART ---
+        const ctxChart = document.getElementById('chartCanvas').getContext('2d');
+        const perfChart = new Chart(ctxChart, {
+            type: 'line',
+            data: {
+                labels: Array(150).fill(''),
+                datasets: [
+                    { label: 'Robot', data: Array(150).fill(50), borderColor: '#f43f5e', borderWidth: 2, pointRadius: 0, tension: 0.1 },
+                    { label: 'Target', data: Array(150).fill(50), borderColor: '#fbbf24', borderWidth: 2, borderDash: [5, 5], pointRadius: 0, fill: true, backgroundColor: 'rgba(251, 191, 36, 0.05)' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'none' },
+                scales: { 
+                    y: { min: 0, max: 100, grid: { color: '#1e293b' } }, 
+                    x: { display: false } 
+                },
+                plugins: { legend: { display: true }, tooltip: { enabled: false } }
+            }
+        });
+
+        // --- LOOP ---
+        function loop() {
+            const now = performance.now();
+            let dt = (now - lastTime) / 1000;
+            lastTime = now;
+            if(dt > 0.1) dt = 0.1;
+
+            // 1. INPUTS
+            const baseSpeed = parseInt(document.getElementById('base-speed').value);
+            const Kp = parseFloat(document.getElementById('kp').value);
+            const Ki = parseFloat(document.getElementById('ki').value);
+            const Kd = parseFloat(document.getElementById('kd').value);
+            const inertiaVal = parseInt(document.getElementById('inertia').value);
+            const frictionVal = parseInt(document.getElementById('friction').value);
+            const linePosVal = parseFloat(document.getElementById('line-pos').value);
+            const sensorLimit = parseInt(document.getElementById('sensor-limit').value);
+            const mode = document.getElementById('control-mode').value;
+            
+            // [BARU] Input Tipe Sensor
+            const sensorType = document.getElementById('sensor-type').value;
+
+            // Update Labels
+            document.getElementById('val-base').innerText = baseSpeed;
+            document.getElementById('val-kp').innerText = Kp.toFixed(1);
+            document.getElementById('val-ki').innerText = Ki.toFixed(3);
+            document.getElementById('val-kd').innerText = Kd.toFixed(1);
+            document.getElementById('val-inertia').innerText = inertiaVal + "%";
+            document.getElementById('val-friction').innerText = frictionVal + "%";
+            document.getElementById('val-sensor').innerText = sensorLimit + "px";
+
+            // 2. LINE LOGIC
+            const lineX = (linePosVal / 100) * CANVAS_W;
+
+            // 3. PID CALCULATION & SENSOR LOGIC
+            
+            // Hitung Posisi Sensor di Depan Robot (Look-Ahead)
+            const sensorOffset = 45; 
+            const sensorX = robotX + (Math.sin(robotAngle) * sensorOffset);
+
+            // Hitung Raw Error
+            let rawError = lineX - sensorX;
+
+            // --- [FITUR BARU] SENSOR QUANTIZATION (DISKRITISASI) ---
+            // Mensimulasikan sensor yang tidak presisi (Digital step)
+            if (sensorType !== 'analog') {
+                // Tentukan resolusi langkah (step)
+                // Digital-8: Lebar sensor dibagi 8 zona
+                // Digital-16: Lebar sensor dibagi 16 zona
+                let steps = (sensorType === 'digital-8') ? 8 : 16;
+                let stepSize = sensorLimit / steps;
+
+                // Matematika pembulatan ke step terdekat
+                // Contoh: Error 12.5 -> 0. Error 28 -> 25.
+                rawError = Math.round(rawError / stepSize) * stepSize;
+            }
+
+            let error = rawError;
+
+            // --- SATURATION LOGIC ---
+            const halfSensor = sensorLimit / 2;
+            let isSaturated = false;
+
+            if (error > halfSensor) { error = halfSensor; isSaturated = true; } 
+            else if (error < -halfSensor) { error = -halfSensor; isSaturated = true; }
+
+            integral += error * dt;
+            const derivative = (error - lastError) / dt;
+            
+            if(integral > 100) integral = 100; if(integral < -100) integral = -100;
+            
+            const pidOutput = ((Kp * error) + (Ki * integral) + (Kd * derivative)) * 0.5;
+            lastError = error;
+
+            // 4. MOTOR MIXING
+            let targetLeft = baseSpeed + pidOutput;
+            let targetRight = baseSpeed - pidOutput;
+
+            // Clamp Target
+            targetLeft = Math.max(-255, Math.min(255, targetLeft));
+            targetRight = Math.max(-255, Math.min(255, targetRight));
+
+            // Acceleration Logic
+            let left, right;
+            if (mode === 'direct') {
+                actualLeftSpeed = targetLeft;
+                actualRightSpeed = targetRight;
+            } else {
+                const accelerationRate = 0.2; 
+                actualLeftSpeed += (targetLeft - actualLeftSpeed) * accelerationRate;
+                actualRightSpeed += (targetRight - actualRightSpeed) * accelerationRate;
+            }
+            left = actualLeftSpeed;
+            right = actualRightSpeed;
+
+            // 5. PHYSICS ENGINE
+            const targetAngularVel = (left - right) * 0.04;
+            
+            // Inertia Map
+            if (inertiaVal === 0) {
+                currentAngularVel = targetAngularVel;
+            } else {
+                let inertiaFactor = 0.8 - (inertiaVal / 120); 
+                if (inertiaFactor < 0.01) inertiaFactor = 0.01;
+                currentAngularVel += (targetAngularVel - currentAngularVel) * inertiaFactor;
+            }
+
+            // Friction Map
+            const frictionCoeff = 0.995 - (frictionVal / 500);
+            currentAngularVel *= frictionCoeff; 
+
+            // Update Angle
+            robotAngle += currentAngularVel * dt;
+            if(robotAngle > 1.5) robotAngle = 1.5; 
+            if(robotAngle < -1.5) robotAngle = -1.5;
+
+            // Lateral Movement
+            const forwardSpeed = (left + right) * 0.5;
+            trackOffset += forwardSpeed * dt * 2;
+            if(trackOffset > 80) trackOffset = 0;
+
+            robotX += Math.sin(robotAngle) * (Math.abs(forwardSpeed) + 50) * dt * 3.0;
+
+            // Bounds
+            if(robotX < 20) { robotX=20; robotAngle=0.1; currentAngularVel=0; }
+            if(robotX > CANVAS_W-20) { robotX=CANVAS_W-20; robotAngle=-0.1; currentAngularVel=0; }
+
+            // 6. DRAW & UPDATE
+            drawScene(lineX, robotX, robotAngle, sensorLimit);
+            updateBars(left, right);
+            
+            document.getElementById('disp-error').innerText = error.toFixed(1);
+            document.getElementById('disp-angle').innerText = (robotAngle * 57.29).toFixed(1);
+            const satBadge = document.getElementById('sat-indicator');
+            isSaturated ? satBadge.classList.remove('hidden') : satBadge.classList.add('hidden');
+
+            // Chart menampilkan posisi SENSOR (hidung) vs Garis
+            // Ini agar visual chart sesuai dengan apa yang dibaca PID
+            updateChartData(lineX, sensorX); 
+            
+            requestAnimationFrame(loop);
+        }
+
+        function drawScene(lx, rx, ang, sLimit) {
+            ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+            
+            // 1. Grid & Floor
+            ctx.strokeStyle = "#1e293b"; ctx.lineWidth = 1;
+            for(let i=0; i<=CANVAS_W; i+=100) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, CANVAS_H); ctx.stroke(); }
+            for(let y = trackOffset; y < CANVAS_H; y += 80) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CANVAS_W, y); ctx.stroke(); }
+
+            // 2. Target Line (Garis Kuning)
+            ctx.shadowColor = "#fbbf24"; ctx.shadowBlur = 10;
+            ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, CANVAS_H); ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // 3. Robot & Sensor (Satu Kesatuan)
+            ctx.save(); 
+            ctx.translate(rx, CANVAS_H - 80); 
+            ctx.rotate(ang); // Rotasi diterapkan ke BODY dan SENSOR
+
+            // --- A. Sensor Zone Visualization (Sekarang ikut miring!) ---
+            // Kita gambar di Y = -40 (posisi hidung robot)
+            ctx.fillStyle = "rgba(16, 185, 129, 0.15)"; // Emerald transparan
+            ctx.fillRect(-sLimit/2, -45, sLimit, 15); // Area sensor
+            
+            // Batas Sensor (Garis Putus-putus)
+            ctx.strokeStyle = "#34d399"; ctx.lineWidth = 1; ctx.setLineDash([2,2]); 
+            ctx.strokeRect(-sLimit/2, -45, sLimit, 15);
+            ctx.setLineDash([]); // Reset dash
+
+            // --- B. Robot Body ---
+            ctx.fillStyle = "#334155"; ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(-30, -40, 60, 80, 10); ctx.fill(); ctx.stroke();
+            
+            // Wheels
+            ctx.fillStyle = "#38bdf8"; ctx.fillRect(-38, -20, 8, 40); // L
+            ctx.fillStyle = "#f43f5e"; ctx.fillRect(30, -20, 8, 40);  // R
+
+            // Sensor Array Fisik (Strip Hijau di Hidung)
+            ctx.fillStyle = "#10b981"; ctx.fillRect(-20, -38, 40, 4);
+
+            // Direction Arrow
+            ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(-8, -10); ctx.lineTo(8, -10);
+            ctx.fillStyle = "#fbbf24"; ctx.fill();
+            
+            ctx.restore();
+        }
+
+        function updateBars(l, r) {
+            const hl = ((l + 255) / 510) * 100;
+            const hr = ((r + 255) / 510) * 100;
+            document.getElementById('bar-left').style.height = `${hl}%`;
+            document.getElementById('bar-right').style.height = `${hr}%`;
+        }
+
+        let frameCount = 0;
+        function updateChartData(linePx, robotPx) {
+            frameCount++; if(frameCount % 3 !== 0) return;
+            const targetVal = (linePx / CANVAS_W) * 100;
+            const robotVal = (robotPx / CANVAS_W) * 100;
+            const robotData = perfChart.data.datasets[0].data;
+            const lineData = perfChart.data.datasets[1].data;
+            robotData.push(robotVal); robotData.shift();
+            lineData.push(targetVal); lineData.shift();
+            perfChart.update('none');
+        }
+
+        function setLine(val) { document.getElementById('line-pos').value = val; }
+        loop();
+    </script>
+</body>
+</html>
