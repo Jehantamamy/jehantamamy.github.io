@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<title>PDF Forge - Merge, Convert & Optimize (Client-Side) - Aries Techlab</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .drag-active { 
+            border-color: #f43f5e !important; 
+            background-color: rgba(244, 63, 94, 0.1) !important; 
+            transform: scale(1.02);
+        }
+        
+        /* Tab Styles */
+        .tab-btn { transition: all 0.2s; border-bottom: 2px solid transparent; }
+        .tab-active { color: #f43f5e; border-bottom-color: #f43f5e; background-color: rgba(244, 63, 94, 0.05); }
+        .tab-inactive { color: #64748b; }
+        .tab-inactive:hover { color: #94a3b8; }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        
+        <div class="w-full max-w-4xl bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[700px]">
+            
+            <div class="border-b border-slate-700 bg-slate-900">
+                <div class="p-6 text-center">
+                    <h1 class="text-2xl font-extrabold text-white mb-1">PDF Forge <span class="text-rose-500">Studio</span></h1>
+                    <p class="text-slate-400 text-xs">Secure Client-Side PDF Tools (No Upload).</p>
+                </div>
+                
+                <div class="flex justify-center gap-1 px-4">
+                    <button onclick="setMode('merge')" id="tab-merge" class="tab-btn tab-active flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-t-lg">
+                        <span>📑</span> Merge PDF
+                    </button>
+                    <button onclick="setMode('img2pdf')" id="tab-img2pdf" class="tab-btn tab-inactive flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-t-lg">
+                        <span>🖼️</span> Image to PDF
+                    </button>
+                    <button onclick="setMode('optimize')" id="tab-optimize" class="tab-btn tab-inactive flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-t-lg">
+                        <span>🚀</span> Optimize
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-grow flex flex-col p-6 md:p-8 relative">
+                
+                <div id="info-banner" class="mb-4 bg-slate-800/50 border border-slate-700 rounded-lg p-3 flex items-start gap-3">
+                    <div class="text-rose-400 mt-0.5">ℹ️</div>
+                    <p id="mode-desc" class="text-xs text-slate-400 leading-relaxed">Combine multiple PDF files into one document.</p>
+                </div>
+
+                <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-600 rounded-2xl p-8 text-center transition-all duration-200 cursor-pointer hover:border-rose-500 hover:bg-slate-800/50 group relative mb-4">
+                    <input type="file" id="file-input" class="hidden" accept="application/pdf" multiple>
+                    
+                    <div class="flex flex-col items-center gap-3 pointer-events-none">
+                        <div class="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-slate-700 group-hover:border-rose-500/50">
+                            <span id="upload-icon" class="text-2xl">📂</span>
+                        </div>
+                        <div>
+                            <p id="upload-text" class="text-sm font-bold text-white group-hover:text-rose-400 transition-colors">Click to Add Files</p>
+                            <p class="text-[10px] text-slate-500 mt-1">or drag and drop here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="file-list-container" class="hidden flex-grow flex flex-col animate-fade-in">
+                    <div class="flex justify-between items-center mb-2 px-1">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Queue (<span id="file-count" class="text-white">0</span>)</span>
+                        <button onclick="clearAll()" class="text-[10px] text-rose-400 hover:underline">Clear All</button>
+                    </div>
+                    
+                    <ul id="file-list" class="flex-grow overflow-y-auto custom-scroll space-y-2 pr-2 max-h-[300px] min-h-[100px] bg-slate-950/30 rounded-xl p-2 border border-slate-800/50">
+                        </ul>
+
+                    <div id="settings-panel" class="hidden mt-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700 grid grid-cols-2 gap-4">
+                        </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-800">
+                        <button onclick="processAction()" id="action-btn" class="w-full py-4 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-xl shadow-lg shadow-rose-600/20 transition-all flex items-center justify-center gap-2 group active:scale-[0.98]">
+                            <span>⚡</span> PROCESS NOW
+                        </button>
+                    </div>
+                </div>
+
+                <div id="empty-state" class="text-center py-4 opacity-40 pointer-events-none select-none">
+                    <p class="text-xs text-slate-500 font-mono">Ready.</p>
+                </div>
+
+                <div id="loading" class="absolute inset-0 bg-slate-900/95 backdrop-blur z-20 hidden flex flex-col items-center justify-center rounded-2xl">
+                    <div class="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <h3 class="text-white font-bold">Processing...</h3>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard]
+        </div>
+
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">PDF Forge: The Secure Way to Merge & Convert Files</h2>
+            <p class="leading-relaxed">
+                Most online PDF tools force you to upload your private documents to their servers. <strong>PDF Forge</strong> is different. 
+                We use advanced <span class="text-rose-400 font-bold">Client-Side Technology (WebAssembly)</span> to process your files directly on your device. 
+                Whether you need to combine multiple reports into one, convert photos to PDF, or clean up file metadata—everything happens locally. 
+                <strong>Your data never leaves your computer.</strong>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📑</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">PDF Merger</h3>
+                <p class="text-xs text-slate-400">
+                    Combine multiple PDF files into a single document. Perfect for compiling reports, ebooks, or administrative documents. Drag and drop to reorder pages effortlessly.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🖼️</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">Image to PDF</h3>
+                <p class="text-xs text-slate-400">
+                    Convert JPG or PNG images into a PDF file. Essential for creating digital portfolios, submitting ID cards (KTP/SIM), or turning scanned receipts into a report.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🚀</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">PDF Optimizer</h3>
+                <p class="text-xs text-slate-400">
+                    Reduce file clutter by removing unused objects and metadata. This "re-saving" process often results in a smaller, cleaner file without quality loss.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border-l-4 border-rose-500 pl-6 py-6 mb-10">
+            <h3 class="text-xl font-bold text-white mb-4 mt-0">How to Merge PDF Files?</h3>
+            <ol class="space-y-3 list-decimal pl-5 marker:text-rose-500 text-sm">
+                <li>Click the <strong>"Merge PDF"</strong> tab above.</li>
+                <li>Drag & Drop your PDF files into the upload zone.</li>
+                <li><strong class="text-white">Reorder:</strong> Drag the files in the list to arrange them in the correct sequence (e.g., Cover Page first, Chapter 1 second).</li>
+                <li>Click the <strong>Preview (👁️)</strong> button if you need to check the content.</li>
+                <li>Hit <strong>"Merge Files Now"</strong> to instantly download your combined document.</li>
+            </ol>
+        </div>
+
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-white">Frequently Asked Questions</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Is it safe for sensitive documents?</h4>
+                    <p class="text-xs">Yes. Unlike other websites, we do not upload your files to a cloud server. All processing is done by your own browser using JavaScript libraries. It works even if you disconnect from the internet after loading the page.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Is there a file size limit?</h4>
+                    <p class="text-xs">Technically, no. However, since the processing happens on your device, very large files (e.g., 500MB+) might be slower depending on your computer's RAM.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Can I merge encrypted/password-protected PDFs?</h4>
+                    <p class="text-xs">For security reasons, browser-based tools cannot bypass PDF passwords. You must unlock the file first before merging.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle]
+        </div>
+
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+
+<script>
+    // --- STATE MANAGEMENT ---
+    let filesArray = [];
+    let currentMode = 'merge'; // merge | img2pdf | optimize
+
+    // DOM Elements
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const fileListEl = document.getElementById('file-list');
+    const fileListContainer = document.getElementById('file-list-container');
+    const emptyState = document.getElementById('empty-state');
+    const loading = document.getElementById('loading');
+    const fileCount = document.getElementById('file-count');
+    const uploadText = document.getElementById('upload-text');
+    const uploadIcon = document.getElementById('upload-icon');
+    const actionBtn = document.getElementById('action-btn');
+
+    // --- TAB SWITCHING LOGIC ---
+    function setMode(mode) {
+        currentMode = mode;
+        filesArray = []; // Reset queue saat ganti mode
+        renderList();
+        
+        // Update Tabs UI
+        ['merge', 'img2pdf', 'optimize'].forEach(m => {
+            const btn = document.getElementById(`tab-${m}`);
+            if(m === mode) {
+                btn.className = "tab-btn tab-active flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-t-lg transition-all";
+            } else {
+                btn.className = "tab-btn tab-inactive flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 rounded-t-lg transition-all hover:bg-slate-800/50";
+            }
+        });
+
+        // Update Info & Input Accept Type
+        const bannerText = document.getElementById('mode-desc');
+        if(mode === 'merge') {
+            bannerText.innerText = "Combine multiple PDF files into one single document.";
+            fileInput.setAttribute('accept', 'application/pdf');
+            uploadText.innerText = "Click to Add PDFs";
+            uploadIcon.innerText = "📑";
+            actionBtn.innerHTML = "<span>⚡</span> MERGE PDFs NOW";
+        } else if(mode === 'img2pdf') {
+            bannerText.innerText = "Convert JPG/PNG images into a single PDF file.";
+            fileInput.setAttribute('accept', 'image/jpeg, image/png');
+            uploadText.innerText = "Click to Add Images";
+            uploadIcon.innerText = "🖼️";
+            actionBtn.innerHTML = "<span>⚡</span> CONVERT TO PDF";
+        } else if(mode === 'optimize') {
+            bannerText.innerText = "Clean & Re-save PDF to reduce size (Metadata cleanup).";
+            fileInput.setAttribute('accept', 'application/pdf');
+            uploadText.innerText = "Add PDF to Optimize";
+            uploadIcon.innerText = "🚀";
+            actionBtn.innerHTML = "<span>⚡</span> OPTIMIZE PDF";
+        }
+    }
+
+    // --- DRAG & DROP EVENTS ---
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+    });
+
+    dropZone.addEventListener('dragover', () => dropZone.classList.add('drag-active'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    
+    dropZone.addEventListener('drop', (e) => {
+        dropZone.classList.remove('drag-active');
+        handleFiles(e.dataTransfer.files);
+    });
+    
+    fileInput.addEventListener('change', function() { handleFiles(this.files); });
+
+    // --- FILE HANDLING ---
+    function handleFiles(files) {
+        // Validasi Tipe File sesuai Mode
+        const validTypes = currentMode === 'img2pdf' ? ['image/jpeg', 'image/png'] : ['application/pdf'];
+        const newFiles = Array.from(files).filter(f => validTypes.includes(f.type));
+        
+        if(newFiles.length === 0 && files.length > 0) {
+            alert(`Invalid file type! Please upload ${currentMode === 'img2pdf' ? 'Images (JPG/PNG)' : 'PDF'} only.`);
+            return;
+        }
+
+        // Mode Optimize hanya boleh 1 file
+        if(currentMode === 'optimize') {
+            filesArray = []; // Reset jika ada file lama
+            if(newFiles.length > 1) alert("Optimization mode only accepts 1 file at a time. Using the first one.");
+            newFiles.splice(1); 
+        }
+
+        newFiles.forEach(f => {
+            filesArray.push({
+                id: Date.now() + Math.random().toString(36).substr(2, 9),
+                file: f
+            });
+        });
+
+        renderList();
+    }
+
+    function renderList() {
+        fileListEl.innerHTML = '';
+        
+        if(filesArray.length > 0) {
+            emptyState.classList.add('hidden');
+            fileListContainer.classList.remove('hidden');
+        } else {
+            emptyState.classList.remove('hidden');
+            fileListContainer.classList.add('hidden');
+        }
+
+        fileCount.innerText = filesArray.length;
+
+        filesArray.forEach((item, index) => {
+            const icon = currentMode === 'img2pdf' ? '🖼️' : '📄';
+            
+            const li = document.createElement('li');
+            li.className = "bg-slate-800/80 p-2.5 rounded-lg flex items-center justify-between group cursor-move border border-transparent hover:border-rose-500/30 transition-all select-none";
+            li.setAttribute('data-id', item.id);
+            
+            li.innerHTML = `
+                <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="text-slate-600 cursor-move px-1 hover:text-white">⋮⋮</div>
+                    <div class="w-8 h-8 rounded bg-slate-700 flex items-center justify-center text-xs">${icon}</div>
+                    <div class="flex-col overflow-hidden">
+                        <p class="text-xs text-white truncate font-medium w-32 md:w-64">${item.file.name}</p>
+                        <p class="text-[9px] text-slate-500 font-mono">${formatBytes(item.file.size)}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button onclick="previewFile('${item.id}')" class="text-sky-500 hover:text-white p-1.5 rounded hover:bg-sky-600 transition" title="Preview">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                    <button onclick="removeFile('${item.id}')" class="text-slate-500 hover:text-white p-1.5 rounded hover:bg-rose-600 transition" title="Remove">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            `;
+            fileListEl.appendChild(li);
+        });
+    }
+
+    // --- ACTIONS ---
+    function removeFile(id) {
+        filesArray = filesArray.filter(f => f.id !== id);
+        renderList();
+        fileInput.value = ''; 
+    }
+
+    function clearAll() {
+        if(confirm('Clear all files?')) {
+            filesArray = [];
+            renderList();
+            fileInput.value = '';
+        }
+    }
+
+    function previewFile(id) {
+        const item = filesArray.find(f => f.id === id);
+        if(item) {
+            const url = URL.createObjectURL(item.file);
+            window.open(url, '_blank');
+        }
+    }
+
+    function processAction() {
+        if(currentMode === 'merge') mergePDFs();
+        else if(currentMode === 'img2pdf') imagesToPDF();
+        else if(currentMode === 'optimize') optimizePDF();
+    }
+
+    // --- ENGINE 1: MERGE PDF ---
+    async function mergePDFs() {
+        if(filesArray.length < 2) { alert("Please upload at least 2 PDF files."); return; }
+        loading.classList.remove('hidden');
+
+        try {
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+
+            for (const item of filesArray) {
+                const arrayBuffer = await item.file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            }
+
+            const pdfBytes = await mergedPdf.save();
+            download(pdfBytes, `Merged_Forge_${Date.now()}.pdf`, "application/pdf");
+        } catch (error) {
+            console.error(error);
+            alert("Error: One of the files might be corrupted.");
+        } finally { loading.classList.add('hidden'); }
+    }
+
+    // --- ENGINE 2: IMAGES TO PDF ---
+    async function imagesToPDF() {
+        if(filesArray.length < 1) return;
+        loading.classList.remove('hidden');
+
+        try {
+            const { PDFDocument } = PDFLib;
+            const pdfDoc = await PDFDocument.create();
+
+            for (const item of filesArray) {
+                const imageBytes = await item.file.arrayBuffer();
+                let image;
+                
+                // Embed Image based on type
+                if (item.file.type === 'image/jpeg') image = await pdfDoc.embedJpg(imageBytes);
+                else image = await pdfDoc.embedPng(imageBytes);
+
+                // Add Page matching image size
+                const page = pdfDoc.addPage([image.width, image.height]);
+                page.drawImage(image, { x: 0, y: 0, width: image.width, height: image.height });
+            }
+
+            const pdfBytes = await pdfDoc.save();
+            download(pdfBytes, `Images_Converted_${Date.now()}.pdf`, "application/pdf");
+        } catch (error) {
+            console.error(error);
+            alert("Error converting images. Ensure they are valid JPG/PNG.");
+        } finally { loading.classList.add('hidden'); }
+    }
+
+    // --- ENGINE 3: OPTIMIZE PDF (Cleaner) ---
+    async function optimizePDF() {
+        if(filesArray.length < 1) return;
+        loading.classList.remove('hidden');
+
+        try {
+            const { PDFDocument } = PDFLib;
+            const arrayBuffer = await filesArray[0].file.arrayBuffer();
+            
+            // Load and Save to clean object streams
+            const pdfDoc = await PDFDocument.load(arrayBuffer);
+            
+            // Re-saving in PDF-Lib often removes unused objects/metadata
+            const pdfBytes = await pdfDoc.save(); 
+            
+            download(pdfBytes, `Optimized_${filesArray[0].file.name}`, "application/pdf");
+        } catch (error) {
+            console.error(error);
+            alert("Optimization failed. File might be encrypted.");
+        } finally { loading.classList.add('hidden'); }
+    }
+
+    // --- UTILS ---
+    new Sortable(fileListEl, {
+        animation: 150,
+        ghostClass: 'bg-slate-700',
+        onEnd: function (evt) {
+            // Reorder State
+            const newOrder = [];
+            fileListEl.querySelectorAll('li').forEach(li => {
+                const id = li.getAttribute('data-id');
+                const found = filesArray.find(f => f.id === id);
+                if(found) newOrder.push(found);
+            });
+            filesArray = newOrder;
+        },
+    });
+
+    function formatBytes(bytes) {
+        if (!+bytes) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
+    }
+</script>
+</body>
+</html>

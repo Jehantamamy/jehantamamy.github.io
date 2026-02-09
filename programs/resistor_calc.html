@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resistor Color Code Calculator (4, 5, 6 Bands) - Aries Tech</title>
+    <meta name="description" content="Interactive Resistor Color Code Calculator. Visual decoder for 4-band, 5-band, and 6-band resistors. Essential tool for electronics engineering.">
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* RESISTOR VISUAL STYLES */
+        .resistor-body {
+            background: linear-gradient(180deg, #d4d4d8 0%, #f4f4f5 40%, #a1a1aa 100%); /* Warna dasar resistor (Beige/Grey) */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), inset 0 -5px 10px rgba(0,0,0,0.2);
+        }
+        .resistor-wire {
+            background: linear-gradient(90deg, #52525b 0%, #a1a1aa 50%, #52525b 100%);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+        .band {
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        
+        /* Custom Select Style */
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            appearance: none;
+        }
+
+        /* Color Classes for Bands */
+        .bg-black-band { background-color: #000000; }
+        .bg-brown-band { background-color: #8B4513; }
+        .bg-red-band { background-color: #EF4444; }
+        .bg-orange-band { background-color: #F97316; }
+        .bg-yellow-band { background-color: #EAB308; }
+        .bg-green-band { background-color: #22C55E; }
+        .bg-blue-band { background-color: #3B82F6; }
+        .bg-violet-band { background-color: #8B5CF6; }
+        .bg-grey-band { background-color: #9CA3AF; }
+        .bg-white-band { background-color: #FFFFFF; }
+        .bg-gold-band { background: linear-gradient(180deg, #ca8a04 0%, #facc15 50%, #ca8a04 100%); }
+        .bg-silver-band { background: linear-gradient(180deg, #9ca3af 0%, #e5e7eb 50%, #9ca3af 100%); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+        
+        <div class="w-full max-w-5xl bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            
+            <div class="p-6 md:p-8 border-b border-slate-700 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white mb-1 flex items-center gap-3">
+                        <span class="text-3xl">📟</span> Resistor Master
+                    </h1>
+                    <p class="text-slate-400 text-xs">Interactive Color Code Decoder for Engineers & Students.</p>
+                </div>
+                
+                <div class="flex bg-slate-800 p-1 rounded-lg">
+                    <button onclick="setBands(4)" id="btn-4" class="px-4 py-2 text-xs font-bold rounded-md bg-sky-600 text-white shadow-lg transition-all">4 Bands</button>
+                    <button onclick="setBands(5)" id="btn-5" class="px-4 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white transition-all">5 Bands</button>
+                    <button onclick="setBands(6)" id="btn-6" class="px-4 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white transition-all">6 Bands</button>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 p-10 flex items-center justify-center border-b border-slate-700 relative overflow-hidden">
+                <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#64748b 1px, transparent 1px); background-size: 20px 20px;"></div>
+
+                <div class="relative flex items-center w-full max-w-2xl transform scale-75 md:scale-100 transition-transform">
+                    <div class="h-4 w-16 bg-gradient-to-b from-slate-400 to-slate-600 resistor-wire rounded-l-full"></div>
+                    
+                    <div class="h-24 w-16 resistor-body rounded-l-2xl border-r border-slate-400/20 relative z-10 flex items-center justify-center">
+                        <div id="visual-band-1" class="h-full w-4 bg-brown-band band absolute left-6"></div>
+                    </div>
+                    
+                    <div class="h-20 flex-grow resistor-body relative z-0 flex items-center justify-evenly px-4">
+                        <div id="visual-band-2" class="h-24 w-4 bg-black-band band"></div>
+                        <div id="visual-band-3" class="h-24 w-4 bg-black-band band hidden"></div>
+                        <div id="visual-band-mul" class="h-24 w-4 bg-red-band band"></div>
+                        <div id="visual-band-tol" class="h-24 w-4 bg-gold-band band"></div>
+                        <div id="visual-band-ppm" class="h-24 w-4 bg-red-band band hidden"></div>
+                    </div>
+
+                    <div class="h-24 w-16 resistor-body rounded-r-2xl border-l border-slate-400/20 relative z-10"></div>
+                    
+                    <div class="h-4 w-16 bg-gradient-to-b from-slate-400 to-slate-600 resistor-wire rounded-r-full"></div>
+                </div>
+            </div>
+
+            <div class="p-6 md:p-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">1st Digit</label>
+                        <select id="select-band-1" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="0" class="text-slate-400">Black (0)</option>
+                            <option value="1" selected class="text-amber-700 font-bold">Brown (1)</option>
+                            <option value="2" class="text-red-500 font-bold">Red (2)</option>
+                            <option value="3" class="text-orange-500 font-bold">Orange (3)</option>
+                            <option value="4" class="text-yellow-400 font-bold">Yellow (4)</option>
+                            <option value="5" class="text-green-500 font-bold">Green (5)</option>
+                            <option value="6" class="text-blue-500 font-bold">Blue (6)</option>
+                            <option value="7" class="text-purple-500 font-bold">Violet (7)</option>
+                            <option value="8" class="text-slate-400 font-bold">Grey (8)</option>
+                            <option value="9" class="text-white font-bold bg-slate-600">White (9)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">2nd Digit</label>
+                        <select id="select-band-2" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="0" selected>Black (0)</option>
+                            <option value="1" class="text-amber-700 font-bold">Brown (1)</option>
+                            <option value="2" class="text-red-500 font-bold">Red (2)</option>
+                            <option value="3" class="text-orange-500 font-bold">Orange (3)</option>
+                            <option value="4" class="text-yellow-400 font-bold">Yellow (4)</option>
+                            <option value="5" class="text-green-500 font-bold">Green (5)</option>
+                            <option value="6" class="text-blue-500 font-bold">Blue (6)</option>
+                            <option value="7" class="text-purple-500 font-bold">Violet (7)</option>
+                            <option value="8" class="text-slate-400 font-bold">Grey (8)</option>
+                            <option value="9" class="text-white font-bold bg-slate-600">White (9)</option>
+                        </select>
+                    </div>
+
+                    <div id="control-band-3" class="hidden">
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">3rd Digit</label>
+                        <select id="select-band-3" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="0" selected>Black (0)</option>
+                            <option value="1" class="text-amber-700 font-bold">Brown (1)</option>
+                            <option value="2" class="text-red-500 font-bold">Red (2)</option>
+                            <option value="3" class="text-orange-500 font-bold">Orange (3)</option>
+                            <option value="4" class="text-yellow-400 font-bold">Yellow (4)</option>
+                            <option value="5" class="text-green-500 font-bold">Green (5)</option>
+                            <option value="6" class="text-blue-500 font-bold">Blue (6)</option>
+                            <option value="7" class="text-purple-500 font-bold">Violet (7)</option>
+                            <option value="8" class="text-slate-400 font-bold">Grey (8)</option>
+                            <option value="9" class="text-white font-bold bg-slate-600">White (9)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">Multiplier</label>
+                        <select id="select-band-mul" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="1">Black (x1 Ω)</option>
+                            <option value="10">Brown (x10 Ω)</option>
+                            <option value="100" selected class="text-red-500 font-bold">Red (x100 Ω)</option>
+                            <option value="1000" class="text-orange-500 font-bold">Orange (x1 kΩ)</option>
+                            <option value="10000" class="text-yellow-400 font-bold">Yellow (x10 kΩ)</option>
+                            <option value="100000" class="text-green-500 font-bold">Green (x100 kΩ)</option>
+                            <option value="1000000" class="text-blue-500 font-bold">Blue (x1 MΩ)</option>
+                            <option value="10000000" class="text-purple-500 font-bold">Violet (x10 MΩ)</option>
+                            <option value="0.1" class="text-yellow-600 font-bold">Gold (x0.1 Ω)</option>
+                            <option value="0.01" class="text-slate-300 font-bold">Silver (x0.01 Ω)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">Tolerance</label>
+                        <select id="select-band-tol" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="1" class="text-amber-700 font-bold">Brown (±1%)</option>
+                            <option value="2" class="text-red-500 font-bold">Red (±2%)</option>
+                            <option value="0.5" class="text-green-500 font-bold">Green (±0.5%)</option>
+                            <option value="0.25" class="text-blue-500 font-bold">Blue (±0.25%)</option>
+                            <option value="0.1" class="text-purple-500 font-bold">Violet (±0.1%)</option>
+                            <option value="0.05" class="text-slate-400 font-bold">Grey (±0.05%)</option>
+                            <option value="5" selected class="text-yellow-600 font-bold">Gold (±5%)</option>
+                            <option value="10" class="text-slate-300 font-bold">Silver (±10%)</option>
+                        </select>
+                    </div>
+
+                    <div id="control-band-ppm" class="hidden">
+                        <label class="block text-[10px] font-mono uppercase text-slate-500 mb-1">Temp. Coeff (PPM)</label>
+                        <select id="select-band-ppm" onchange="calculate()" class="w-full bg-slate-800 border border-slate-700 rounded-lg p-2 text-sm text-white focus:border-sky-500 outline-none">
+                            <option value="100" class="text-amber-700 font-bold">Brown (100ppm)</option>
+                            <option value="50" class="text-red-500 font-bold">Red (50ppm)</option>
+                            <option value="15" class="text-orange-500 font-bold">Orange (15ppm)</option>
+                            <option value="25" class="text-yellow-400 font-bold">Yellow (25ppm)</option>
+                            <option value="10" class="text-blue-500 font-bold">Blue (10ppm)</option>
+                            <option value="5" class="text-purple-500 font-bold">Violet (5ppm)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="lg:col-span-1 bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-6 flex flex-col justify-center items-center text-center shadow-inner relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5">
+                        <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    
+                    <p class="text-xs text-slate-500 font-mono uppercase tracking-widest mb-2">Resistor Value</p>
+                    <h2 id="result-value" class="text-5xl font-extrabold text-white tracking-tight mb-2">1.0 kΩ</h2>
+                    <p id="result-tolerance" class="text-lg font-mono text-sky-400">± 5%</p>
+                    
+                    <div class="mt-6 w-full border-t border-slate-700 pt-4 flex justify-between text-[10px] text-slate-500 font-mono">
+                         <span>Min: <span id="val-min" class="text-slate-300">950 Ω</span></span>
+                         <span>Max: <span id="val-max" class="text-slate-300">1.05 kΩ</span></span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <div class="mt-12 max-w-4xl text-center space-y-4">
+            <h3 class="text-xl font-bold text-white">How it works?</h3>
+            <p class="text-sm text-slate-400 max-w-2xl mx-auto">
+                Electronics engineers use color bands to identify resistor values. 
+                <span class="text-sky-400">Black=0, Brown=1, Red=2...</span> Memorizing this is hard. 
+                This tool provides an instant calculation with visual validation to prevent assembly errors.
+            </p>
+        </div>
+
+    </main>
+	<section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard]
+        </div>
+
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">The Logic Behind Resistor Color Codes</h2>
+            <p class="leading-relaxed">
+                Resistors are too small to have numbers printed on them. Instead, engineers developed a color-coding system to indicate resistance, tolerance, and reliability. This system, established by the <strong>IEC 60062</strong> standard, allows you to read values from any angle.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+            <div>
+                <h3 class="text-sky-400 font-bold text-lg mb-3">📖 How to Read the Bands?</h3>
+                <ul class="space-y-3 list-none pl-0">
+                    <li class="flex gap-3">
+                        <span class="text-xl">➡️</span>
+                        <div>
+                            <strong class="text-white">Orientation:</strong> hold the resistor so the <span class="text-yellow-500 font-bold">Gold</span> or <span class="text-slate-300 font-bold">Silver</span> band is on the <strong>Right</strong>. Reading is always done from Left to Right.
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-xl">🔢</span>
+                        <div>
+                            <strong class="text-white">Significant Digits:</strong> The first 2 (or 3) bands represent the base number (e.g., Red-Red = 22).
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-xl">✖️</span>
+                        <div>
+                            <strong class="text-white">Multiplier:</strong> The next band tells you how many zeros to add (e.g., Orange = x1,000).
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="text-xl">🎯</span>
+                        <div>
+                            <strong class="text-white">Tolerance:</strong> The gap-separated band on the right. It shows how precise the resistor is.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 overflow-hidden">
+                <h4 class="text-white font-bold mb-4 text-center text-xs uppercase tracking-widest">Quick Reference Chart</h4>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-[10px] md:text-xs text-left">
+                        <thead class="text-slate-500 border-b border-slate-600">
+                            <tr>
+                                <th class="pb-2">Color</th>
+                                <th class="pb-2">Digit</th>
+                                <th class="pb-2">Multiplier</th>
+                                <th class="pb-2">Tolerance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-700/50">
+                            <tr><td class="py-2 font-bold" style="color:#000">Black</td><td>0</td><td>1 Ω</td><td>-</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#8B4513">Brown</td><td>1</td><td>10 Ω</td><td>± 1%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#EF4444">Red</td><td>2</td><td>100 Ω</td><td>± 2%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#F97316">Orange</td><td>3</td><td>1 kΩ</td><td>-</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#EAB308">Yellow</td><td>4</td><td>10 kΩ</td><td>-</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#22C55E">Green</td><td>5</td><td>100 kΩ</td><td>± 0.5%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#3B82F6">Blue</td><td>6</td><td>1 MΩ</td><td>± 0.25%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#A855F7">Violet</td><td>7</td><td>10 MΩ</td><td>± 0.1%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#9CA3AF">Grey</td><td>8</td><td>-</td><td>± 0.05%</td></tr>
+                            <tr><td class="py-2 font-bold" style="color:#FFF">White</td><td>9</td><td>-</td><td>-</td></tr>
+                            <tr><td class="py-2 font-bold text-yellow-500">Gold</td><td>-</td><td>0.1 Ω</td><td>± 5%</td></tr>
+                            <tr><td class="py-2 font-bold text-slate-300">Silver</td><td>-</td><td>0.01 Ω</td><td>± 10%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-8">
+            <h3 class="text-2xl font-bold text-white mb-6">Practical Engineering Insights</h3>
+
+            <div class="bg-slate-900/50 border-l-4 border-sky-500 pl-6 py-2">
+                <h4 class="text-white font-bold mb-2">When to use 4-Band vs 5-Band?</h4>
+                <p class="text-sm">
+                    <strong>4-Band (Carbon Film):</strong> Common for general use like limiting LED current or Pull-up/down resistors. They are cheaper but have 5% tolerance.
+                    <br><br>
+                    <strong>5-Band (Metal Film):</strong> Used in precision circuits like Audio Amplifiers or Voltage References. They usually have 1% tolerance (Brown band at the end), ensuring the exact voltage levels required.
+                </p>
+            </div>
+
+            <div class="bg-slate-900/50 border-l-4 border-rose-500 pl-6 py-2">
+                <h4 class="text-white font-bold mb-2">What is the 6th Band (PPM)?</h4>
+                <p class="text-sm">
+                    PPM stands for <em>Parts Per Million</em>. It indicates how much the resistance changes as the resistor heats up. 
+                    
+                    <br>
+                    Example: A <strong>Red (50ppm)</strong> band means for every 1°C change in temperature, the resistance shifts by 0.005%. This is critical for military or aerospace electronics where temperature varies wildly.
+                </p>
+            </div>
+        </div>
+        
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle]
+        </div>
+
+    </section>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+
+    <script>
+        let currentBands = 4;
+        
+        // Color Mapping for CSS Classes
+        const colorMap = {
+            '0': 'bg-black-band', '1': 'bg-brown-band', '2': 'bg-red-band', 
+            '3': 'bg-orange-band', '4': 'bg-yellow-band', '5': 'bg-green-band', 
+            '6': 'bg-blue-band', '7': 'bg-violet-band', '8': 'bg-grey-band', 
+            '9': 'bg-white-band', 
+            '0.1': 'bg-gold-band', '0.01': 'bg-silver-band',
+            '10': 'bg-brown-band', '100': 'bg-red-band', '1000': 'bg-orange-band',
+            '10000': 'bg-yellow-band', '100000': 'bg-green-band', '1000000': 'bg-blue-band',
+            '10000000': 'bg-purple-band', 
+            '0.5': 'bg-green-band', '0.25': 'bg-blue-band', '0.05': 'bg-grey-band'
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            calculate();
+        });
+
+        function setBands(num) {
+            currentBands = num;
+            
+            // Update Buttons
+            [4,5,6].forEach(n => {
+                const btn = document.getElementById(`btn-${n}`);
+                if(n === num) btn.className = "px-4 py-2 text-xs font-bold rounded-md bg-sky-600 text-white shadow-lg transition-all";
+                else btn.className = "px-4 py-2 text-xs font-bold rounded-md text-slate-400 hover:text-white transition-all";
+            });
+
+            // Toggle Inputs Visibility
+            const band3Ctrl = document.getElementById('control-band-3');
+            const bandPpmCtrl = document.getElementById('control-band-ppm');
+            
+            // Toggle Visual Bands
+            const vBand3 = document.getElementById('visual-band-3');
+            const vBandPpm = document.getElementById('visual-band-ppm');
+
+            if(num === 4) {
+                band3Ctrl.classList.add('hidden');
+                bandPpmCtrl.classList.add('hidden');
+                vBand3.classList.add('hidden');
+                vBandPpm.classList.add('hidden');
+            } else if (num === 5) {
+                band3Ctrl.classList.remove('hidden');
+                bandPpmCtrl.classList.add('hidden');
+                vBand3.classList.remove('hidden');
+                vBandPpm.classList.add('hidden');
+            } else if (num === 6) {
+                band3Ctrl.classList.remove('hidden');
+                bandPpmCtrl.classList.remove('hidden');
+                vBand3.classList.remove('hidden');
+                vBandPpm.classList.remove('hidden');
+            }
+
+            calculate();
+        }
+
+        function calculate() {
+            // Get Values
+            const b1 = parseInt(document.getElementById('select-band-1').value);
+            const b2 = parseInt(document.getElementById('select-band-2').value);
+            const b3 = parseInt(document.getElementById('select-band-3').value);
+            const mul = parseFloat(document.getElementById('select-band-mul').value);
+            const tol = parseFloat(document.getElementById('select-band-tol').value);
+            const ppm = document.getElementById('select-band-ppm').value; // For visuals only
+
+            // Update Visual Colors
+            updateVisualBand('visual-band-1', b1);
+            updateVisualBand('visual-band-2', b2);
+            updateVisualBand('visual-band-3', b3);
+            updateVisualBand('visual-band-mul', mul);
+            updateVisualBand('visual-band-tol', tol);
+            updateVisualBand('visual-band-ppm', ppm);
+
+            // Calculation Logic
+            let resistance = 0;
+            if (currentBands === 4) {
+                resistance = (b1 * 10 + b2) * mul;
+            } else {
+                resistance = (b1 * 100 + b2 * 10 + b3) * mul;
+            }
+
+            // Formatting Output
+            displayResult(resistance, tol);
+        }
+
+        function updateVisualBand(elementId, value) {
+            const el = document.getElementById(elementId);
+            // Remove old colors
+            el.className = el.className.replace(/bg-[\w-]+-band/g, '');
+            // Add new color
+            let colorClass = colorMap[value.toString()] || 'bg-black-band';
+            el.classList.add(colorClass);
+            el.classList.add('band'); // Ensure basic class remains
+        }
+
+        function displayResult(ohms, tolerance) {
+            let formatted = '';
+            
+            if (ohms >= 1000000) {
+                formatted = (ohms / 1000000).toFixed(2).replace(/\.00$/, '') + ' MΩ';
+            } else if (ohms >= 1000) {
+                formatted = (ohms / 1000).toFixed(2).replace(/\.00$/, '') + ' kΩ';
+            } else {
+                formatted = ohms.toFixed(2).replace(/\.00$/, '') + ' Ω';
+            }
+
+            document.getElementById('result-value').innerText = formatted;
+            document.getElementById('result-tolerance').innerText = `± ${tolerance}%`;
+
+            // Min Max Calculation
+            const range = ohms * (tolerance / 100);
+            const min = ohms - range;
+            const max = ohms + range;
+            
+            document.getElementById('val-min').innerText = formatSimple(min);
+            document.getElementById('val-max').innerText = formatSimple(max);
+        }
+
+        function formatSimple(val) {
+            if (val >= 1000000) return (val / 1000000).toFixed(2) + ' MΩ';
+            if (val >= 1000) return (val / 1000).toFixed(2) + ' kΩ';
+            return val.toFixed(1) + ' Ω';
+        }
+    </script>
+</body>
+</html>

@@ -55,11 +55,11 @@
 
     <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                 <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </div>
-                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+                <span class="text-sm font-bold">Back to Dashboard</span>
             </a>
             <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
                 <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
@@ -138,37 +138,91 @@
         </div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
         
-        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Leaderboard 728x90]
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard]
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-4">QR Code Generator Gratis & Barcode Maker (HD)</h1>
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Free Custom QR Code Generator - WiFi, vCard & URLs</h2>
+            <p class="leading-relaxed">
+                Create professional, high-resolution QR Codes instantly with <strong>Insta-Connect QR</strong>. 
+                Whether you need a <span class="text-amber-400 font-bold">WiFi Login QR</span> for your cafe, a <span class="text-amber-400 font-bold">Digital Business Card (vCard)</span> for networking, or a simple Website Link, we've got you covered. 
+                Customize colors, shapes, and download in PNG or SVG formats. 
+                <strong>100% Free & No Expiry (Static QR).</strong>
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📶</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">WiFi Auto-Connect</h3>
+                <p class="text-xs text-slate-400">
+                    Stop spelling out complex passwords! Create a QR code containing your WiFi SSID and Password. Guests scan it and connect instantly.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📇</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">vCard (Contact)</h3>
+                <p class="text-xs text-slate-400">
+                    Share your contact details (Name, Phone, Email) with a single scan. The user's phone will automatically prompt to "Save Contact".
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🎨</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">Custom Branding</h3>
+                <p class="text-xs text-slate-400">
+                    Ditch the boring black-and-white squares. Change colors, dot styles, and corner markers to match your brand identity.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border-l-4 border-amber-500 pl-6 py-6 mb-10">
+            <h3 class="text-xl font-bold text-white mb-4 mt-0">Why use "Static" QR Codes?</h3>
+            <p class="text-sm mb-4">
+                Many online generators create "Dynamic" QR codes that expire after a trial period or require a monthly subscription. 
+                <strong>Insta-Connect QR generates Static Codes.</strong>
+            </p>
+            <ul class="space-y-2 list-none pl-0 text-sm">
+                <li class="flex items-center gap-2">
+                    <span class="text-emerald-400">✅</span> <strong>Forever Free:</strong> Your QR code will work forever.
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-emerald-400">✅</span> <strong>Direct Data:</strong> The information (Link, WiFi Pass) is stored directly in the image pattern, not on a redirect server.
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-emerald-400">✅</span> <strong>Scanning Speed:</strong> Faster scanning because it doesn't need to ping an external server first.
+                </li>
+            </ul>
+        </div>
+
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-white">Frequently Asked Questions</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Is it safe to type my WiFi Password here?</h4>
+                    <p class="text-xs">Yes. This tool runs <strong>Client-Side</strong>. Your WiFi password is converted into the QR pattern directly in your browser. It is never sent to our servers or stored anywhere.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">What is SVG format?</h4>
+                    <p class="text-xs">SVG (Scalable Vector Graphics) allows you to resize the QR code to any size (even billboard size) without it becoming blurry/pixelated. Perfect for print designers.</p>
+                </div>
+
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Can I change the link later?</h4>
+                    <p class="text-xs">No. Since this is a Static QR Code, the data is hard-coded into the image. If you change your website URL or WiFi password, you must generate a new QR code.</p>
+                </div>
+            </div>
+        </div>
         
-        <p class="mb-4">
-            Butuh cara cepat untuk membagikan password WiFi tanpa ribet? Atau ingin membuat kartu nama digital (vCard) yang modern? 
-            <strong>Insta-QR Gen</strong> adalah solusinya. Ini adalah alat pembuat kode QR dan Barcode online yang bekerja 100% di browser Anda.
-        </p>
-
-        <h3 class="text-xl font-bold text-white mt-6 mb-2">Kenapa Harus Menggunakan QR Generator Ini?</h3>
-        <ul class="list-disc pl-5 space-y-2 mb-6">
-            <li><strong>Keamanan Privasi:</strong> Berbeda dengan generator online lainnya, alat ini bersifat <em>Client-Side</em>. Artinya, data password WiFi atau kontak Anda tidak pernah dikirim ke server kami. Semuanya diproses di perangkat Anda sendiri.</li>
-            <li><strong>Kualitas Cetak Tinggi (HD):</strong> QR Code yang dihasilkan memiliki resolusi tinggi (High Definition) sehingga tidak akan pecah saat dicetak di brosur atau poster.</li>
-            <li><strong>Mendukung Barcode:</strong> Selain QR, Anda juga bisa membuat Barcode (CODE128, EAN-13) untuk keperluan inventaris gudang atau label produk UMKM.</li>
-            <li><strong>Tanpa Iklan Mengganggu:</strong> Kami mendesain alat ini agar bersih dan fokus pada fungsinya.</li>
-        </ul>
-
-        <h3 class="text-xl font-bold text-white mt-6 mb-2">Cara Membuat QR Code WiFi Otomatis</h3>
-        <p class="mb-4">
-            1. Klik tab <strong>WIFI</strong> di menu atas.<br>
-            2. Masukkan Nama WiFi (SSID) dan Password WiFi Anda.<br>
-            3. Pilih jenis keamanan (biasanya WPA/WPA2).<br>
-            4. Klik <strong>Download Gambar</strong>, lalu cetak dan tempel di ruang tamu atau kafe Anda. Tamu tinggal scan untuk terhubung!
-        </p>
-
-        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Rectangle 300x250]
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle]
         </div>
 
     </section>

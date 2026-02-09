@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Splitter - Extract or Remove Pages Online - Aries Tech</title>
+    <meta name="description" content="Split PDF files, extract specific pages, or delete unwanted pages online. Visual grid selection. Secure client-side processing.">
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Checkbox Style for Page Selection */
+        .page-card.selected { 
+            border-color: #f43f5e; 
+            background-color: rgba(244, 63, 94, 0.1);
+        }
+        .page-card.selected .check-circle {
+            background-color: #f43f5e;
+            border-color: #f43f5e;
+        }
+        
+        /* Custom Scroll */
+        .custom-scroll::-webkit-scrollbar { width: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center p-4 md:p-8">
+        
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-white mb-2">PDF Splitter & Organizer</h1>
+            <p class="text-slate-400 text-sm">Select pages to <span class="text-emerald-400 font-bold">Extract</span> or <span class="text-rose-400 font-bold">Delete</span>.</p>
+        </div>
+
+        <div id="upload-section" class="w-full max-w-2xl">
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-600 rounded-2xl p-12 text-center transition-all cursor-pointer hover:border-rose-500 hover:bg-slate-800/50 group">
+                <input type="file" id="file-input" class="hidden" accept="application/pdf">
+                <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg border border-slate-700">
+                    <span class="text-3xl">✂️</span>
+                </div>
+                <h3 class="text-lg font-bold text-white mb-1">Click to Upload PDF</h3>
+                <p class="text-xs text-slate-500">Processing happens in your browser (Private).</p>
+            </div>
+        </div>
+
+        <div id="editor-section" class="w-full max-w-6xl hidden flex-col h-[80vh]">
+            
+            <div class="bg-slate-800 border border-slate-700 rounded-t-xl p-4 flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl">📄</div>
+                    <div>
+                        <h4 id="filename-display" class="text-sm font-bold text-white truncate max-w-[200px]">document.pdf</h4>
+                        <p class="text-[10px] text-slate-400"><span id="page-count">0</span> Pages Loaded</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="selectAll()" class="px-3 py-1.5 text-xs font-bold text-slate-300 bg-slate-700 rounded hover:bg-slate-600">Select All</button>
+                    <button onclick="deselectAll()" class="px-3 py-1.5 text-xs font-bold text-slate-300 bg-slate-700 rounded hover:bg-slate-600">Deselect</button>
+                    <button onclick="resetApp()" class="px-3 py-1.5 text-xs font-bold text-rose-400 border border-rose-500/30 rounded hover:bg-rose-500/10">✕ Close</button>
+                </div>
+            </div>
+
+            <div class="flex-grow bg-slate-900 border-x border-slate-700 overflow-y-auto custom-scroll p-6">
+                <div id="page-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                    </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-b-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-2xl z-10">
+                <div class="text-xs text-slate-400">
+                    <span id="selected-count" class="font-bold text-white">0</span> pages selected
+                </div>
+                
+                <div class="flex gap-3 w-full md:w-auto">
+                    <button onclick="processPDF('extract')" class="flex-1 md:flex-none px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Extract Selected
+                    </button>
+                    
+                    <button onclick="processPDF('delete')" class="flex-1 md:flex-none px-6 py-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg shadow-lg shadow-rose-600/20 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        Delete Selected
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="fixed inset-0 bg-slate-900/95 backdrop-blur z-50 hidden flex flex-col items-center justify-center">
+            <div class="w-16 h-16 border-4 border-slate-700 rounded-full mb-4">
+                <div class="absolute w-16 h-16 border-4 border-rose-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 id="loading-text" class="text-white font-bold text-lg">Rendering PDF Pages...</h3>
+            <p class="text-xs text-slate-400 mt-2">Large files may take a moment.</p>
+        </div>
+
+    </main>
+    
+    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard 728x90]
+        </div>
+
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Free PDF Splitter: Extract & Remove Pages Securely</h2>
+            <p class="leading-relaxed">
+                Need to separate a large PDF document into smaller files? Or perhaps remove specific pages from a report? 
+                <strong>Aries Tech PDF Splitter</strong> allows you to organize your documents visually. Unlike other online tools, we process your files 
+                <strong>100% in your browser</strong>. Your sensitive data never leaves your device.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+            
+            <div>
+                <h3 class="text-sky-400 font-bold text-lg mb-4">📝 How to Split or Delete Pages?</h3>
+                <ol class="space-y-4 list-decimal pl-5 marker:text-sky-500">
+                    <li class="pl-2">
+                        <strong class="text-white">Upload your PDF:</strong> Drag and drop your file into the box above. We will render a visual grid of all pages.
+                    </li>
+                    <li class="pl-2">
+                        <strong class="text-white">Select Pages:</strong> Click on the page thumbnails you want to target. You can use "Select All" for bulk actions.
+                    </li>
+                    <li class="pl-2">
+                        <strong class="text-white">Choose Action:</strong>
+                        <ul class="list-disc pl-4 mt-2 space-y-1 text-xs text-slate-400">
+                            <li><span class="text-emerald-400 font-bold">Extract:</span> Creates a new PDF containing <em>ONLY</em> the selected pages.</li>
+                            <li><span class="text-rose-400 font-bold">Delete:</span> Creates a new PDF containing everything <em>EXCEPT</em> the selected pages.</li>
+                        </ul>
+                    </li>
+                    <li class="pl-2">
+                        <strong class="text-white">Download:</strong> Your new optimized PDF will be ready instantly.
+                    </li>
+                </ol>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <h3 class="text-white font-bold text-lg mb-4">🚀 Why use this Tool?</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <h4 class="text-emerald-400 font-bold text-sm mb-1">🔒 Maximum Privacy (Client-Side)</h4>
+                        <p class="text-xs">
+                            Most "free" tools upload your PDF to a cloud server to process it. We use <strong>WebAssembly</strong> to process files locally on your computer. Perfect for contracts, bank statements, and legal documents.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-amber-400 font-bold text-sm mb-1">👀 Visual Grid Selection</h4>
+                        <p class="text-xs">
+                            Don't guess page numbers (e.g., "1-5, 8, 12"). See the actual content of the pages before you split or delete them. Zero mistakes.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-rose-400 font-bold text-sm mb-1">⚡ No Installation Required</h4>
+                        <p class="text-xs">
+                            Works on Windows, Mac, Linux, and Chromebooks without installing heavy software like Adobe Acrobat.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border-l-4 border-sky-500 pl-6 py-4 my-8">
+            <h4 class="text-white font-bold mb-2">Common Use Cases</h4>
+            <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm pl-0 list-none">
+                <li>✅ <strong>Students:</strong> Extract only the relevant chapters from a textbook PDF.</li>
+                <li>✅ <strong>Business:</strong> Remove confidential pages from a report before sharing.</li>
+                <li>✅ <strong>Legal:</strong> Separate signed pages from a contract.</li>
+                <li>✅ <strong>HR:</strong> Split a bulk file of resumes into individual applications.</li>
+            </ul>
+        </div>
+
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle 300x250]
+        </div>
+
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+
+<script>
+    // --- KONFIGURASI PDF.JS WORKER (WAJIB) ---
+    // Tanpa ini, PDF tidak akan bisa dirender visualnya
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    // --- STATE VARIABLES ---
+    let currentFile = null;      // Menyimpan file mentah
+    let pdfDocInfo = null;       // Info dokumen dari PDF.js
+    let selectedPages = new Set(); // Menyimpan index halaman yang dipilih (Set agar unik)
+    let totalPages = 0;
+
+    // --- DOM ELEMENTS ---
+    const uploadSection = document.getElementById('upload-section');
+    const editorSection = document.getElementById('editor-section');
+    const pageGrid = document.getElementById('page-grid');
+    const loadingOverlay = document.getElementById('loading');
+    const loadingText = document.getElementById('loading-text');
+    const selectedCountEl = document.getElementById('selected-count');
+    const filenameDisplay = document.getElementById('filename-display');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+
+    // --- EVENT LISTENERS ---
+    
+    // Drag & Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+    });
+    
+    dropZone.addEventListener('dragover', () => dropZone.classList.add('border-rose-500', 'bg-slate-800'));
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-rose-500', 'bg-slate-800'));
+    
+    dropZone.addEventListener('drop', (e) => {
+        dropZone.classList.remove('border-rose-500', 'bg-slate-800');
+        const files = e.dataTransfer.files;
+        if(files.length) handleFile(files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        if(e.target.files.length) handleFile(e.target.files[0]);
+    });
+
+    // --- CORE FUNCTIONS ---
+
+    async function handleFile(file) {
+        if(file.type !== 'application/pdf') {
+            alert('Please upload a valid PDF file.');
+            return;
+        }
+
+        currentFile = file;
+        filenameDisplay.innerText = file.name;
+        
+        // Show Loading
+        loadingOverlay.classList.remove('hidden');
+        loadingText.innerText = "Reading Document...";
+
+        try {
+            // 1. Baca File ArrayBuffer
+            const arrayBuffer = await file.arrayBuffer();
+            
+            // 2. Load PDF via PDF.js (Untuk Visual)
+            const loadingTask = pdfjsLib.getDocument(arrayBuffer);
+            pdfDocInfo = await loadingTask.promise;
+            totalPages = pdfDocInfo.numPages;
+
+            document.getElementById('page-count').innerText = totalPages;
+
+            // 3. Render Visual Grid
+            await renderGrid();
+
+            // 4. Switch View
+            uploadSection.classList.add('hidden');
+            editorSection.classList.remove('hidden');
+            editorSection.classList.add('flex');
+
+        } catch (error) {
+            console.error(error);
+            alert("Error reading PDF. Password protected files are not supported yet.");
+        } finally {
+            loadingOverlay.classList.add('hidden');
+        }
+    }
+
+    async function renderGrid() {
+        pageGrid.innerHTML = '';
+        selectedPages.clear();
+        updateCount();
+        loadingText.innerText = `Rendering ${totalPages} Pages...`;
+
+        // Loop setiap halaman
+        for (let i = 1; i <= totalPages; i++) {
+            // Container Halaman
+            const card = document.createElement('div');
+            card.className = "page-card relative bg-slate-800 rounded-lg p-2 border-2 border-transparent hover:border-slate-500 cursor-pointer transition-all group";
+            card.setAttribute('data-page', i);
+            card.onclick = () => togglePage(i, card);
+
+            // Canvas untuk Render PDF
+            const canvas = document.createElement('canvas');
+            canvas.className = "w-full h-auto rounded shadow-sm opacity-80 group-hover:opacity-100 transition-opacity";
+            const context = canvas.getContext('2d');
+
+            // Render Halaman
+            const page = await pdfDocInfo.getPage(i);
+            const viewport = page.getViewport({ scale: 0.5 }); // Scale kecil biar ringan (Thumbnail)
+            
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            const renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+            
+            // Async render (jangan tunggu satu-satu selesai biar UI responsif, tapi disini kita await agar urutan benar)
+            await page.render(renderContext).promise;
+
+            // Checkbox Indicator
+            const check = document.createElement('div');
+            check.className = "check-circle absolute top-3 right-3 w-6 h-6 rounded-full border-2 border-slate-400 bg-slate-900 flex items-center justify-center transition-all z-10";
+            check.innerHTML = `<svg class="w-4 h-4 text-white opacity-0 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>`;
+
+            // Page Number
+            const pageNum = document.createElement('div');
+            pageNum.className = "absolute bottom-1 left-0 right-0 text-center text-[10px] text-slate-400 font-mono";
+            pageNum.innerText = `Page ${i}`;
+
+            card.appendChild(canvas);
+            card.appendChild(check);
+            card.appendChild(pageNum);
+            pageGrid.appendChild(card);
+        }
+    }
+
+    // --- SELECTION LOGIC ---
+
+    function togglePage(pageNum, cardElement) {
+        // Toggle Set
+        if (selectedPages.has(pageNum)) {
+            selectedPages.delete(pageNum);
+            cardElement.classList.remove('selected');
+            cardElement.querySelector('.check-circle svg').classList.add('opacity-0');
+        } else {
+            selectedPages.add(pageNum);
+            cardElement.classList.add('selected');
+            cardElement.querySelector('.check-circle svg').classList.remove('opacity-0');
+        }
+        updateCount();
+    }
+
+    function updateCount() {
+        selectedCountEl.innerText = selectedPages.size;
+    }
+
+    function selectAll() {
+        const cards = document.querySelectorAll('.page-card');
+        selectedPages.clear();
+        cards.forEach(card => {
+            const page = parseInt(card.getAttribute('data-page'));
+            selectedPages.add(page);
+            card.classList.add('selected');
+            card.querySelector('.check-circle svg').classList.remove('opacity-0');
+        });
+        updateCount();
+    }
+
+    function deselectAll() {
+        const cards = document.querySelectorAll('.page-card');
+        selectedPages.clear();
+        cards.forEach(card => {
+            card.classList.remove('selected');
+            card.querySelector('.check-circle svg').classList.add('opacity-0');
+        });
+        updateCount();
+    }
+
+    // --- PDF PROCESSING (EXTRACT / DELETE) ---
+
+    async function processPDF(mode) {
+        if (selectedPages.size === 0) {
+            alert("Please select at least 1 page.");
+            return;
+        }
+
+        loadingOverlay.classList.remove('hidden');
+        loadingText.innerText = "Processing File...";
+
+        try {
+            const { PDFDocument } = PDFLib;
+            
+            // 1. Load Dokumen Asli (ArrayBuffer)
+            const arrayBuffer = await currentFile.arrayBuffer();
+            const originalPdf = await PDFDocument.load(arrayBuffer);
+            
+            // 2. Buat Dokumen Baru
+            const newPdf = await PDFDocument.create();
+            
+            // 3. Tentukan Index Halaman yang mau diambil
+            // PDF-Lib pakai index 0-based, sedangkan UI kita 1-based.
+            const indicesToCopy = [];
+            const total = originalPdf.getPageCount();
+
+            for (let i = 0; i < total; i++) {
+                const pageNum = i + 1; // 1-based
+                const isSelected = selectedPages.has(pageNum);
+
+                if (mode === 'extract') {
+                    // Kalau Extract: Ambil HANYA yang dipilih
+                    if (isSelected) indicesToCopy.push(i);
+                } else if (mode === 'delete') {
+                    // Kalau Delete: Ambil yang TIDAK dipilih
+                    if (!isSelected) indicesToCopy.push(i);
+                }
+            }
+
+            if(indicesToCopy.length === 0) {
+                alert("Operation resulted in an empty PDF.");
+                loadingOverlay.classList.add('hidden');
+                return;
+            }
+
+            // 4. Salin Halaman
+            const copiedPages = await newPdf.copyPages(originalPdf, indicesToCopy);
+            copiedPages.forEach((page) => newPdf.addPage(page));
+
+            // 5. Simpan & Download
+            const pdfBytes = await newPdf.save();
+            
+            // Nama File Baru
+            const originalName = currentFile.name.replace('.pdf', '');
+            const suffix = mode === 'extract' ? 'Extracted' : 'Remaining';
+            const newFilename = `${originalName}_${suffix}.pdf`;
+
+            download(pdfBytes, newFilename, "application/pdf");
+
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred while processing the PDF.");
+        } finally {
+            loadingOverlay.classList.add('hidden');
+        }
+    }
+
+    function resetApp() {
+        if(confirm("Close current file?")) {
+            currentFile = null;
+            selectedPages.clear();
+            uploadSection.classList.remove('hidden');
+            editorSection.classList.add('hidden');
+            fileInput.value = ''; // Reset input
+        }
+    }
+</script>
+</body>
+</html>

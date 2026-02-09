@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aries Tech Lab | Robotics & Software Engineering</title>
+    <title>Aries TechLab | Software Engineering and Arts</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <!-- Google tag (gtag.js) -->
@@ -73,11 +73,11 @@
             </div>
 
             <div class="hidden md:flex items-center gap-8 text-sm font-medium">
-                <a href="#about" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Tentang</a>
+                <a href="#about" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">About</a>
                 <a href="#dashboard" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Dashboard</a>
-                <a href="#catalog" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Katalog</a>
-				<a href="#services" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Jenis Pelayanan</a>
-                <a href="#custom" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Jasa Custom</a>
+                <a href="#catalog" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Catalog</a>
+				<a href="#services" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Services</a>
+                <a href="#custom" class="nav-link text-slate-400 hover:text-sky-400" onclick="closeApp()">Custom Services</a>
                 
             </div>
 
@@ -101,24 +101,24 @@
                         University Lecturer, Writer, Illustrator & Robotics Engineer
                     </div>
                     <h2 class="text-5xl md:text-7xl font-extrabold leading-[1.1] mb-6">
-                        Menjembatani Imajinasi dengan <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400 italic">Solusi Nyata.</span>
+                        Bridging Imagination into <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400 italic">Real Solution.</span>
                     </h2>
                     <p class="text-slate-400 text-lg md:text-xl max-w-2xl mb-10 leading-relaxed">
-                        Dosen universitas yang berfokus pada <span class="text-white font-semibold">Embedded Systems</span>, Senior Developer aplikasi desktop cerdas, dan penulis yang berdedikasi mengembangkan ekosistem teknologi inovatif dan humanis.
+                        University Lecturer focused on <span class="text-white font-semibold">Embedded Systems</span>, Smart and Secure Desktop Application Development, Writing and Art dedicated on Improving Innovative Technology and Humanist Ecosystem.
                     </p>
                     
                     <div class="flex flex-wrap gap-4 justify-center md:justify-start">
                         <a href="#catalog" class="px-8 py-3 bg-white text-slate-900 rounded-full font-bold hover:bg-sky-400 hover:text-white transition-all shadow-xl">
-                            Produk Teknologi
+                            Tech Products
                         </a>
                         <a href="#books" class="px-8 py-3 bg-white text-slate-900 rounded-full font-bold hover:bg-red-400 hover:text-white transition-all shadow-xl">
-                            Produk Literasi
+                            Literacy Products
                         </a>
 						<a href="#dashboard" class="px-8 py-3 bg-white text-slate-900 rounded-full font-bold hover:bg-green-400 hover:text-white transition-all shadow-xl">
                             Tools
                         </a>
 						<a href="#custom" class="px-8 py-3 border border-slate-700 rounded-full font-bold hover:bg-slate-800 transition-all">
-                            Diskusi Proyek Kustom
+                            Custom Project
                         </a>
                     </div>
                 </div>
@@ -131,7 +131,7 @@
                     </div>
                     <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-emerald-500/50 transition-colors">
                         <div class="text-3xl mb-2">💻</div>
-                        <div class="text-sm font-bold">Electron.js</div>
+                        <div class="text-sm font-bold">Executable Program</div>
                         <div class="text-[10px] text-slate-500 font-mono">Enterprise Desktop</div>
                     </div>
                     <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700 backdrop-blur-sm hover:border-purple-500/50 transition-colors">
@@ -156,16 +156,41 @@
 			
 			<div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-6 border-b border-slate-800 pb-8">
 				<div class="w-full md:w-1/2">
-					<h3 class="text-3xl font-bold text-white mb-2">Engineering Sandbox</h3>
-					<p class="text-slate-400 mb-6">Kumpulan alat bantu riset, simulasi, dan utilitas harian.</p>
-					
+					<div class="mb-10 relative">
+						<div class="absolute -top-10 -left-10 w-32 h-32 bg-sky-500/10 rounded-full blur-3xl"></div>
+						
+						<h3 class="text-4xl font-extrabold text-white mb-4 relative z-10">
+							Engineering <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">Sandbox</span>
+						</h3>
+						
+						<p class="text-slate-400 text-lg mb-6 max-w-2xl leading-relaxed">
+							A powerful suite of <strong class="text-slate-200">Browser-Based Tools</strong> for Engineers, Students, and Creatives. 
+							Analyze circuits, manipulate PDFs, or generate assets instantly.
+						</p>
+
+						<div class="flex flex-wrap gap-3 font-mono text-xs">
+							<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-emerald-500/30 text-emerald-400">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+								<span>100% Client-Side (Secure)</span>
+							</div>
+							<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-sky-500/30 text-sky-400">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+								<span>Blazing Fast</span>
+							</div>
+							<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-amber-500/30 text-amber-400">
+								<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+								<span>No Hidden Fees</span>
+							</div>
+						</div>
+					</div>
+
 					<div class="relative group">
 						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 group-focus-within:text-sky-400 transition-colors">
 							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 						</div>
 						<input type="text" id="search-input" onkeyup="filterApps()" 
 							   class="block w-full p-3 pl-10 text-sm text-white bg-slate-900 border border-slate-700 rounded-xl focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all placeholder-slate-600 shadow-lg" 
-							   placeholder="Cari program (misal: QR, PID, Image)...">
+							   placeholder="Search a program (Example: QR, PID, Image)...">
 					</div>
 				</div>
 
@@ -190,7 +215,7 @@
 			
 			<div id="empty-search" class="hidden text-center py-20">
 				<div class="text-4xl mb-4">🔍</div>
-				<p class="text-slate-500">Program tidak ditemukan. Coba kata kunci lain.</p>
+				<p class="text-slate-500">Programs Not Found!. Try different keyword.</p>
 			</div>
 		</section>
 		<section id="logic-playground" class="py-24 px-6 max-w-7xl mx-auto">
@@ -202,7 +227,7 @@
 					</div>
 					<h3 class="text-3xl font-bold text-white mb-4">Logic Gate Simulator</h3>
 					<p class="text-slate-400 mb-6 leading-relaxed">
-						Gerbang logika adalah blok bangunan dasar dari semua sistem digital. Gunakan simulator ini untuk memvisualisasikan bagaimana input biner diproses menjadi output.
+						Logic gates are the basic building blocks of all digital systems. Use this simulator to visualize how binary inputs are processed into outputs.
 					</p>
 					
 					<div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-lg">
@@ -292,7 +317,7 @@
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
                     <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Tech Products</h3>
-                    <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Software siap pakai dengan standar keamanan tinggi dan arsitektur desktop modern untuk kebutuhan institusi Anda.</p>
+                    <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Ready-to-use software with high security standards and modern desktop architecture for your institution's needs.</p>
                 </div>
 
                 <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl border border-slate-700 overflow-hidden shadow-2xl">
@@ -316,7 +341,8 @@
                             </div>
 
                             <p class="text-slate-400 text-sm mb-8 leading-relaxed">
-                                Solusi manajemen keuangan sekolah berbasis Electron.js dengan fokus utama pada kedaulatan data. Sistem berjalan sepenuhnya offline dengan sistem lisensi berbasis hardware ID untuk memastikan keamanan investasi perangkat lunak Anda.
+                                A Windows .exe-based school financial management solution with a primary focus on data security. The system runs completely offline with a hardware ID-based licensing system to ensure the security of your software investment.<br><br>
+								(Solusi manajemen keuangan sekolah berbasis Windows .exe dengan fokus utama pada keamanan data. Sistem berjalan sepenuhnya offline dengan sistem lisensi berbasis hardware ID untuk memastikan keamanan investasi perangkat lunak Anda.)
                             </p>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
@@ -340,10 +366,10 @@
 
                             <div class="flex flex-wrap gap-4">
                                 <a href="https://wa.me/6285869418606?text=Halo%20Aries%20Tech%20Lab,%20saya%20tertarik%20dengan%20produk%20Secure%20Finance" target="_blank" class="px-8 py-3 bg-sky-600 hover:bg-sky-500 rounded-xl font-bold text-sm transition-all shadow-lg text-white">
-                                    Minta Demo
+                                    Request Demo
                                 </a>
-                                <a href="mailto:aries.media@email.com?subject=Tanya%20Produk%20Secure%20Finance" class="px-8 py-3 border border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all text-white text-center">
-                                    Email Diskusi
+                                <a href="mailto:jehantammy@gmail.com?subject=Tanya%20Produk%20Secure%20Finance" class="px-8 py-3 border border-slate-700 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all text-white text-center">
+                                    Email discussion
                                 </a>
                             </div>
                         </div>
@@ -356,7 +382,7 @@
 		<section id="books" class="py-24 px-6 max-w-7xl mx-auto">
             <div class="text-center mb-16">
 				<h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Literature Products</h3>
-				<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Buku dan e-book berkualitas untuk anda baca</p>
+				<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Quality books and e-books for daily reading</p>
 			</div>
 			<div class="bg-gradient-to-br from-amber-950/30 to-slate-900 rounded-3xl border border-amber-500/20 overflow-hidden shadow-2xl relative">
 			
@@ -401,11 +427,11 @@
                         
                         <div class="flex flex-wrap gap-4 items-center">
                             <button onclick="generateQuote()" class="px-8 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-amber-600/20 flex items-center gap-2 group">
-                                <span class="group-hover:rotate-180 transition-transform duration-500">↻</span> Kutip Acak
+                                <span class="group-hover:rotate-180 transition-transform duration-500">↻</span> Random Quotes
                             </button>
                             <button onclick="openApp('library.html', 'Aries Library')" 
 									class="px-6 py-3 border border-slate-700 hover:border-amber-500/50 hover:text-amber-400 text-slate-400 rounded-xl font-bold text-sm transition-all">
-								Lihat Koleksi Buku
+								Books Collection
 							</button>
                         </div>
                     </div>
@@ -415,42 +441,42 @@
 		
 		<section id="services" class="py-24 px-6 max-w-7xl mx-auto">
 			<div class="text-center mb-16">
-				<h3 class="text-3xl font-bold text-white mb-4">Layanan Konsultasi & Pengembangan</h3>
-				<p class="text-slate-400">Pilih skema kerjasama yang paling sesuai dengan kebutuhan riset atau bisnis Anda.</p>
+				<h3 class="text-3xl font-bold text-white mb-4">Consultation and Development Service</h3>
+				<p class="text-slate-400">Choose the collaboration scheme that best suits your research or business needs.</p>
 			</div>
 
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 				<div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-sky-500 transition-all group">
 					<h4 class="text-sky-400 font-bold mb-4 uppercase tracking-widest text-xs">Research Support</h4>
-					<div class="text-3xl font-bold text-white mb-6">Konsultasi</div>
+					<div class="text-3xl font-bold text-white mb-6">Consultation</div>
 					<ul class="text-xs text-slate-500 space-y-4 mb-10">
-						<li>• Review Metodologi & Arsitektur</li>
+						<li>• Methodology & Architecture Review</li>
 						<li>• Troubleshooting Firmware</li>
-						<li>• Sesi Diskusi 1-on-1 (60 Menit)</li>
+						<li>• Discussion 1-on-1 (60 Minutes)</li>
 					</ul>
-					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Mulai Diskusi</a>
+					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Start Discussion</a>
 				</div>
 
 				<div class="p-8 rounded-2xl bg-sky-600 border border-sky-400 shadow-2xl shadow-sky-600/20 transform scale-105">
 					<h4 class="text-white font-bold mb-4 uppercase tracking-widest text-xs opacity-80">Full Development</h4>
 					<div class="text-3xl font-bold text-white mb-6">Custom Project</div>
 					<ul class="text-xs text-white/80 space-y-4 mb-10">
-						<li>• Pembuatan Prototype Fisik</li>
-						<li>• Software Desktop + Hardware</li>
-						<li>• Dokumentasi & Garansi Sistem</li>
+						<li>• Physical Prototype Creation</li>
+						<li>• Desktop Software + Hardware</li>
+						<li>• System Documentation & Warranty</li>
 					</ul>
-					<a href="#custom" class="block text-center py-3 rounded-lg bg-white text-sky-600 font-bold text-sm hover:bg-slate-100 transition">Pesan Sekarang</a>
+					<a href="#custom" class="block text-center py-3 rounded-lg bg-white text-sky-600 font-bold text-sm hover:bg-slate-100 transition">Order Now!</a>
 				</div>
 
 				<div class="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-emerald-500 transition-all">
 					<h4 class="text-emerald-400 font-bold mb-4 uppercase tracking-widest text-xs">Bulk License</h4>
 					<div class="text-3xl font-bold text-white mb-6">Enterprise</div>
 					<ul class="text-xs text-slate-500 space-y-4 mb-10">
-						<li>• Lisensi Multi-Perangkat</li>
-						<li>• Custom Branding Instansi</li>
-						<li>• Support Prioritas 24/7</li>
+						<li>• Multi-Device License</li>
+						<li>• Custom Agency Branding</li>
+						<li>• 24/7 Priority Support</li>
 					</ul>
-					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Hubungi Sales</a>
+					<a href="#custom" class="block text-center py-3 rounded-lg border border-slate-600 text-sm font-bold hover:bg-slate-700 transition">Order Now!</a>
 				</div>
 			</div>
 		</section>
@@ -459,9 +485,9 @@
             <div class="bg-gradient-to-r from-sky-600 to-emerald-600 rounded-3xl p-1 md:p-px shadow-2xl overflow-hidden">
                 <div class="bg-slate-900 rounded-[22px] p-8 md:p-16 flex flex-col lg:flex-row items-center gap-12">
                     <div class="lg:w-1/2">
-                        <h3 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Butuh Solusi <br><span class="text-sky-400">Teknikal Khusus?</span></h3>
+                        <h3 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Need a Solution for<br><span class="text-sky-400">Special needs?</span></h3>
                         <p class="text-slate-400 mb-8 leading-relaxed">
-                            Menerima pesanan kustom untuk pengembangan sistem embedded, prototipe robotika, hingga aplikasi desktop spesifik untuk kebutuhan riset akademik atau operasional bisnis Anda.
+                            Accepting custom orders for the development of embedded systems, robotics prototypes, to specific desktop applications for your academic research or business operational needs.
                         </p>
                         <div class="space-y-4 mb-8">
                             <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-800/50 border border-slate-800">
@@ -483,12 +509,12 @@
                     
                     <div class="lg:w-1/2 w-full">
                         <div class="bg-slate-800/30 p-8 rounded-2xl border border-slate-700 backdrop-blur-sm">
-                            <h4 class="text-lg font-bold text-white mb-6">Mulai Diskusi Proyek</h4>
+                            <h4 class="text-lg font-bold text-white mb-6">Start Project Discussion</h4>
                             <div class="space-y-4">
-                                <input type="text" placeholder="Nama Lengkap / Instansi" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
-                                <textarea placeholder="Ceritakan kebutuhan sistem Anda secara singkat..." rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all"></textarea>
-                                <a href="https://wa.me/NOMOR_WHATSAPP_ANDA" class="w-full py-4 bg-white text-slate-900 rounded-xl font-extrabold text-center block hover:bg-sky-400 hover:text-white transition-all">
-                                    Kirim Via WhatsApp
+                                <input type="text" placeholder="Full name / Business Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
+                                <textarea placeholder="Tell your requirement in details..." rows="4" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all"></textarea>
+                                <a href="https://wa.me/085869418606" class="w-full py-4 bg-white text-slate-900 rounded-xl font-extrabold text-center block hover:bg-sky-400 hover:text-white transition-all">
+                                    Send Via WhatsApp
                                 </a>
                             </div>
                             <p class="text-[10px] text-center text-slate-500 mt-4 uppercase tracking-widest font-mono italic">Respond Time: ± 24 Hours</p>
@@ -498,45 +524,7 @@
             </div>
         </section>
 		
-        <div id="modal-add" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-4">
-            <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="toggleModal()"></div>
-            <div class="relative bg-slate-900 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden fade-in">
-                <div class="p-6 border-b border-slate-800">
-                    <h3 class="text-xl font-bold text-white">Register New Module</h3>
-                    <p class="text-xs text-slate-500 mt-1 font-mono uppercase tracking-tighter">Environment: /root/programs/</p>
-                </div>
-                <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-2">Nama Program</label>
-                        <input type="text" id="prog-name" placeholder="Misal: PID Tuner Pro" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-400 mb-2">Nama File (.html)</label>
-                        <input type="text" id="prog-file" placeholder="Misal: pid_tuner.html" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none transition-all">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-2">Icon (Emoji)</label>
-                            <input type="text" id="prog-icon" value="⚙️" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 mb-2">Warna</label>
-                            <select id="prog-color" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm focus:border-sky-500 outline-none">
-                                <option value="sky">Blue</option>
-                                <option value="emerald">Green</option>
-                                <option value="purple">Purple</option>
-                                <option value="amber">Orange</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-6 bg-slate-800/50 flex justify-end gap-3">
-                    <button onclick="toggleModal()" class="px-4 py-2 text-sm text-slate-400 hover:text-white">Batal</button>
-                    <button onclick="addNewProgram()" class="px-6 py-2 bg-sky-600 hover:bg-sky-500 rounded-lg text-sm font-bold shadow-lg shadow-sky-600/20">Simpan Program</button>
-                </div>
-            </div>
-        </div>
-		
+        		
 		<footer class="bg-slate-950 pt-20 pb-10 px-6 border-t border-slate-900">
             <div class="max-w-7xl mx-auto">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
@@ -546,29 +534,28 @@
                             <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
                         </div>
                         <p class="text-slate-500 text-sm max-w-sm leading-relaxed mb-6">
-                            Laboratorium inovasi digital yang berfokus pada sistem robotika, keamanan, perangkat lunak desktop, dan pengembangan akademik yang berkelanjutan.
+                            A digital innovation laboratory focused on robotics systems, security, desktop software, and sustainable academic development.
                         </p>
                         <div>
 							<h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Support</h5>
 							
 							<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
 								<span class="text-lg">🍕</span> <div class="text-left">
-									<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+									<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Treat me!</span>
 									<span class="block text-xs font-bold">Pizza / Kopi</span>
 								</div>
 							</a>
-							
-							</div>
+						</div>
 	
                     </div>
 
                     <div>
                         <h5 class="text-white font-bold mb-6 text-sm uppercase tracking-widest">Navigation</h5>
                         <ul class="space-y-4 text-sm text-slate-500">
-                            <li><a href="#about" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Tentang</a></li>
+                            <li><a href="#about" class="hover:text-sky-400 transition-colors" onclick="closeApp()">About</a></li>
                             <li><a href="#dashboard" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Dashboard</a></li>
-                            <li><a href="#catalog" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Katalog Produk</a></li>
-                            <li><a href="#custom" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Jasa Custom</a></li>
+                            <li><a href="#catalog" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Product Catalog</a></li>
+                            <li><a href="#custom" class="hover:text-sky-400 transition-colors" onclick="closeApp()">Custom Service</a></li>
                         </ul>
                     </div>
 
@@ -581,7 +568,8 @@
                             </li>
                             
                             <li class="text-[10px] italic leading-relaxed">
-                                Tersedia untuk konsultasi proyek pada hari kerja (09.00 - 17.00 WIB).
+                                Available for project consultation on weekdays (09.00 - 17.00 WIB).<br>
+								Tersedia untuk konsultasi proyek pada hari kerja (09.00 - 17.00 WIB).
                             </li>
                         </ul>
                     </div>
@@ -601,9 +589,9 @@
 
         <div id="mobile-menu" class="fixed inset-0 bg-slate-950 z-[100] hidden flex flex-col items-center justify-center space-y-8">
             <button onclick="toggleMobileMenu()" class="absolute top-6 right-6 text-sky-400 font-bold">✕ CLOSE</button>
-            <a href="#about" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">TENTANG</a>
+            <a href="#about" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">ABOUT</a>
             <a href="#dashboard" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">DASHBOARD</a>
-            <a href="#catalog" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">KATALOG</a>
+            <a href="#catalog" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">CATALOG</a>
             <a href="#custom" class="text-2xl font-bold" onclick="toggleMobileMenu(); closeApp()">CUSTOM ORDER</a>
         </div>
 
@@ -612,7 +600,7 @@
     <section id="app-viewer" class="hidden pt-16 h-screen bg-slate-900">
         <div class="bg-slate-800 px-6 py-2 flex justify-between items-center border-b border-slate-700">
             <div class="flex items-center gap-3">
-                <button onclick="closeApp()" class="text-slate-400 hover:text-white text-sm">✕ Tutup</button>
+                <button onclick="closeApp()" class="text-slate-400 hover:text-white text-sm">✕ Close</button>
                 <span class="h-4 w-[1px] bg-slate-600"></span>
                 <span id="active-app-name" class="text-sky-400 text-xs font-mono font-bold uppercase tracking-widest"></span>
             </div>
@@ -661,58 +649,19 @@
         }
 		
 		let programs = [
-            { name: "GraderA+", file: "GraderA/index.html", category: "Academic", icon: "📊️", color: "sky", desc: "Penilaian presentasi mahasiswa dengan custom instrument dan export to .xlsx" },
-            { name: "Transcript Analyzer", file: "transkrip.html", category: "Academic", icon: "📊", color: "sky", desc: "Ekstraksi data transkrip PDF & simulasi IPK kelulusan." },
-			{ 
-				name: "Insta-Connect QR", 
-				file: "qr_studio.html", 
-				category: "Utility", 
-				icon: "▣",  // Ikon kotak unik
-				color: "amber", 
-				desc: "Buat QR Code instan untuk Login WiFi Otomatis, Kartu Nama Digital (vCard), dan Tautan Website." 
-			},
-			{ 
-				name: "Pixel-Diet Img", 
-				file: "image_tools.html", 
-				category: "Utility", 
-				icon: "📉", 
-				color: "amber", 
-				desc: "Kompres dan ubah format gambar (JPG/PNG/WEBP) secara aman di browser tanpa upload ke server. Cocok untuk syarat administrasi online." 
-			},
-			{ 
-				name: "Cine-Capture", 
-				file: "screen_recorder.html", 
-				category: "Utility", 
-				icon: "🎥", 
-				color: "amber", 
-				desc: "Perekam layar gratis tanpa watermark. Support audio mic & sistem. (Khusus Desktop)." 
-			},
-			{ 
-			  name: "Sensor Noise Filter (Tutorial Interaktif)", 
-			  file: "filter_sim.html", 
-			  category: "Tutorial/Simulation", 
-			  icon: "📡", 
-			  color: "emerald", 
-			  desc: "Visualisasi perbandingan SMA & EMA Filter untuk membersihkan data sensor yang kotor." 
-			},
-			{ 
-			  name: "Motor Torque Lab (Tutorial Interaktif)", 
-			  file: "motor_sim.html", 
-			  category: "Tutorial/Simulation", 
-			  icon: "⚙️", 
-			  color: "emerald", 
-			  desc: "Simulasi perhitungan torsi, beban katrol, dan pengaruh gearbox pada sistem penggerak." 
-			},
-			{ 
-			  name: "PID Line Tuner (Tutorial Interaktif)", 
-			  file: "pid_sim.html", 
-			  category: "Tutorial/Simulation", 
-			  icon: "🧠", 
-			  color: "emerald", 
-			  desc: "Visualisasi tuning Kp, Ki, Kd untuk kestabilan robot Line Follower." 
-			}
-			
-        ];
+			{ name: "GraderA+", file: "GraderA/index.html", category: "Academic", icon: "📊️", color: "sky", desc: "Student presentation assessment tool with custom instruments and Excel (.xlsx) export." },
+			{ name: "Transcript Analyzer", file: "transkrip.html", category: "Academic", icon: "📊", color: "sky", desc: "Extract data from PDF transcripts and simulate GPA for graduation projection." },
+			{ name: "Insta-Connect QR", file: "qr_studio.html", category: "Utility", icon: "▣", color: "amber", desc: "Instant QR Code generator for WiFi Auto-Login, Digital Business Cards (vCard), and URL links." },
+			{ name: "Pixel-Diet Img", file: "image_tools.html", category: "Utility", icon: "📉", color: "amber", desc: "Securely compress and convert images (JPG/PNG/WEBP) locally in-browser." },
+			{ name: "PDF Forge", file: "pdf_forge.html", category: "Utility", icon: "📑", color: "amber", desc: "Securely merge multiple PDF files into one document. 100% Client-side processing." },
+			{ name: "PDF Splitter", file: "pdf_splitter.html", category: "Utility", icon: "🖼️", color: "amber", desc: "Split or remove PDF pages into different document. 100% Client-side processing." },
+			{ name: "PDF to Image", file: "pdf_converter.html", category: "Utility", icon: "🖼️", color: "amber", desc: "Convert PDF pages to high-quality JPG/PNG images. Download as ZIP." },
+			{ name: "Cine-Capture", file: "screen_recorder.html", category: "Utility", icon: "🎥", color: "amber", desc: "Free, watermark-free screen recorder. Supports microphone & system audio. (Desktop Only)." },
+			{ name: "Resistor Decoder", file: "resistor_calc.html", category: "Tutorial/Simulation", icon: "📟", color: "emerald", desc: "Interactive Resistor Color Code Calculator. Visual decoder for 4, 5, and 6-band resistors." },
+			{ name: "Sensor Noise Filter", file: "filter_sim.html", category: "Tutorial/Simulation", icon: "📡", color: "emerald", desc: "Interactive visualization comparing SMA & EMA filters for noise reduction in sensor data." },
+			{ name: "Motor Torque Lab", file: "motor_sim.html", category: "Tutorial/Simulation", icon: "⚙️", color: "emerald", desc: "Simulation for calculating torque, pulley loads, and gearbox impact on drive systems." },
+			{ name: "PID Line Tuner", file: "pid_sim.html", category: "Tutorial/Simulation", icon: "🧠", color: "emerald", desc: "Visual tuning of Kp, Ki, and Kd parameters for Line Follower robot stability." }
+		];
 		
 		const quotesData = [
 			{ text: "Kita tidak bisa men-debug masa lalu, tapi kita bisa me-refactor masa depan.", source: "Waktu yang Hilang" },

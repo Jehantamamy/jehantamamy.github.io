@@ -48,11 +48,11 @@
 
     <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                 <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </div>
-                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+                <span class="text-sm font-bold">Back to Dashboard</span>
             </a>
             <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
                 <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
@@ -185,29 +185,117 @@
         </div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
         
-        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Leaderboard 728x90]
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard]
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-4">Cara Kompres & Edit Foto Online Gratis (Untuk CPNS & Administrasi)</h1>
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Pixel-Diet: Compress & Convert Images Securely</h2>
+            <p class="leading-relaxed">
+                Struggling with large image files that won't upload? <strong>Pixel-Diet</strong> is your free solution. 
+                Whether you need to reduce a photo to under <strong>200KB</strong> for an online application (CPNS/Job Forms) or convert a modern <strong>WebP</strong> file to a standard <strong>JPG</strong>, 
+                we handle it all. Best of all, we use <span class="text-amber-400 font-bold">Client-Side Compression</span>—your photos never leave your browser.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📉</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">Smart Compression</h3>
+                <p class="text-xs text-slate-400">
+                    Reduce image size by up to <strong>80%</strong> without visible quality loss. Choose your quality level to hit that perfect file size target (e.g., &lt;500KB).
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🔄</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">Format Converter</h3>
+                <p class="text-xs text-slate-400">
+                    Switch easily between formats. Convert <strong class="text-amber-500">PNG</strong> to <strong class="text-amber-500">JPG</strong> for smaller size, or <strong class="text-amber-500">JPG</strong> to <strong class="text-amber-500">WebP</strong> for website optimization.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🛡️</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">100% Private</h3>
+                <p class="text-xs text-slate-400">
+                    Unlike other websites, we don't upload your personal photos to a cloud server. Everything is processed locally on your phone or laptop.
+                </p>
+            </div>
+        </div>
+
+        <div class="space-y-6 mb-12">
+            <h3 class="text-2xl font-bold text-white">Which Image Format Should You Choose?</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-400">
+                    <thead class="text-white border-b border-slate-700 bg-slate-800">
+                        <tr>
+                            <th class="p-3">Format</th>
+                            <th class="p-3">Best Used For</th>
+                            <th class="p-3">Pros</th>
+                            <th class="p-3">Cons</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800">
+                        <tr>
+                            <td class="p-3 font-bold text-amber-400">JPG / JPEG</td>
+                            <td class="p-3">Photos, ID Cards, Social Media</td>
+                            <td class="p-3">Smallest file size, universal compatibility.</td>
+                            <td class="p-3">No transparency, lossy compression.</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-sky-400">PNG</td>
+                            <td class="p-3">Logos, Screenshots, Diagrams</td>
+                            <td class="p-3">Supports transparency, sharp text/edges.</td>
+                            <td class="p-3">Large file size (not good for photos).</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-emerald-400">WebP</td>
+                            <td class="p-3">Websites, Modern Apps</td>
+                            <td class="p-3">Superior compression (smaller than JPG).</td>
+                            <td class="p-3">Older software might not open it.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border-l-4 border-amber-500 pl-6 py-6 mb-10">
+            <h3 class="text-xl font-bold text-white mb-4 mt-0">How to Reduce Image Size (KB)?</h3>
+            <ol class="space-y-3 list-decimal pl-5 marker:text-amber-500 text-sm">
+                <li><strong class="text-white">Upload:</strong> Drag your image into the box.</li>
+                <li><strong class="text-white">Adjust Quality:</strong> Use the slider to lower the quality. 
+                    <ul class="list-disc pl-4 mt-1 text-xs text-slate-400">
+                        <li><strong>80-90%:</strong> Good for general use.</li>
+                        <li><strong>50-70%:</strong> Best for aggressive compression (e.g., getting under 200KB).</li>
+                    </ul>
+                </li>
+                <li><strong class="text-white">Check Preview:</strong> Look at the "After" size preview to ensure it meets your requirements.</li>
+                <li><strong class="text-white">Download:</strong> Save the optimized image instantly.</li>
+            </ol>
+        </div>
+
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-white">Frequently Asked Questions</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Does it work for KTP/SIM uploads?</h4>
+                    <p class="text-xs">Yes! Most government sites require JPG under 200KB or 500KB. Use our slider to adjust the file size until it fits.</p>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-1">Can I bulk convert images?</h4>
+                    <p class="text-xs">Currently, Pixel-Diet focuses on single-image optimization for maximum control. For bulk PDF conversion, check our <strong>PDF Tools</strong>.</p>
+                </div>
+            </div>
+        </div>
         
-        <p class="mb-4">
-            Apakah Anda kesulitan mengupload foto karena ukurannya terlalu besar? Atau format foto Anda (WebP/HEIC) ditolak oleh sistem pendaftaran CPNS/Kampus?
-            <strong>Pixel-Diet Studio</strong> adalah solusi all-in-one untuk memanipulasi gambar langsung di browser Anda.
-        </p>
-
-        <h3 class="text-xl font-bold text-white mt-6 mb-2">Fitur Unggulan Alat Ini:</h3>
-        <ul class="list-disc pl-5 space-y-2 mb-6">
-            <li><strong>Kompresi Otomatis:</strong> Cukup masukkan target ukuran (misal: 200KB), dan sistem kami akan menghitung kualitas terbaik agar foto Anda lolos validasi.</li>
-            <li><strong>Privasi Aman (Client-Side):</strong> Foto Anda diedit langsung di dalam laptop/HP Anda. Tidak ada data yang diupload ke server, sehingga dokumen sensitif (KTP/KK) tetap aman.</li>
-            <li><strong>Editor Lengkap:</strong> Potong (Crop), Putar (Rotate), dan ubah ke Hitam Putih (Grayscale) dalam satu aplikasi.</li>
-            <li><strong>Konversi Format:</strong> Ubah foto WebP atau PNG menjadi JPG standar administrasi dengan satu klik.</li>
-        </ul>
-
-        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Rectangle 300x250]
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle]
         </div>
 
     </section>

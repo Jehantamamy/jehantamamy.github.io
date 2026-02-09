@@ -42,11 +42,11 @@
 
     <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
                 <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </div>
-                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+                <span class="text-sm font-bold">Back to Dashboard</span>
             </a>
             <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
                 <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
@@ -158,36 +158,95 @@
         </div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
         
-        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Leaderboard 728x90]
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard]
         </div>
 
-        <h1 class="text-3xl font-bold text-white mb-4">Cara Merekam Layar Laptop Tanpa Aplikasi (Gratis & HD)</h1>
+        <div class="border-b border-slate-800 pb-8 mb-8">
+            <h2 class="text-3xl font-bold text-white mb-4">Free Online Screen Recorder - No Watermark, No Time Limit</h2>
+            <p class="leading-relaxed">
+                Looking for a simple way to record your screen without installing heavy software? 
+                <strong>Cine-Capture</strong> is a powerful browser-based screen recorder. 
+                Whether you are a gamer, teacher, or professional, capture your desktop, specific tabs, or applications instantly. 
+                Best of all? <span class="text-amber-400 font-bold">No Watermarks</span> and <span class="text-amber-400 font-bold">Unlimited Recording Time</span>.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🚫</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">No Watermark</h3>
+                <p class="text-xs text-slate-400">
+                    Your videos are yours. We do not stamp our logo on your recordings. Clean, professional output every time.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🎙️</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">Audio Support</h3>
+                <p class="text-xs text-slate-400">
+                    Record your <strong>Microphone</strong> for voiceovers and capture <strong>System Audio</strong> (computer sounds) simultaneously.
+                </p>
+            </div>
+
+            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
+                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🔒</div>
+                <h3 class="text-white font-bold text-base mb-2 mt-0">100% Private</h3>
+                <p class="text-xs text-slate-400">
+                    Recordings are processed locally in your browser. No video is uploaded to our servers. Your data is safe.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900/50 border-l-4 border-amber-500 pl-6 py-6 mb-10">
+            <h3 class="text-xl font-bold text-white mb-4 mt-0">How to Record Your Screen?</h3>
+            <ol class="space-y-3 list-decimal pl-5 marker:text-amber-500 text-sm">
+                <li>Click the large <strong>"Start Recording"</strong> button.</li>
+                <li>A browser popup will ask you what to share:
+                    <ul class="list-disc pl-4 mt-1 text-xs text-slate-400">
+                        <li><strong>Entire Screen:</strong> Best for tutorials showing multiple apps.</li>
+                        <li><strong>Window:</strong> Record just one application (e.g., PowerPoint).</li>
+                        <li><strong>Browser Tab:</strong> Best for recording YouTube or websites.</li>
+                    </ul>
+                </li>
+                <li><strong class="text-white">Enable Audio:</strong> Make sure to check the "Share system audio" box if you want to record computer sounds.</li>
+                <li>Click <strong>"Share"</strong> to start recording.</li>
+                <li>When finished, click <strong>"Stop"</strong>. You can preview your video and download it as a WebM file.</li>
+            </ol>
+        </div>
+
+        <div class="space-y-6">
+            <h3 class="text-2xl font-bold text-white">Troubleshooting & Tips</h3>
+            
+            <div class="space-y-4">
+                <div>
+                    <h4 class="text-amber-400 font-bold text-sm mb-1">Why is there no sound?</h4>
+                    <p class="text-xs">
+                        To record system audio (YouTube, Music, Games), you must select <strong>"Entire Screen"</strong> or <strong>"Browser Tab"</strong> and check the "Share system audio" box in the popup. MacOS has stricter permissions for system audio.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-amber-400 font-bold text-sm mb-1">Which format is the video?</h4>
+                    <p class="text-xs">
+                        Videos are saved in <strong>.WebM</strong> format by default, which is optimized for web browsers. You can play it in Chrome, VLC, or convert it to MP4 later using a video converter.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="text-amber-400 font-bold text-sm mb-1">Does it work on Mobile?</h4>
+                    <p class="text-xs">
+                        Screen recording APIs are currently limited to Desktop browsers (Chrome, Edge, Firefox, Opera). Mobile browsers (Android/iOS) generally block web-based screen recording for security reasons.
+                    </p>
+                </div>
+            </div>
+        </div>
         
-        <p class="mb-4">
-            Apakah Anda sedang mencari cara merekam layar laptop atau PC tanpa harus menginstal aplikasi berat seperti OBS atau Bandicam? 
-            Anda berada di tempat yang tepat. <strong>Cine-Capture Studio</strong> adalah alat perekam layar online berbasis web yang memungkinkan Anda membuat video tutorial, 
-            presentasi, atau dokumentasi bug dengan mudah dan cepat.
-        </p>
-
-        <h3 class="text-xl font-bold text-white mt-6 mb-2">Kenapa Menggunakan Perekam Layar Online Ini?</h3>
-        <ul class="list-disc pl-5 space-y-2 mb-6">
-            <li><strong>Tanpa Watermark:</strong> Video hasil rekaman bersih, profesional, dan tidak ada logo mengganggu.</li>
-            <li><strong>Privasi Terjaga:</strong> Proses perekaman terjadi secara lokal di browser Anda (Client-Side). Video Anda tidak pernah diunggah ke server kami.</li>
-            <li><strong>Support Mic & System Audio:</strong> Anda bisa merekam suara Anda (narasi) sekaligus suara dari video/game yang sedang dimainkan.</li>
-            <li><strong>Multi-Resolusi:</strong> Tersedia opsi hemat kuota (480p) hingga kualitas ultra jernih (4K) untuk kebutuhan YouTube.</li>
-        </ul>
-
-        <h3 class="text-xl font-bold text-white mt-6 mb-2">Tips Merekam Agar Hasil Maksimal</h3>
-        <p class="mb-4">
-            Untuk hasil terbaik, pilih opsi <strong>"High (1080p)"</strong> dan pastikan Anda berada di ruangan yang hening jika menggunakan mikrofon. 
-            Jika Anda ingin merekam tutorial coding, opsi 60 FPS akan membuat pergerakan kursor terlihat lebih halus.
-        </p>
-
-        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
-            [Space Iklan AdSense Rectangle 300x250]
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+            [AdSense Slot: Rectangle]
         </div>
 
     </section>
