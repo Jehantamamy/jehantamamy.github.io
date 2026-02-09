@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompres Foto Online & Edit Gambar Gratis - Aries Tech</title>
+    <meta name="description" content="Alat kompres foto online gratis untuk CPNS/Administrasi. Bisa resize, crop, convert ke JPG/WebP, dan edit gambar tanpa upload ke server (Aman).">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom UI Elements */
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #38bdf8; cursor: pointer; margin-top: -6px; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+        
+        .drag-active { border-color: #0ea5e9 !important; background-color: rgba(14, 165, 233, 0.1) !important; }
+        .btn-tool { @apply p-2 rounded-lg border border-slate-600 hover:bg-slate-700 hover:text-white hover:border-sky-500 transition-all text-slate-400 flex items-center justify-center; }
+        .btn-tool-active { @apply bg-sky-600 text-white border-sky-500 shadow-lg shadow-sky-500/30; }
+
+        /* Override Cropper Style */
+        .cropper-modal { opacity: 0.8; background-color: #0f172a; }
+        .cropper-view-box { outline-color: #38bdf8; outline-width: 2px; }
+        .cropper-line { background-color: #38bdf8; }
+        .cropper-point { background-color: #38bdf8; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        
+        <div class="w-full max-w-6xl bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+            
+            <div class="md:w-1/3 p-6 border-b md:border-b-0 md:border-r border-slate-700 flex flex-col overflow-y-auto max-h-[800px]">
+                <div class="mb-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-sky-500 text-2xl">🎨</span> 
+                        <h1 class="text-xl font-extrabold text-white">Pixel-Diet <span class="text-sky-500 font-light">Studio</span></h1>
+                    </div>
+                    <p class="text-slate-400 text-xs">Edit, Crop & Compress (Client-Side).</p>
+                </div>
+
+                <div id="drop-zone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center transition-all cursor-pointer hover:border-sky-500 hover:bg-slate-800/50 mb-6 group relative">
+                    <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">📁</div>
+                    <p class="text-xs font-bold text-slate-300">Klik atau Tarik Foto</p>
+                    <p class="text-[10px] text-slate-500 mt-1">JPG, PNG, WEBP (Max 10MB)</p>
+                </div>
+
+                <div id="editor-panel" class="hidden flex flex-col gap-6 flex-grow">
+                    
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Editor Tools</label>
+                            <button onclick="resetImage()" class="text-[10px] text-rose-400 hover:text-rose-300 underline">Reset All</button>
+                        </div>
+                        <div class="grid grid-cols-5 gap-2">
+                            <button onclick="startCrop()" class="btn-tool col-span-2 text-xs font-bold gap-1 text-sky-400 border-sky-900/50 bg-sky-900/10" title="Potong Gambar">
+                                ✂ Crop
+                            </button>
+                            <button onclick="rotate(-90)" class="btn-tool" title="Putar Kiri">↺</button>
+                            <button onclick="rotate(90)" class="btn-tool" title="Putar Kanan">↻</button>
+                            <button onclick="flip('h')" class="btn-tool" title="Cermin">↔</button>
+                        </div>
+                        <div class="mt-2">
+                            <button onclick="toggleGrayscale()" id="btn-gray" class="btn-tool w-full text-xs" title="Hitam Putih">B/W (Hitam Putih)</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800/50 p-3 rounded-lg border border-slate-700">
+                        <label class="flex items-center justify-between text-xs font-bold text-sky-400 mb-2">
+                            <span>TARGET AUTO (KB)</span>
+                            <input type="checkbox" id="auto-mode" class="accent-sky-500" checked onchange="toggleAutoMode()">
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="number" id="target-size" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-sm text-white focus:border-sky-500 outline-none" placeholder="200" value="200">
+                            <span class="text-xs self-center text-slate-500">KB</span>
+                        </div>
+                    </div>
+
+                    <div id="manual-controls" class="space-y-4 opacity-50 pointer-events-none transition-opacity">
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold text-slate-400 mb-1">
+                                <span>Kualitas</span> <span id="quality-val" class="text-sky-400">80%</span>
+                            </div>
+                            <input type="range" id="quality" min="1" max="100" value="80" oninput="updateVal('quality-val', this.value + '%'); processImage()">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold text-slate-400 mb-1">
+                                <span>Resize</span> <span id="scale-val" class="text-sky-400">100%</span>
+                            </div>
+                            <input type="range" id="scale" min="10" max="100" value="100" oninput="updateVal('scale-val', this.value + '%'); processImage()">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-xs font-semibold text-slate-400 mb-2">Format Output</label>
+                        <select id="format" class="w-full bg-slate-900 border border-slate-600 rounded p-2 text-xs text-white focus:border-sky-500 outline-none" onchange="processImage()">
+                            <option value="image/jpeg">JPEG (Dokumen Standar)</option>
+                            <option value="image/png">PNG (Transparan)</option>
+                            <option value="image/webp">WEBP (Web Modern)</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <button id="download-btn" onclick="downloadImage()" class="hidden mt-auto mb-2 w-full py-4 bg-gradient-to-r from-sky-600 to-emerald-600 hover:from-sky-500 hover:to-emerald-500 text-white font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                    <span>SIMPAN GAMBAR</span>
+                    <span id="final-size-badge" class="bg-black/20 px-2 py-0.5 rounded text-[10px]">0 KB</span>
+                </button>
+            </div>
+
+            <div class="md:w-2/3 bg-slate-950 relative flex flex-col">
+                <div class="absolute top-4 left-4 right-4 flex justify-between items-center z-20 pointer-events-none">
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded-full border border-white/10 text-[10px] text-slate-300">
+                        Asli: <span id="orig-size" class="text-white font-bold">-</span>
+                    </div>
+                    <div class="bg-black/60 backdrop-blur px-3 py-1 rounded-full border border-white/10 text-[10px] text-emerald-400">
+                        Hasil: <span id="new-size" class="font-bold">-</span>
+                    </div>
+                </div>
+
+                <div id="crop-actions" class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2 hidden">
+                    <button onclick="cancelCrop()" class="px-4 py-2 bg-slate-800 text-white text-xs font-bold rounded-full border border-slate-600 hover:bg-slate-700 shadow-lg">Batal</button>
+                    <button onclick="applyCrop()" class="px-6 py-2 bg-emerald-600 text-white text-xs font-bold rounded-full hover:bg-emerald-500 shadow-lg shadow-emerald-500/30">✔ Potong (Apply)</button>
+                </div>
+
+                <div class="flex-grow flex items-center justify-center p-8 overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/checkerboard-cross-light.png')] bg-repeat opacity-100 relative">
+                    
+                    <div class="max-w-full max-h-full relative">
+                        <img id="preview-img" class="max-w-full max-h-[80vh] object-contain shadow-2xl rounded-lg border border-slate-700 hidden">
+                    </div>
+                    
+                    <div id="empty-state" class="text-center opacity-30">
+                        <svg class="w-24 h-24 mx-auto mb-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <p class="text-sm">Preview Gambar</p>
+                    </div>
+                </div>
+                
+                <div id="loading" class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-40 hidden">
+                    <div class="w-10 h-10 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                    <p class="text-xs font-bold text-sky-400">MEMPROSES...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <section class="max-w-4xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-8 text-slate-600 text-xs">
+            [Space Iklan AdSense Leaderboard 728x90]
+        </div>
+
+        <h1 class="text-3xl font-bold text-white mb-4">Cara Kompres & Edit Foto Online Gratis (Untuk CPNS & Administrasi)</h1>
+        
+        <p class="mb-4">
+            Apakah Anda kesulitan mengupload foto karena ukurannya terlalu besar? Atau format foto Anda (WebP/HEIC) ditolak oleh sistem pendaftaran CPNS/Kampus?
+            <strong>Pixel-Diet Studio</strong> adalah solusi all-in-one untuk memanipulasi gambar langsung di browser Anda.
+        </p>
+
+        <h3 class="text-xl font-bold text-white mt-6 mb-2">Fitur Unggulan Alat Ini:</h3>
+        <ul class="list-disc pl-5 space-y-2 mb-6">
+            <li><strong>Kompresi Otomatis:</strong> Cukup masukkan target ukuran (misal: 200KB), dan sistem kami akan menghitung kualitas terbaik agar foto Anda lolos validasi.</li>
+            <li><strong>Privasi Aman (Client-Side):</strong> Foto Anda diedit langsung di dalam laptop/HP Anda. Tidak ada data yang diupload ke server, sehingga dokumen sensitif (KTP/KK) tetap aman.</li>
+            <li><strong>Editor Lengkap:</strong> Potong (Crop), Putar (Rotate), dan ubah ke Hitam Putih (Grayscale) dalam satu aplikasi.</li>
+            <li><strong>Konversi Format:</strong> Ubah foto WebP atau PNG menjadi JPG standar administrasi dengan satu klik.</li>
+        </ul>
+
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
+            [Space Iklan AdSense Rectangle 300x250]
+        </div>
+
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+
+<script>
+    // --- STATE ---
+    let originalFile = null;
+    let baseImage = null; // Image dasar (setelah di-crop/reset)
+    let compressedBlob = null;
+    let cropper = null;
+    
+    // Editor State
+    let editState = {
+        rotation: 0, 
+        flipH: 1,    
+        grayscale: false
+    };
+    
+    let isAutoMode = true;
+    let debounceTimer;
+
+    // --- DOM ELEMENTS ---
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewImg = document.getElementById('preview-img');
+    const loading = document.getElementById('loading');
+
+    // --- EVENTS ---
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-active');
+        if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if(e.target.files.length) handleFile(e.target.files[0]); });
+
+    document.getElementById('target-size').addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => { if(isAutoMode) processImage(); }, 500);
+    });
+
+    // --- CROPPER FUNCTIONS ---
+    function startCrop() {
+        if(cropper) return;
+        
+        // Disable other tools
+        document.getElementById('editor-panel').classList.add('pointer-events-none', 'opacity-50');
+        document.getElementById('crop-actions').classList.remove('hidden');
+
+        // Init Cropper
+        cropper = new Cropper(previewImg, {
+            viewMode: 1,
+            dragMode: 'move',
+            autoCropArea: 0.8,
+            background: false,
+            ready() {
+                // Apply current edits visual fix if needed (Advanced: Cropper works on DOM image)
+            }
+        });
+    }
+
+    function applyCrop() {
+        if(!cropper) return;
+        
+        // Get cropped canvas
+        const croppedCanvas = cropper.getCroppedCanvas();
+        
+        // Update Base Image
+        baseImage = new Image();
+        baseImage.onload = () => {
+            endCrop();
+            processImage(); // Re-process with new base
+        };
+        baseImage.src = croppedCanvas.toDataURL();
+    }
+
+    function cancelCrop() {
+        endCrop();
+        // Just re-process current state to restore view
+        processImage(); 
+    }
+
+    function endCrop() {
+        if(cropper) {
+            cropper.destroy();
+            cropper = null;
+        }
+        document.getElementById('editor-panel').classList.remove('pointer-events-none', 'opacity-50');
+        document.getElementById('crop-actions').classList.add('hidden');
+    }
+
+    // --- EDITOR FUNCTIONS ---
+    function resetImage() {
+        if(!originalFile) return;
+        handleFile(originalFile); // Reload original
+    }
+
+    function rotate(deg) {
+        editState.rotation = (editState.rotation + deg) % 360;
+        processImage();
+    }
+
+    function flip(axis) {
+        if(axis === 'h') editState.flipH *= -1;
+        processImage();
+    }
+
+    function toggleGrayscale() {
+        editState.grayscale = !editState.grayscale;
+        const btn = document.getElementById('btn-gray');
+        if(editState.grayscale) btn.classList.add('btn-tool-active');
+        else btn.classList.remove('btn-tool-active');
+        processImage();
+    }
+
+    // --- CORE LOGIC ---
+    function handleFile(file) {
+        if(!file.type.match('image.*')) { alert("Hanya file gambar!"); return; }
+        
+        originalFile = file;
+        document.getElementById('orig-size').innerText = formatBytes(file.size);
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            baseImage = new Image();
+            baseImage.onload = () => {
+                document.getElementById('empty-state').classList.add('hidden');
+                document.getElementById('editor-panel').classList.remove('hidden');
+                document.getElementById('download-btn').classList.remove('hidden');
+                previewImg.classList.remove('hidden');
+                
+                // Reset Edit State
+                editState = { rotation: 0, flipH: 1, grayscale: false };
+                document.getElementById('btn-gray').classList.remove('btn-tool-active');
+                
+                processImage();
+            };
+            baseImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function processImage() {
+        if(!baseImage) return;
+        loading.classList.remove('hidden');
+
+        await new Promise(r => setTimeout(r, 50));
+
+        const format = document.getElementById('format').value;
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Use baseImage as source (it might be cropped)
+        // Dimensions Logic
+        const angle = (editState.rotation * Math.PI) / 180;
+        const sin = Math.abs(Math.sin(angle));
+        const cos = Math.abs(Math.cos(angle));
+        
+        const manualScale = isAutoMode ? 1.0 : parseInt(document.getElementById('scale').value) / 100;
+        const orgW = baseImage.width * manualScale;
+        const orgH = baseImage.height * manualScale;
+
+        canvas.width = orgW * cos + orgH * sin;
+        canvas.height = orgW * sin + orgH * cos;
+
+        // Draw Logic
+        ctx.save();
+        if(editState.grayscale) ctx.filter = 'grayscale(100%)';
+        ctx.translate(canvas.width/2, canvas.height/2);
+        ctx.rotate(angle);
+        ctx.scale(editState.flipH, 1);
+        ctx.drawImage(baseImage, -orgW/2, -orgH/2, orgW, orgH);
+        ctx.restore();
+
+        // Compression Logic
+        let bestBlob = null;
+
+        if (isAutoMode) {
+            const targetKB = parseInt(document.getElementById('target-size').value) || 200;
+            const targetBytes = targetKB * 1024;
+            
+            let minQ = 0.0, maxQ = 1.0, quality = 0.8;
+            
+            for(let i=0; i<5; i++) {
+                quality = (minQ + maxQ) / 2;
+                const blob = await new Promise(r => canvas.toBlob(r, format, quality));
+                if(blob.size > targetBytes) maxQ = quality; 
+                else { minQ = quality; bestBlob = blob; }
+            }
+            if(!bestBlob || bestBlob.size > targetBytes) {
+                bestBlob = await new Promise(r => canvas.toBlob(r, format, 0.5));
+            }
+        } else {
+            const quality = parseInt(document.getElementById('quality').value) / 100;
+            bestBlob = await new Promise(r => canvas.toBlob(r, format, quality));
+        }
+
+        updateResult(bestBlob);
+        loading.classList.add('hidden');
+    }
+
+    function updateResult(blob) {
+        compressedBlob = blob;
+        const sizeStr = formatBytes(blob.size);
+        document.getElementById('new-size').innerText = sizeStr;
+        document.getElementById('final-size-badge').innerText = sizeStr;
+        
+        const sizeEl = document.getElementById('new-size');
+        if(blob.size < originalFile.size) sizeEl.className = "text-emerald-400 font-bold";
+        else sizeEl.className = "text-rose-400 font-bold";
+
+        // Update preview image source so users see the final result
+        // Note: For Cropper to work again, we might need to reset src if they click crop again.
+        // But startCrop() initializes on current src, which is fine.
+        previewImg.src = URL.createObjectURL(blob);
+    }
+
+    function toggleAutoMode() {
+        isAutoMode = document.getElementById('auto-mode').checked;
+        const manual = document.getElementById('manual-controls');
+        if(isAutoMode) {
+            manual.classList.add('opacity-50', 'pointer-events-none');
+            processImage();
+        } else {
+            manual.classList.remove('opacity-50', 'pointer-events-none');
+        }
+    }
+
+    function updateVal(id, val) { document.getElementById(id).innerText = val; }
+
+    function downloadImage() {
+        if(!compressedBlob) return;
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(compressedBlob);
+        
+        let ext = "jpg";
+        if(document.getElementById('format').value === 'image/png') ext = 'png';
+        if(document.getElementById('format').value === 'image/webp') ext = 'webp';
+
+        const name = originalFile.name.split('.')[0];
+        link.download = `${name}_edited.${ext}`;
+        link.click();
+    }
+
+    function formatBytes(bytes) {
+        if (!+bytes) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+    }
+</script>
+</body>
+</html>

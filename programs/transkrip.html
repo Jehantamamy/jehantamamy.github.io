@@ -3,210 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulator & Analisis Transkrip</title>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<title>Simulator IPK & Analisis Transkrip Online - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #2563eb;
-            --success: #166534;
-            --danger: #dc2626;
-            --bg: #f8fafc;
-        }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
 
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background-color: var(--bg);
-            color: #1e293b;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #f1f5f9;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-card p { margin: 10px 0 0; font-size: 1.8rem; font-weight: 800; color: var(--primary); }
-
-        .progress-container {
-            background: #e2e8f0;
-            border-radius: 10px;
-            height: 8px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: 0.5s; }
-
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f8fafc; padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0; font-size: 0.85rem; }
-        td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
-
-        /* Styling Select untuk Nilai */
-        .select-nilai {
-            padding: 5px;
-            border-radius: 6px;
-            border: 1px solid #cbd5e1;
-            font-weight: bold;
-            cursor: pointer;
-            width: 70px;
-        }
-        .bg-danger { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
-        .bg-safe { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-
-        .upload-area {
-            border: 2px dashed #cbd5e1;
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 25px;
+        .drag-active { border-color: #0ea5e9 !important; background-color: rgba(14, 165, 233, 0.1) !important; }
+        
+        select, input {
+            appearance: none; 
+            background-color: #0f172a;
         }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
 
-<div class="container">
-    <h2 style="text-align:center; color: var(--primary);">Simulator IPK Transkrip</h2>
-
-    <div class="upload-area">
-        <input type="file" id="pdf-upload" accept="application/pdf">
-        <p style="font-size: 0.8rem; color: #64748b;">Unggah PDF -> Ubah nilai di tabel untuk simulasi</p>
-    </div>
-
-    <div id="stats-dashboard" class="stats-grid" style="display: none;">
-        <div class="stat-card"><h3>IPK</h3><p id="stat-ipk">0.00</p></div>
-        <div class="stat-card">
-            <h3>SKS</h3><p id="stat-sks">0/144</p>
-            <div class="progress-container"><div class="progress-bar" id="sks-progress"></div></div>
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
         </div>
-        <div class="stat-card"><h3>Total Poin</h3><p id="stat-poin">0</p></div>
-    </div>
+    </nav>
 
-    <table id="result-table" style="display:none;">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Mata Kuliah</th>
-                <th style="width: 60px;">SKS</th>
-                <th style="width: 100px;">Nilai (Edit)</th>
-                <th style="width: 80px;">Poin</th>
-            </tr>
-        </thead>
-        <tbody id="table-body"></tbody>
-    </table>
-</div>
+    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        
+        <div class="w-full max-w-6xl bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[600px]">
+            
+            <div class="p-8 border-b border-slate-700 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="text-indigo-500 text-3xl">🎓</span> 
+                        <h1 class="text-2xl font-extrabold text-white">IPK Simulator <span class="text-xs font-light px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30">V2.0</span></h1>
+                    </div>
+                    <p class="text-slate-400 text-xs">Simulasi "What-If" dengan Data PDF + Input Manual.</p>
+                </div>
+                
+                <div id="drop-zone" class="w-full md:w-80 border-2 border-dashed border-slate-600 rounded-xl p-3 text-center transition-all cursor-pointer hover:border-indigo-500 hover:bg-slate-800/50 group relative">
+                    <input type="file" id="pdf-upload" class="absolute inset-0 opacity-0 cursor-pointer" accept="application/pdf">
+                    <div class="flex items-center justify-center gap-3">
+                        <div class="text-xl group-hover:scale-110 transition">📄</div>
+                        <div class="text-left">
+                            <p class="text-xs font-bold text-slate-300">Upload Transkrip PDF</p>
+                            <p class="text-[10px] text-slate-500">Otomatis Ekstrak Data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="main-content" class="flex-grow p-8 hidden">
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg class="w-20 h-20 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Proyeksi IPK</p>
+                        <p id="stat-ipk" class="text-4xl font-extrabold text-white">0.00</p>
+                    </div>
+
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total SKS</p>
+                        <div class="flex items-end gap-2 mb-2">
+                            <p id="stat-sks" class="text-3xl font-bold text-white">0</p>
+                            <span class="text-slate-500 text-sm mb-1">/ 144</span>
+                        </div>
+                        <div class="w-full bg-slate-700 rounded-full h-2">
+                            <div id="sks-progress" class="bg-indigo-500 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Mutu</p>
+                        <p id="stat-poin" class="text-3xl font-bold text-emerald-400">0</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-bold text-slate-300">Daftar Mata Kuliah</h3>
+                    <div class="flex gap-2">
+                        <button onclick="resetData()" class="px-4 py-2 bg-slate-800 text-rose-400 text-xs font-bold rounded-lg border border-slate-700 hover:bg-slate-700">
+                            Reset Data
+                        </button>
+                        <button onclick="addManualRow()" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-500 shadow-lg shadow-indigo-500/20 flex items-center gap-2">
+                            <span>+</span> Tambah Matkul Manual
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden flex flex-col max-h-[500px]">
+                    <div class="overflow-y-auto custom-scroll flex-grow">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-900 sticky top-0 z-10 shadow-lg">
+                                <tr>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700 w-10">#</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700">Mata Kuliah</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700 w-20 text-center">SKS</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700 w-32">Nilai</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700 w-20 text-center">Mutu</th>
+                                    <th class="p-4 text-xs font-bold text-slate-400 border-b border-slate-700 w-10"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-slate-700 text-sm text-slate-300">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="empty-state" class="flex-grow flex flex-col items-center justify-center p-12 text-center opacity-50">
+                <div class="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mb-4 border border-slate-700">
+                    <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Mulai Simulasi</h3>
+                <p class="text-slate-400 max-w-sm mb-6">Unggah transkrip PDF atau mulai input manual dari nol.</p>
+                <button onclick="addManualRow()" class="px-6 py-2 bg-slate-800 text-indigo-400 text-sm font-bold rounded-full border border-slate-700 hover:bg-slate-700 hover:text-indigo-300 transition-all">
+                    Input Manual Tanpa PDF
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+	<section class="max-w-4xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-8 text-slate-600 text-xs">
+            [Space Iklan AdSense Leaderboard 728x90]
+        </div>
+
+        <h1 class="text-3xl font-bold text-white mb-4">Simulator IPK & Kalkulator Transkrip Online</h1>
+        
+        <p class="mb-4">
+            Bagi mahasiswa, menghitung proyeksi Indeks Prestasi Kumulatif (IPK) seringkali membingungkan, apalagi jika harus menghitung manual dari transkrip PDF. 
+            <strong>Aries Tech Academic Simulator</strong> hadir untuk mempermudah proses tersebut. Cukup unggah file transkrip, dan sistem kami akan otomatis mengekstrak mata kuliah Anda.
+        </p>
+
+        <h3 class="text-xl font-bold text-white mt-6 mb-2">Fitur Utama:</h3>
+        <ul class="list-disc pl-5 space-y-2 mb-6">
+            <li><strong>Import PDF Otomatis:</strong> Tidak perlu ketik ulang nama mata kuliah. Algoritma kami membaca pola teks dalam PDF transkrip universitas pada umumnya.</li>
+            <li><strong>Simulasi Nilai ("What-If"):</strong> Ingin tahu apa yang terjadi jika Anda mengulang mata kuliah yang dapat D menjadi A? Cukup ubah dropdown nilai, dan IPK akan terhitung ulang secara <em>real-time</em>.</li>
+            <li><strong>Privasi Aman:</strong> Pemrosesan PDF dilakukan di browser (Client-Side). File transkrip Anda tidak diunggah ke server kami.</li>
+        </ul>
+
+        <h3 class="text-xl font-bold text-white mt-6 mb-2">Tips Akademik:</h3>
+        <p class="mb-4">
+            Untuk mendongkrak IPK, prioritaskan mengulang mata kuliah dengan bobot SKS besar (3 atau 4 SKS) yang memiliki nilai C atau D. Perbaikan pada mata kuliah ber-SKS besar memberikan dampak signifikan pada perhitungan total mutu.
+        </p>
+		
+		<h1 class="text-3xl font-bold text-white mb-4">Cara Simulasi Nilai IPK & SKS</h1>
+        <p>Gunakan fitur <strong>"Tambah Matkul Manual"</strong> untuk mensimulasikan mata kuliah yang akan diambil semester depan. Masukkan estimasi nilai, dan lihat bagaimana pengaruhnya terhadap IPK total Anda.</p>
+        
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
+            [Space Iklan AdSense Rectangle 300x250]
+        </div>
+
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
 
 <script>
+    // --- SETUP ---
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-
+    
     const bobotNilai = { 'A': 4, 'A-': 3.75, 'AB': 3.5, 'B+': 3.25, 'B': 3, 'B-': 2.75, 'BC': 2.5, 'C+': 2.25, 'C': 2, 'D': 1, 'E': 0 };
+    
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('pdf-upload');
+    const mainContent = document.getElementById('main-content');
+    const emptyState = document.getElementById('empty-state');
+    const tbody = document.getElementById('table-body');
+    
+    let rowCount = 0;
 
-    document.getElementById('pdf-upload').addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    // --- EVENTS ---
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-active'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault(); dropZone.classList.remove('drag-active');
+        if(e.dataTransfer.files.length) processFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if(e.target.files.length) processFile(e.target.files[0]); });
+
+    // --- LOGIC ---
+    function processFile(file) {
+        if (!file || file.type !== 'application/pdf') { alert("Mohon unggah file PDF."); return; }
         
         const reader = new FileReader();
         reader.onload = async function() {
-            const typedarray = new Uint8Array(this.result);
-            const pdf = await pdfjsLib.getDocument(typedarray).promise;
-            let fullText = "";
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const content = await page.getTextContent();
-                fullText += content.items.map(item => item.str).join("  ") + " \n";
-            }
-            parseData(fullText);
+            try {
+                const pdf = await pdfjsLib.getDocument(new Uint8Array(this.result)).promise;
+                let fullText = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    fullText += content.items.map(item => item.str).join("  ") + " \n";
+                }
+                parseData(fullText);
+            } catch (error) { alert("Gagal membaca PDF."); }
         };
         reader.readAsArrayBuffer(file);
-    });
+    }
 
-    // Ganti fungsi parseData di dalam tag <script> dengan versi ini:
+    function parseData(text) {
+        const regex = /(?!\bHalaman\b|\bPage\b)([A-Z][A-Z0-9\s\/\-\(\)]{7,})\s+([1-6])\s+([A-E][ABCDE+\-]?)/g;
+        const cleanedText = text.replace(/\n/g, " "); 
+        let match;
+        
+        // Reset jika upload baru
+        // tbody.innerHTML = ""; // Optional: mau replace atau append? Replace lebih bersih.
+        // rowCount = 0;
+        
+        while ((match = regex.exec(cleanedText)) !== null) {
+            addTableRow(match[1].trim(), match[2], match[3], false);
+        }
+        
+        showDashboard();
+    }
 
-	function parseData(text) {
-		// Regex yang lebih toleran terhadap karakter unik dan baris baru
-		// Menambahkan pencarian untuk nama yang sangat panjang
-		const regex = /(?!\bHalaman\b|\bPage\b)([A-Z][A-Z0-9\s\/\-\(\)]{7,})\s+([1-6])\s+([A-E][ABCDE+\-]?)/g;
-		
-		// Membersihkan teks dari line break yang tidak perlu agar nama panjang tersambung
-		const cleanedText = text.replace(/\n/g, " "); 
-		
-		let match, count = 1;
-		const tbody = document.getElementById('table-body');
-		tbody.innerHTML = "";
+    function addManualRow() {
+        showDashboard();
+        addTableRow("Mata Kuliah Baru", 3, "A", true);
+        
+        // Scroll to bottom
+        const tableContainer = document.querySelector('.custom-scroll');
+        tableContainer.scrollTop = tableContainer.scrollHeight;
+    }
 
-		while ((match = regex.exec(cleanedText)) !== null) {
-			const nama = match[1].trim();
-			const sks = match[2];
-			const nilaiAwal = match[3];
+    function addTableRow(nama, sks, nilai, isManual) {
+        rowCount++;
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-700/50 transition-colors group";
+        
+        // Generate Options
+        const options = Object.keys(bobotNilai).map(n => 
+            `<option value="${n}" ${n === nilai ? 'selected' : ''}>${n}</option>`
+        ).join('');
 
-			const row = document.createElement('tr');
-			row.innerHTML = `
-				<td>${count++}</td>
-				<td style="font-size: 0.85rem; max-width: 300px;">${nama}</td>
-				<td class="sks-val">${sks}</td>
-				<td>
-					<select class="select-nilai" onchange="hitungUlang()">
-						${Object.keys(bobotNilai).map(n => `<option value="${n}" ${n === nilaiAwal ? 'selected' : ''}>${n}</option>`).join('')}
-					</select>
-				</td>
-				<td class="poin-row">0</td>
-			`;
-			tbody.appendChild(row);
-		}
-		document.getElementById('result-table').style.display = "table";
-		document.getElementById('stats-dashboard').style.display = "grid";
-		hitungUlang();
-	}
+        // SKS Input (Editable if manual, fixed if PDF)
+        // Kita buat semuanya editable saja biar fleksibel, tapi styling beda dikit
+        const sksInput = isManual 
+            ? `<input type="number" min="1" max="6" value="${sks}" class="sks-input w-12 bg-slate-900 border border-indigo-500/50 rounded p-1 text-center text-xs text-white focus:outline-none" onchange="hitungUlang()">`
+            : `<span class="sks-static inline-block px-2 py-1 rounded bg-slate-700 text-xs font-mono">${sks}</span><input type="hidden" value="${sks}" class="sks-input">`;
+
+        const namaInput = isManual
+            ? `<input type="text" value="${nama}" class="w-full bg-transparent border-b border-dashed border-slate-600 focus:border-indigo-500 outline-none text-white font-bold" placeholder="Nama Matkul">`
+            : `<span class="font-bold text-white max-w-xs truncate block" title="${nama}">${nama}</span>`;
+
+        tr.innerHTML = `
+            <td class="p-4 border-b border-slate-700 font-mono text-slate-500">${rowCount}</td>
+            <td class="p-4 border-b border-slate-700">${namaInput}</td>
+            <td class="p-4 border-b border-slate-700 text-center">${sksInput}</td>
+            <td class="p-4 border-b border-slate-700">
+                <select class="select-nilai w-full bg-slate-900 border border-slate-600 text-white text-xs rounded p-2 focus:border-indigo-500 outline-none cursor-pointer" onchange="hitungUlang()">
+                    ${options}
+                </select>
+            </td>
+            <td class="p-4 border-b border-slate-700 text-center font-mono font-bold text-slate-400 poin-row">0</td>
+            <td class="p-4 border-b border-slate-700 text-center">
+                <button onclick="deleteRow(this)" class="text-slate-600 hover:text-rose-500 transition-colors" title="Hapus Baris">✕</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        hitungUlang();
+    }
+
+    function deleteRow(btn) {
+        btn.closest('tr').remove();
+        hitungUlang();
+    }
+
+    function resetData() {
+        if(confirm("Hapus semua data?")) {
+            tbody.innerHTML = "";
+            rowCount = 0;
+            hitungUlang();
+            mainContent.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+        }
+    }
+
+    function showDashboard() {
+        emptyState.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+    }
 
     function hitungUlang() {
         let totalSks = 0;
         let totalPoin = 0;
         
-        document.querySelectorAll('#table-body tr').forEach(row => {
-            const sks = parseInt(row.querySelector('.sks-val').textContent);
-            const nilai = row.querySelector('.select-nilai').value;
+        const rows = document.querySelectorAll('#table-body tr');
+        
+        rows.forEach((row, index) => {
+            // Update Nomor Urut
+            row.querySelector('td:first-child').innerText = index + 1;
+            
+            // Ambil SKS (bisa dari input manual atau hidden input statis)
+            let sksVal = row.querySelector('.sks-input').value;
+            // Fallback jika input hidden (utk data pdf statis yg span-nya diubah jadi input hidden)
+            // Logic di addTableRow: kalau statis, ada <span class="sks-static">..</span> dan <input type="hidden" class="sks-input">
+            // Kalau manual, ada <input type="number" class="sks-input">
+            
+            const sks = parseInt(sksVal) || 0;
             const selectEl = row.querySelector('.select-nilai');
+            const nilai = selectEl.value;
             
             const poinMK = bobotNilai[nilai] || 0;
             const subTotal = sks * poinMK;
             
-            // Update Tampilan Poin per Baris
             row.querySelector('.poin-row').textContent = subTotal.toFixed(1);
             
-            // Update Warna Dropdown
+            // Visual Styles
             if(['C','D','E','BC','C+'].includes(nilai)) {
-                selectEl.className = 'select-nilai bg-danger';
+                selectEl.className = 'select-nilai w-full bg-rose-900/30 border border-rose-500/50 text-rose-300 text-xs rounded p-2 focus:border-rose-500 outline-none cursor-pointer';
             } else {
-                selectEl.className = 'select-nilai bg-safe';
+                selectEl.className = 'select-nilai w-full bg-emerald-900/30 border border-emerald-500/50 text-emerald-300 text-xs rounded p-2 focus:border-emerald-500 outline-none cursor-pointer';
             }
 
             totalSks += sks;
             totalPoin += subTotal;
         });
 
-        const ipk = totalSks > 0 ? (totalPoin / totalSks).toFixed(2) : 0;
-        document.getElementById('stat-ipk').textContent = ipk;
-        document.getElementById('stat-sks').textContent = `${totalSks} / 144`;
-        document.getElementById('stat-poin').textContent = totalPoin.toFixed(1);
-        document.getElementById('sks-progress').style.width = Math.min((totalSks / 144) * 100, 100) + "%";
+        const ipk = totalSks > 0 ? (totalPoin / totalSks).toFixed(2) : "0.00";
+        document.getElementById('stat-ipk').innerText = ipk;
+        document.getElementById('stat-sks').innerText = totalSks;
+        document.getElementById('stat-poin').innerText = totalPoin.toFixed(1);
+        
+        const percentage = Math.min((totalSks / 144) * 100, 100);
+        document.getElementById('sks-progress').style.width = percentage + "%";
+        
+        // Warna IPK
+        const ipkEl = document.getElementById('stat-ipk');
+        if(parseFloat(ipk) >= 3.5) ipkEl.className = "text-4xl font-extrabold text-emerald-400";
+        else if(parseFloat(ipk) >= 3.0) ipkEl.className = "text-4xl font-extrabold text-indigo-400";
+        else ipkEl.className = "text-4xl font-extrabold text-amber-400";
     }
 </script>
 </body>

@@ -152,20 +152,47 @@
             <div class="h-[1px] w-full bg-gradient-to-r from-transparent via-slate-800 to-transparent"></div>
         </div>
 
-        <section id="dashboard" class="py-20 px-6 max-w-7xl mx-auto">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-                <div>
-                    <h3 class="text-3xl font-bold text-white mb-2">Engineering and Academic Sandbox</h3>
-                    <p class="text-slate-400">Kumpulan alat bantu dan simulasi teknis untuk riset & akademik.</p>
-                </div>
-                <div class="flex gap-3">
-                    <span class="px-3 py-1 bg-slate-800 border border-slate-700 rounded text-[10px] font-mono text-slate-500 uppercase">Total: <span id="app-count" class="text-sky-400">0</span> Programs</span>
-                </div>
-            </div>
+        <section id="dashboard" class="py-20 px-6 max-w-7xl mx-auto min-h-screen">
+			
+			<div class="flex flex-col md:flex-row justify-between items-end mb-8 gap-6 border-b border-slate-800 pb-8">
+				<div class="w-full md:w-1/2">
+					<h3 class="text-3xl font-bold text-white mb-2">Engineering Sandbox</h3>
+					<p class="text-slate-400 mb-6">Kumpulan alat bantu riset, simulasi, dan utilitas harian.</p>
+					
+					<div class="relative group">
+						<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-500 group-focus-within:text-sky-400 transition-colors">
+							<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+						</div>
+						<input type="text" id="search-input" onkeyup="filterApps()" 
+							   class="block w-full p-3 pl-10 text-sm text-white bg-slate-900 border border-slate-700 rounded-xl focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none transition-all placeholder-slate-600 shadow-lg" 
+							   placeholder="Cari program (misal: QR, PID, Image)...">
+					</div>
+				</div>
 
-            <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-        </section>
+				<div class="w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
+					<div class="flex gap-2" id="category-filters">
+						<button onclick="filterCategory('All')" class="cat-btn active px-4 py-2 rounded-lg text-xs font-bold bg-sky-600 text-white transition-all shadow-lg shadow-sky-600/20">All</button>
+						<button onclick="filterCategory('Academic')" class="cat-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all">Academic</button>
+						<button onclick="filterCategory('Tutorial/Simulation')" class="cat-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all">Tutorial</button>
+						<button onclick="filterCategory('Utility')" class="cat-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all">Utility</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex justify-between items-center mb-6">
+				<span class="text-[10px] uppercase tracking-widest text-slate-500 font-mono">
+					Showing: <span id="visible-count" class="text-white font-bold">0</span> / <span id="total-count">0</span> Tools
+				</span>
+			</div>
+
+			<div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
+				</div>
+			
+			<div id="empty-search" class="hidden text-center py-20">
+				<div class="text-4xl mb-4">🔍</div>
+				<p class="text-slate-500">Program tidak ditemukan. Coba kata kunci lain.</p>
+			</div>
+		</section>
 		<section id="logic-playground" class="py-24 px-6 max-w-7xl mx-auto">
 			<div class="flex flex-col md:flex-row gap-12 items-start">
 				
@@ -264,7 +291,7 @@
 		<section id="catalog" class="py-24 px-6 bg-slate-900/50">
             <div class="max-w-7xl mx-auto">
                 <div class="text-center mb-16">
-                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Products</h3>
+                    <h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Tech Products</h3>
                     <p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Software siap pakai dengan standar keamanan tinggi dan arsitektur desktop modern untuk kebutuhan institusi Anda.</p>
                 </div>
 
@@ -325,9 +352,14 @@
             </div>
         </section>
 		
+		
 		<section id="books" class="py-24 px-6 max-w-7xl mx-auto">
-            <div class="bg-gradient-to-br from-amber-950/30 to-slate-900 rounded-3xl border border-amber-500/20 overflow-hidden shadow-2xl relative">
-                
+            <div class="text-center mb-16">
+				<h3 class="text-3xl md:text-4xl font-bold text-white mb-4">Featured Literature Products</h3>
+				<p class="text-slate-400 max-w-2xl mx-auto text-sm md:text-base">Buku dan e-book berkualitas untuk anda baca</p>
+			</div>
+			<div class="bg-gradient-to-br from-amber-950/30 to-slate-900 rounded-3xl border border-amber-500/20 overflow-hidden shadow-2xl relative">
+			
                 <div class="absolute top-0 right-0 w-64 h-64 bg-amber-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
                 <div class="flex flex-col md:flex-row items-stretch">
@@ -632,9 +664,33 @@
             { name: "GraderA+", file: "GraderA/index.html", category: "Academic", icon: "📊️", color: "sky", desc: "Penilaian presentasi mahasiswa dengan custom instrument dan export to .xlsx" },
             { name: "Transcript Analyzer", file: "transkrip.html", category: "Academic", icon: "📊", color: "sky", desc: "Ekstraksi data transkrip PDF & simulasi IPK kelulusan." },
 			{ 
+				name: "Insta-Connect QR", 
+				file: "qr_studio.html", 
+				category: "Utility", 
+				icon: "▣",  // Ikon kotak unik
+				color: "amber", 
+				desc: "Buat QR Code instan untuk Login WiFi Otomatis, Kartu Nama Digital (vCard), dan Tautan Website." 
+			},
+			{ 
+				name: "Pixel-Diet Img", 
+				file: "image_tools.html", 
+				category: "Utility", 
+				icon: "📉", 
+				color: "amber", 
+				desc: "Kompres dan ubah format gambar (JPG/PNG/WEBP) secara aman di browser tanpa upload ke server. Cocok untuk syarat administrasi online." 
+			},
+			{ 
+				name: "Cine-Capture", 
+				file: "screen_recorder.html", 
+				category: "Utility", 
+				icon: "🎥", 
+				color: "amber", 
+				desc: "Perekam layar gratis tanpa watermark. Support audio mic & sistem. (Khusus Desktop)." 
+			},
+			{ 
 			  name: "Sensor Noise Filter (Tutorial Interaktif)", 
 			  file: "filter_sim.html", 
-			  category: "Research", 
+			  category: "Tutorial/Simulation", 
 			  icon: "📡", 
 			  color: "emerald", 
 			  desc: "Visualisasi perbandingan SMA & EMA Filter untuk membersihkan data sensor yang kotor." 
@@ -642,7 +698,7 @@
 			{ 
 			  name: "Motor Torque Lab (Tutorial Interaktif)", 
 			  file: "motor_sim.html", 
-			  category: "Robotics", 
+			  category: "Tutorial/Simulation", 
 			  icon: "⚙️", 
 			  color: "emerald", 
 			  desc: "Simulasi perhitungan torsi, beban katrol, dan pengaruh gearbox pada sistem penggerak." 
@@ -650,11 +706,12 @@
 			{ 
 			  name: "PID Line Tuner (Tutorial Interaktif)", 
 			  file: "pid_sim.html", 
-			  category: "Control", 
+			  category: "Tutorial/Simulation", 
 			  icon: "🧠", 
 			  color: "emerald", 
 			  desc: "Visualisasi tuning Kp, Ki, Kd untuk kestabilan robot Line Follower." 
 			}
+			
         ];
 		
 		const quotesData = [
@@ -718,32 +775,95 @@
 		}
 
         // RENDER DASHBOARD
-        function renderPrograms() {
-            const grid = document.getElementById('project-grid');
-            const countLabel = document.getElementById('app-count');
-            grid.innerHTML = '';
-            
-            programs.forEach((p) => {
-                const card = `
-                    <div class="group relative p-1 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-800 hover:border-sky-500/50 transition-all duration-300 cursor-pointer overflow-hidden" onclick="openApp('${p.file}', '${p.name}')">
-                        <div class="p-6">
-                            <div class="flex justify-between items-start mb-4">
-                                <span class="text-3xl group-hover:scale-110 transition-transform duration-300">${p.icon}</span>
-                                <span class="text-[10px] font-mono font-bold px-2 py-1 rounded bg-${p.color}-500/10 text-${p.color}-400 border border-${p.color}-500/20 uppercase tracking-widest">${p.category}</span>
-                            </div>
-                            <h4 class="text-lg font-bold text-white mb-2 group-hover:text-sky-400 transition-colors">${p.name}</h4>
-                            <p class="text-xs text-slate-500 leading-relaxed mb-6">${p.desc || 'Modul aplikasi untuk mendukung produktivitas riset dan akademik.'}</p>
-                            <div class="flex items-center text-sky-400 text-[10px] font-bold uppercase tracking-wider">
-                                Launch Module 
-                                <svg class="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += card;
-            });
-            countLabel.innerText = programs.length;
-        }
+        // --- APP STORE LOGIC (SEARCH & FILTER) ---
+    
+		let activeCategory = 'All';
+
+		function renderPrograms(data = programs) {
+			const grid = document.getElementById('project-grid');
+			const emptyState = document.getElementById('empty-search');
+			const visibleCount = document.getElementById('visible-count');
+			const totalCount = document.getElementById('total-count');
+
+			// Update Stats
+			visibleCount.innerText = data.length;
+			totalCount.innerText = programs.length;
+
+			grid.innerHTML = '';
+
+			if (data.length === 0) {
+				emptyState.classList.remove('hidden');
+			} else {
+				emptyState.classList.add('hidden');
+				
+				data.forEach((p) => {
+					// Styling warna dinamis sesuai kategori
+					let badgeColor = 'slate';
+					if(p.category === 'Utility') badgeColor = 'amber';
+					if(p.category === 'Robotics') badgeColor = 'emerald';
+					if(p.category === 'Academic') badgeColor = 'sky';
+
+					const card = `
+						<a href="programs/${p.file}" class="group relative p-1 rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-800 hover:border-${p.color}-500/50 transition-all duration-300 cursor-pointer overflow-hidden hover:-translate-y-1 shadow-lg hover:shadow-${p.color}-500/10 block">
+							<div class="p-6 h-full flex flex-col">
+								<div class="flex justify-between items-start mb-4">
+									<div class="w-12 h-12 rounded-xl bg-${p.color}-500/10 border border-${p.color}-500/20 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+										${p.icon}
+									</div>
+									<span class="text-[10px] font-mono font-bold px-2 py-1 rounded bg-${badgeColor}-500/10 text-${badgeColor}-400 border border-${badgeColor}-500/20 uppercase tracking-widest">
+										${p.category}
+									</span>
+								</div>
+								<h4 class="text-lg font-bold text-white mb-2 group-hover:text-${p.color}-400 transition-colors">${p.name}</h4>
+								<p class="text-xs text-slate-400 leading-relaxed mb-6 flex-grow line-clamp-2">${p.desc}</p>
+								
+								<div class="pt-4 border-t border-slate-800 flex items-center justify-between mt-auto">
+									<span class="text-[10px] text-slate-500 font-mono group-hover:text-white transition-colors">v1.0.0</span>
+									<div class="flex items-center text-${p.color}-400 text-[10px] font-bold uppercase tracking-wider group-hover:underline">
+										Buka Tool 
+										<svg class="w-3 h-3 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+									</div>
+								</div>
+							</div>
+						</a>
+					`;
+					grid.innerHTML += card;
+				});
+			}
+		}
+
+		// SEARCH FUNCTION
+		function filterApps() {
+			const query = document.getElementById('search-input').value.toLowerCase();
+			
+			const filtered = programs.filter(p => {
+				const matchesSearch = p.name.toLowerCase().includes(query) || p.desc.toLowerCase().includes(query);
+				const matchesCat = activeCategory === 'All' || p.category === activeCategory;
+				return matchesSearch && matchesCat;
+			});
+
+			renderPrograms(filtered);
+		}
+
+		// CATEGORY BUTTON FUNCTION
+		function filterCategory(cat) {
+			activeCategory = cat;
+			
+			// Update Button Styles
+			const buttons = document.querySelectorAll('.cat-btn');
+			buttons.forEach(btn => {
+				if(btn.innerText === cat) {
+					// Style Active
+					btn.className = "cat-btn active px-4 py-2 rounded-lg text-xs font-bold bg-sky-600 text-white transition-all shadow-lg shadow-sky-600/20";
+				} else {
+					// Style Inactive
+					btn.className = "cat-btn px-4 py-2 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 hover:text-white border border-slate-700 transition-all";
+				}
+			});
+
+			// Re-run filter to combine with search
+			filterApps(); 
+		}
 
         // MODAL LOGIC (OVERRIDE DARI SUB 1)
         function toggleModal() {
@@ -1079,15 +1199,16 @@
 			mouse.y = null;
 		});
 
-		
-		document.addEventListener('DOMContentLoaded', renderPrograms);
+		// UPDATE INIT (Penting: Ganti init lama dengan ini)
 		document.addEventListener('DOMContentLoaded', () => {
-			// ... kode init lainnya ...
-			// Start
-			init();
-			animate();
-			generateQuote(); // Opsional: Jalankan otomatis saat load
-		});
+			// ... init canvas, particles, quotes dll ...
+			init(); // Canvas
+			animate(); // Canvas
+			generateQuote();
+			
+			// Render Awal (Semua Program)
+			renderPrograms(); 
+		});		
 		
     </script>
 

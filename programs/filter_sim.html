@@ -2,140 +2,213 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Sensor Noise Filter Simulator</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Noise Filter Simulator (SMA vs EMA) - Aries Tech</title>
+    <meta name="description" content="Simulasi filter digital sensor (SMA vs EMA) untuk Arduino/IoT. Visualisasikan reduksi noise secara realtime dan generate kode C++ otomatis.">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #10b981; cursor: pointer; margin-top: -6px; 
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px; }
+    </style>
 </head>
-<body class="p-4 bg-slate-950 text-slate-200">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-bold text-emerald-400 font-mono tracking-tighter uppercase italic">Sensor Noise Filter Lab</h2>
-            <div class="text-[10px] bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded text-emerald-500 font-mono uppercase">Status: Live Simulation</div>
-        </div>
+<body class="flex flex-col min-h-screen">
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="lg:col-span-1 space-y-6 bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-xl">
-                <div>
-                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase">Noise Level (Intensity)</label>
-                    <input type="range" id="noise-lvl" min="0" max="50" value="15" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    <div id="noise-val" class="text-right text-rose-400 font-bold text-xs mt-1">15</div>
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </div>
-
-                <div class="pt-4 border-t border-slate-800">
-                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase text-sky-400">SMA Window (Data Points)</label>
-                    <input type="range" id="sma-window" min="2" max="50" value="10" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    <div id="sma-val" class="text-right text-sky-400 font-bold text-xs mt-1">10</div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-800">
-                    <label class="block text-[10px] font-mono text-slate-500 mb-2 uppercase text-purple-400">EMA Alpha (Smoothing)</label>
-                    <input type="range" id="ema-alpha" min="0.01" max="1" step="0.01" value="0.1" class="w-full h-1 bg-slate-800 rounded-lg appearance-none cursor-pointer">
-                    <div id="ema-val" class="text-right text-purple-400 font-bold text-xs mt-1">0.10</div>
-                </div>
-
-                <div class="pt-6">
-                    <button onclick="resetData()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition uppercase tracking-widest">Clear Graph</button>
-                </div>
+                <span class="text-sm font-bold">Kembali ke Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
             </div>
-
-            <div class="lg:col-span-3 bg-white p-4 rounded-2xl shadow-inner min-h-[450px]">
-                <canvas id="filterChart"></canvas>
-            </div>
-        </div>
-		
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-			<div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
-				<h4 class="text-white font-bold text-xs uppercase mb-4 flex items-center gap-2">
-					<span class="text-rose-500">📊</span> Live Performance Metrics (RMSE)
-				</h4>
-				<div class="space-y-4">
-					<div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg border border-sky-900/20">
-						<span class="text-[10px] text-slate-400 font-mono">SMA ERROR (RMSE):</span>
-						<span id="sma-rmse" class="text-sky-400 font-bold font-mono">0.00</span>
-					</div>
-					<div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg border border-purple-900/20">
-						<span class="text-[10px] text-slate-400 font-mono">EMA ERROR (RMSE):</span>
-						<span id="ema-rmse" class="text-purple-400 font-bold font-mono">0.00</span>
-					</div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
 				</div>
-				<p class="text-[9px] text-slate-500 mt-4 italic">
-					*RMSE (Root Mean Square Error) mengukur deviasi hasil filter terhadap nilai ideal (Sine Wave). Nilai lebih kecil = Lebih Baik.
+			</a>
+        </div>
+    </nav>
+
+    <main class="flex-grow flex flex-col p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+        
+        <div class="max-w-6xl mx-auto w-full">
+            
+            <div class="flex justify-between items-end mb-6 border-b border-slate-800 pb-4">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white mb-1">Sensor Noise Filter Lab</h1>
+                    <p class="text-slate-400 text-xs">Simulasi Algoritma Smoothing (SMA & EMA) untuk IoT/Robotics.</p>
+                </div>
+                <div class="hidden md:block text-[10px] bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full text-emerald-400 font-mono uppercase tracking-wider animate-pulse">
+                    ● Live Simulation
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                
+                <div class="lg:col-span-1 space-y-6 bg-slate-900/90 backdrop-blur p-5 rounded-2xl border border-slate-800 shadow-xl h-fit">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <label class="text-[10px] font-mono text-slate-500 uppercase">Noise Level</label>
+                            <span id="noise-val" class="text-rose-400 font-bold text-xs">15</span>
+                        </div>
+                        <input type="range" id="noise-lvl" min="0" max="50" value="15" class="w-full">
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex justify-between mb-2">
+                            <label class="text-[10px] font-mono text-sky-500 uppercase">SMA Window</label>
+                            <span id="sma-val" class="text-sky-400 font-bold text-xs">10</span>
+                        </div>
+                        <input type="range" id="sma-window" min="2" max="50" value="10" class="w-full">
+                        <p class="text-[9px] text-slate-500 mt-1">Jendela rata-rata data.</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-800">
+                        <div class="flex justify-between mb-2">
+                            <label class="text-[10px] font-mono text-purple-500 uppercase">EMA Alpha</label>
+                            <span id="ema-val" class="text-purple-400 font-bold text-xs">0.10</span>
+                        </div>
+                        <input type="range" id="ema-alpha" min="0.01" max="1" step="0.01" value="0.1" class="w-full">
+                        <p class="text-[9px] text-slate-500 mt-1">Sensitivitas data baru (0-1).</p>
+                    </div>
+
+                    <div class="pt-4">
+                        <button onclick="resetData()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold transition uppercase tracking-widest border border-slate-700 hover:border-slate-500">
+                            Reset Graph
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-3 bg-white p-2 rounded-2xl shadow-inner min-h-[400px] border-4 border-slate-800 relative">
+                    <canvas id="filterChart"></canvas>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl">
+                    <h4 class="text-white font-bold text-xs uppercase mb-4 flex items-center gap-2">
+                        <span class="text-rose-500">📊</span> Live Metrics (RMSE Error)
+                    </h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg border border-sky-900/20">
+                            <span class="text-[10px] text-slate-400 font-mono">SMA ERROR (Window Filter):</span>
+                            <span id="sma-rmse" class="text-sky-400 font-bold font-mono text-sm">0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-950 p-3 rounded-lg border border-purple-900/20">
+                            <span class="text-[10px] text-slate-400 font-mono">EMA ERROR (Expo Filter):</span>
+                            <span id="ema-rmse" class="text-purple-400 font-bold font-mono text-sm">0.00</span>
+                        </div>
+                    </div>
+                    <p class="text-[9px] text-slate-500 mt-3 italic">
+                        *RMSE (Root Mean Square Error): Nilai penyimpangan dari gelombang ideal. Semakin kecil = Semakin akurat & halus.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
+                    <h4 class="text-white font-bold text-xs uppercase mb-4 flex items-center gap-2">
+                        <span class="text-emerald-500">⚖️</span> Studi Kasus: Timbangan Digital
+                    </h4>
+                    <p class="text-[11px] text-slate-400 leading-relaxed mb-3">
+                        Bayangkan Anda membuat Timbangan Digital Presisi. Sensor Load Cell sangat sensitif terhadap getaran meja (noise).
+                    </p>
+                    <div class="bg-slate-950/50 p-3 rounded border border-slate-800 text-[10px] text-slate-300">
+                        <p class="mb-1"><strong class="text-rose-400">Tanpa Filter:</strong> Berat terbaca 98g, 102g, 99g (Angka loncat-loncat).</p>
+                        <p><strong class="text-emerald-400">Dengan Filter:</strong> Berat terbaca stabil 100.1g (User senang).</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <section class="max-w-5xl mx-auto px-6 py-12 prose prose-invert prose-sm text-slate-300">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [Space Iklan AdSense Leaderboard 728x90]
+        </div>
+
+        <div class="border-b border-slate-800 pb-4">
+			<h3 class="text-2xl font-bold text-white">Digital Filter: SMA vs EMA</h3>
+			<p class="text-slate-400 text-sm">Panduan mendalam untuk implementasi pada Mikrokontroler.</p>
+		</div>
+
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+			<div class="space-y-4">
+				<h4 class="text-sky-400 font-bold flex items-center gap-2">
+					<span class="p-1 bg-sky-500/10 rounded">01</span> Simple Moving Average
+				</h4>
+				<p class="text-xs text-slate-400 leading-relaxed">
+					SMA bekerja dengan menjumlahkan data dalam rentang waktu tertentu (Window) dan membaginya dengan jumlah data tersebut. Ini adalah filter linier yang memberikan bobot yang sama untuk setiap sampel.
 				</p>
+				<ul class="text-[11px] text-slate-500 space-y-2 list-disc ml-4">
+					<li><b>Memory:</b> Membutuhkan RAM untuk menyimpan array.</li>
+					<li><b>Lag:</b> Mengalami keterlambatan respon sebesar $(N-1)/2$.</li>
+					<li><b>Usage:</b> Cocok untuk data yang sangat fluktuatif namun stabil di satu titik.</li>
+				</ul>
+				
 			</div>
 
-			<div class="bg-slate-900 p-6 rounded-2xl border border-slate-800">
-				<h4 class="text-white font-bold text-xs uppercase mb-4 flex items-center gap-2">
-					<span class="text-emerald-500">🛠️</span> Contoh Praktis: Timbangan Digital
+			<div class="space-y-4">
+				<h4 class="text-purple-400 font-bold flex items-center gap-2">
+					<span class="p-1 bg-purple-500/10 rounded">02</span> Exponential Moving Average
 				</h4>
-				<p class="text-[11px] text-slate-400 leading-relaxed">
-					Bayangkan Anda membuat <b>Timbangan Digital Precision</b>. Sensor <i>Load Cell</i> sangat sensitif terhadap getaran meja (noise).
-					<br><br>
-					<b>Kasus:</b> Jika berat benda asli 100g, tapi sensor membaca 98g, 102g, 99g (Noise).
-					<ul class="list-disc ml-4 mt-2 text-[10px] space-y-1">
-						<li><b>Filter Bagus:</b> Hasil menunjukkan 100.1g (Stabil & Akurat).</li>
-						<li><b>Filter Buruk:</b> Hasil menunjukkan 100.5g tapi angka terus berubah-ubah (Osilasi).</li>
-					</ul>
+				<p class="text-xs text-slate-400 leading-relaxed">
+					EMA (juga dikenal sebagai *Single Pole Low Pass Filter*) memberikan bobot lebih pada data terbaru secara eksponensial. Data lama tidak pernah dibuang, namun pengaruhnya mengecil seiring waktu.
 				</p>
+				<ul class="text-[11px] text-slate-500 space-y-2 list-disc ml-4">
+					<li><b>Memory:</b> Sangat irit, hanya butuh 1 variabel untuk menyimpan nilai sebelumnya.</li>
+					<li><b>Responsive:</b> Lebih cepat mendeteksi perubahan mendadak dibanding SMA.</li>
+					<li><b>Usage:</b> Standar industri untuk pembacaan sensor pada robotika dan drone.</li>
+				</ul>
+				
 			</div>
 		</div>
-		
-		<section class="mt-12 space-y-10 pb-20">
-			<div class="border-b border-slate-800 pb-4">
-				<h3 class="text-2xl font-bold text-white">Digital Filter: SMA vs EMA</h3>
-				<p class="text-slate-400 text-sm">Panduan mendalam untuk implementasi pada Mikrokontroler.</p>
+		<br>
+		<div class="bg-slate-900 rounded-3xl overflow-hidden border border-slate-700 shadow-2xl">
+			<div class="p-6 border-b border-slate-800 bg-slate-800/50 flex justify-between items-center">
+				<div>
+					<h4 class="text-white font-bold text-sm">Arduino / C++ Code Generator</h4>
+					<p class="text-[10px] text-slate-500 uppercase font-mono">Based on current simulation parameters</p>
+				</div>
+				<button onclick="copyCode()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all">
+					Copy Code
+				</button>
 			</div>
-
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-				<div class="space-y-4">
-					<h4 class="text-sky-400 font-bold flex items-center gap-2">
-						<span class="p-1 bg-sky-500/10 rounded">01</span> Simple Moving Average
-					</h4>
-					<p class="text-xs text-slate-400 leading-relaxed">
-						SMA bekerja dengan menjumlahkan data dalam rentang waktu tertentu (Window) dan membaginya dengan jumlah data tersebut. Ini adalah filter linier yang memberikan bobot yang sama untuk setiap sampel.
-					</p>
-					<ul class="text-[11px] text-slate-500 space-y-2 list-disc ml-4">
-						<li><b>Memory:</b> Membutuhkan RAM untuk menyimpan array.</li>
-						<li><b>Lag:</b> Mengalami keterlambatan respon sebesar $(N-1)/2$.</li>
-						<li><b>Usage:</b> Cocok untuk data yang sangat fluktuatif namun stabil di satu titik.</li>
-					</ul>
-					
-				</div>
-
-				<div class="space-y-4">
-					<h4 class="text-purple-400 font-bold flex items-center gap-2">
-						<span class="p-1 bg-purple-500/10 rounded">02</span> Exponential Moving Average
-					</h4>
-					<p class="text-xs text-slate-400 leading-relaxed">
-						EMA (juga dikenal sebagai *Single Pole Low Pass Filter*) memberikan bobot lebih pada data terbaru secara eksponensial. Data lama tidak pernah dibuang, namun pengaruhnya mengecil seiring waktu.
-					</p>
-					<ul class="text-[11px] text-slate-500 space-y-2 list-disc ml-4">
-						<li><b>Memory:</b> Sangat irit, hanya butuh 1 variabel untuk menyimpan nilai sebelumnya.</li>
-						<li><b>Responsive:</b> Lebih cepat mendeteksi perubahan mendadak dibanding SMA.</li>
-						<li><b>Usage:</b> Standar industri untuk pembacaan sensor pada robotika dan drone.</li>
-					</ul>
-					
-				</div>
+			<div class="p-6">
+				<pre class="bg-slate-950 p-6 rounded-xl border border-slate-800 overflow-x-auto">
+					<code id="code-output" class="text-emerald-400 font-mono text-[11px] leading-relaxed">
+	// Kode akan tergenerate otomatis di sini...
+					</code>
+				</pre>
 			</div>
-
-			<div class="bg-slate-900 rounded-3xl overflow-hidden border border-slate-700 shadow-2xl">
-				<div class="p-6 border-b border-slate-800 bg-slate-800/50 flex justify-between items-center">
-					<div>
-						<h4 class="text-white font-bold text-sm">Arduino / C++ Code Generator</h4>
-						<p class="text-[10px] text-slate-500 uppercase font-mono">Based on current simulation parameters</p>
-					</div>
-					<button onclick="copyCode()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-all">
-						Copy Code
-					</button>
-				</div>
-				<div class="p-6">
-					<pre class="bg-slate-950 p-6 rounded-xl border border-slate-800 overflow-x-auto">
-						<code id="code-output" class="text-emerald-400 font-mono text-[11px] leading-relaxed">
-		// Kode akan tergenerate otomatis di sini...
-						</code>
-					</pre>
-				</div>
-			</div>
-		</section>
+		</div>
 		
 		<div class="mt-8 space-y-6">
 			<div class="bg-slate-900 border-l-4 border-amber-500 p-6 rounded-r-2xl shadow-lg">
@@ -194,190 +267,267 @@
 				</ol>
 			</div>
 		</div>
-	
-    </div>
+        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-8 text-slate-600 text-xs">
+            [Space Iklan AdSense Rectangle 300x250]
+        </div>
 
-    <script>
-        let chart;
-        let time = 0;
-        let smaBuffer = [];
-        let lastEma = 0;
-		let smaErrorSum = 0;
-		let emaErrorSum = 0;
-		let sampleCount = 0;
+    </section>
 
-        function initChart() {
-            const ctx = document.getElementById('filterChart').getContext('2d');
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        { label: 'Raw Noise Data', data: [], borderColor: '#f43f5e', borderWidth: 1, pointRadius: 0, tension: 0.1 },
-                        { label: 'SMA Filtered', data: [], borderColor: '#0ea5e9', borderWidth: 2, pointRadius: 0, tension: 0.3 },
-                        { label: 'EMA Filtered', data: [], borderColor: '#a855f7', borderWidth: 2, pointRadius: 0, tension: 0.3 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: false,
-                    scales: {
-                        y: { min: -100, max: 200, grid: { color: '#f1f5f9' } },
-                        x: { grid: { display: false }, ticks: { display: false } }
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+
+<script>
+    // --- STATE VARIABLES ---
+    let chart;
+    let time = 0;
+    
+    // Filter Memory
+    let smaBuffer = [];
+    let lastEma = 0;
+    
+    // Statistics
+    let smaErrorSum = 0;
+    let emaErrorSum = 0;
+    let sampleCount = 0;
+
+    // --- INITIALIZATION ---
+    function initChart() {
+        const ctx = document.getElementById('filterChart').getContext('2d');
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { 
+                        label: 'Raw Sensor (Noisy)', 
+                        data: [], 
+                        borderColor: '#f43f5e', // Rose
+                        borderWidth: 1, 
+                        pointRadius: 0, 
+                        tension: 0.1 
                     },
-                    plugins: { legend: { labels: { font: { size: 10 } } } }
+                    { 
+                        label: 'SMA Filtered', 
+                        data: [], 
+                        borderColor: '#0ea5e9', // Sky Blue
+                        borderWidth: 2, 
+                        pointRadius: 0, 
+                        tension: 0.3 
+                    },
+                    { 
+                        label: 'EMA Filtered', 
+                        data: [], 
+                        borderColor: '#a855f7', // Purple
+                        borderWidth: 2, 
+                        pointRadius: 0, 
+                        tension: 0.3 
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false, // Matikan animasi agar performa tinggi
+                interaction: { intersect: false },
+                scales: {
+                    y: { 
+                        min: 0, 
+                        max: 100, 
+                        grid: { color: '#f1f5f9' } 
+                    },
+                    x: { 
+                        display: false // Sembunyikan label X agar bersih
+                    }
+                },
+                plugins: { 
+                    legend: { 
+                        labels: { 
+                            font: { size: 10, family: 'Inter' },
+                            usePointStyle: true
+                        } 
+                    } 
                 }
-            });
-        }
-
-        function simulate() {
-            const noiseIntensity = parseFloat(document.getElementById('noise-lvl').value);
-            const smaWindow = parseInt(document.getElementById('sma-window').value);
-            const emaAlpha = parseFloat(document.getElementById('ema-alpha').value);
-
-            document.getElementById('noise-val').innerText = noiseIntensity;
-            document.getElementById('sma-val').innerText = smaWindow;
-            document.getElementById('ema-val').innerText = emaAlpha.toFixed(2);
-
-            // 1. Generate Raw Data (Sine wave + Noise)
-            const baseSignal = 50 + Math.sin(time * 0.1) * 30;
-            const noise = (Math.random() - 0.5) * noiseIntensity * 2;
-            const rawData = baseSignal + noise;
-
-            // 2. SMA Logic
-            smaBuffer.push(rawData);
-            if (smaBuffer.length > smaWindow) smaBuffer.shift();
-            const smaData = smaBuffer.reduce((a, b) => a + b, 0) / smaBuffer.length;
-
-            // 3. EMA Logic
-            const emaData = (emaAlpha * rawData) + ((1 - emaAlpha) * lastEma);
-            lastEma = emaData;
-			
-			const smaErr = Math.pow(smaData - baseSignal, 2);
-			const emaErr = Math.pow(emaData - baseSignal, 2);
-
-			smaErrorSum += smaErr;
-			emaErrorSum += emaErr;
-			sampleCount++;
-			
-			// Update UI RMSE setiap 1 detik agar tidak terlalu cepat berkedip
-			if (sampleCount % 10 === 0) {
-				document.getElementById('sma-rmse').innerText = Math.sqrt(smaErrorSum / sampleCount).toFixed(2);
-				document.getElementById('ema-rmse').innerText = Math.sqrt(emaErrorSum / sampleCount).toFixed(2);
-			}
-            // Update Chart
-            chart.data.labels.push(time.toFixed(1));
-            chart.data.datasets[0].data.push(rawData);
-            chart.data.datasets[1].data.push(smaData);
-            chart.data.datasets[2].data.push(emaData);
-
-            if (chart.data.labels.length > 50) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
-                chart.data.datasets[1].data.shift();
-                chart.data.datasets[2].data.shift();
             }
+        });
+    }
 
-            chart.update('none');
-            time += 1;
+    // --- SIMULATION LOOP (10Hz) ---
+    function simulate() {
+        // 1. Get User Input
+        const noiseIntensity = parseFloat(document.getElementById('noise-lvl').value);
+        const smaWindow = parseInt(document.getElementById('sma-window').value);
+        const emaAlpha = parseFloat(document.getElementById('ema-alpha').value);
+
+        // Update UI Labels
+        document.getElementById('noise-val').innerText = noiseIntensity;
+        document.getElementById('sma-val').innerText = smaWindow;
+        document.getElementById('ema-val').innerText = emaAlpha.toFixed(2);
+
+        // 2. Generate Data (Sine Wave Base + Random Noise)
+        // Base signal: Sine wave berpusat di 50, amplitudo 30
+        const baseSignal = 50 + Math.sin(time * 0.1) * 30;
+        const noise = (Math.random() - 0.5) * noiseIntensity * 2;
+        const rawData = baseSignal + noise;
+
+        // 3. Apply SMA Filter (Moving Average)
+        smaBuffer.push(rawData);
+        if (smaBuffer.length > smaWindow) smaBuffer.shift();
+        const smaData = smaBuffer.reduce((a, b) => a + b, 0) / smaBuffer.length;
+
+        // 4. Apply EMA Filter (Exponential Moving Average)
+        // Rumus: y[n] = α * x[n] + (1 - α) * y[n-1]
+        // Inisialisasi awal (jika time 0) pakai rawData agar tidak mulai dari 0
+        if(time === 0) lastEma = rawData;
+        const emaData = (emaAlpha * rawData) + ((1 - emaAlpha) * lastEma);
+        lastEma = emaData;
+        
+        // 5. Calculate Error (RMSE)
+        // Selisih antara hasil filter dengan Base Signal (Ideal tanpa noise)
+        const smaErr = Math.pow(smaData - baseSignal, 2);
+        const emaErr = Math.pow(emaData - baseSignal, 2);
+
+        smaErrorSum += smaErr;
+        emaErrorSum += emaErr;
+        sampleCount++;
+        
+        // Update UI RMSE (Setiap 5 frame agar tidak flicker)
+        if (sampleCount % 5 === 0) {
+            document.getElementById('sma-rmse').innerText = Math.sqrt(smaErrorSum / sampleCount).toFixed(2);
+            document.getElementById('ema-rmse').innerText = Math.sqrt(emaErrorSum / sampleCount).toFixed(2);
         }
 
-        function resetData() {
-			// 1. Reset Waktu & Posisi
-			time = 0;
-			currentPos = 0;
-			
-			// 2. Reset Variabel Filter (Kunci Akurasi)
-			smaBuffer = [];
-			lastEma = 0;
-			
-			// 3. Reset Statistik (Penting untuk validasi baru)
-			smaErrorSum = 0;
-			emaErrorSum = 0;
-			sampleCount = 0;
-			
-			// 4. Reset Tampilan UI
-			document.getElementById('sma-rmse').innerText = "0.00";
-			document.getElementById('ema-rmse').innerText = "0.00";
-			
-			// 5. Reset Grafik
-			chart.data.labels = [];
-			chart.data.datasets.forEach(d => d.data = []);
-			chart.update();
-		}
-		
-		function updateGeneratedCode() {
-			const smaWindow = document.getElementById('sma-window').value;
-			const emaAlpha = document.getElementById('ema-alpha').value;
-			
-			const code = `
-		/* * Generated by Aries Tech Lab - Filter Lab
-		 * Case: Loadcell / Sensor Smoothing
-		 */
+        // 6. Update Chart
+        chart.data.labels.push(time.toFixed(1));
+        chart.data.datasets[0].data.push(rawData);
+        chart.data.datasets[1].data.push(smaData);
+        chart.data.datasets[2].data.push(emaData);
 
-		// === OPSI A: Implementasi EMA (Direkomendasikan) ===
-		float emaAlpha = ${emaAlpha};
-		float lastEMA = 0;
+        // Batasi hanya 100 titik data di layar agar memori aman
+        if (chart.data.labels.length > 100) {
+            chart.data.labels.shift();
+            chart.data.datasets[0].data.shift();
+            chart.data.datasets[1].data.shift();
+            chart.data.datasets[2].data.shift();
+        }
 
-		float applyEMA(float rawData) {
-			float filtered = (emaAlpha * rawData) + ((1.0 - emaAlpha) * lastEMA);
-			lastEMA = filtered;
-			return filtered;
-		}
+        chart.update('none'); // Update mode 'none' agar tidak ada animasi berat
+        time += 1;
+    }
 
-		// === OPSI B: Implementasi SMA (Butuh Array) ===
-		const int windowSize = ${smaWindow};
-		float readings[windowSize];
-		int readIndex = 0;
-		float total = 0;
+    // --- UTILITIES ---
 
-		float applySMA(float rawData) {
-			total = total - readings[readIndex];
-			readings[readIndex] = rawData;
-			total = total + readings[readIndex];
-			readIndex = (readIndex + 1) % windowSize;
-			return total / windowSize;
-		}
+    function resetData() {
+        // Reset Logic
+        time = 0;
+        smaBuffer = [];
+        lastEma = 0;
+        smaErrorSum = 0;
+        emaErrorSum = 0;
+        sampleCount = 0;
+        
+        // Reset UI
+        document.getElementById('sma-rmse').innerText = "0.00";
+        document.getElementById('ema-rmse').innerText = "0.00";
+        
+        // Reset Chart
+        chart.data.labels = [];
+        chart.data.datasets.forEach(d => d.data = []);
+        chart.update();
+    }
+    
+    function updateGeneratedCode() {
+        const smaWindow = document.getElementById('sma-window').value;
+        const emaAlpha = document.getElementById('ema-alpha').value;
+        
+        // Template Code C++ / Arduino
+        const code = `
+/* * Generated by Aries Tech - Filter Lab
+ * Parameters: SMA Window=${smaWindow}, EMA Alpha=${emaAlpha}
+ */
 
-		void setup() {
-			Serial.begin(9600);
-		}
+// === OPSI 1: EMA Filter (Direkomendasikan: Irit Memori) ===
+float emaAlpha = ${emaAlpha};
+float lastEMA = 0;
 
-		void loop() {
-			float raw = analogRead(A0); // Contoh sensor
-			float result = applyEMA(raw);
-			Serial.println(result);
-			delay(10);
-		}
-			`.trim();
+float applyEMA(float rawData) {
+    float filtered = (emaAlpha * rawData) + ((1.0 - emaAlpha) * lastEMA);
+    lastEMA = filtered;
+    return filtered;
+}
 
-			document.getElementById('code-output').innerText = code;
-		}
+// === OPSI 2: SMA Filter (Butuh Array Memori) ===
+const int WINDOW_SIZE = ${smaWindow};
+float readings[WINDOW_SIZE];
+int readIndex = 0;
+float total = 0;
+float average = 0;
 
-		// Panggil fungsi ini di dalam setInterval(simulate) atau saat slider berubah
-		function copyCode() {
-			const codeText = document.getElementById('code-output').innerText;
-			navigator.clipboard.writeText(codeText);
-			alert("Kode berhasil disalin!");
-		}
+float applySMA(float rawData) {
+    total = total - readings[readIndex]; // Kurangi data lama
+    readings[readIndex] = rawData;       // Simpan data baru
+    total = total + readings[readIndex]; // Tambah data baru
+    readIndex = (readIndex + 1) % WINDOW_SIZE; // Geser index
+    
+    average = total / WINDOW_SIZE;
+    return average;
+}
 
-		// Tambahkan updateGeneratedCode() ke event listener slider Anda
-		document.querySelectorAll('input[type=range]').forEach(el => {
-			el.addEventListener('input', updateGeneratedCode);
-		});
+void setup() {
+    Serial.begin(9600);
+    // Inisialisasi array SMA dengan 0
+    for (int i = 0; i < WINDOW_SIZE; i++) readings[i] = 0;
+}
 
-		// Panggil sekali saat load
-		updateGeneratedCode();
+void loop() {
+    // Contoh pembacaan sensor
+    float sensorValue = analogRead(A0); 
+    
+    // Pilih salah satu filter:
+    float hasilFilter = applyEMA(sensorValue); 
+    
+    Serial.print("Raw:");
+    Serial.print(sensorValue);
+    Serial.print(",Filtered:");
+    Serial.println(hasilFilter);
+    
+    delay(10); // Sampling rate
+}
+        `.trim();
 
+        document.getElementById('code-output').innerText = code;
+    }
+
+    function copyCode() {
+        const codeText = document.getElementById('code-output').innerText;
+        navigator.clipboard.writeText(codeText).then(() => {
+            alert("Kode C++ berhasil disalin ke clipboard!");
+        });
+    }
+
+    // --- EVENT LISTENERS ---
+    
+    // Update Code Generator saat slider berubah
+    document.querySelectorAll('input[type=range]').forEach(el => {
+        el.addEventListener('input', updateGeneratedCode);
+    });
+
+    // Reset data jika parameter berubah (agar grafik tidak loncat aneh)
+    document.querySelectorAll('input[type=range]').forEach(el => {
+        el.addEventListener('change', () => {
+            // Optional: resetData(); // Uncomment jika ingin auto-reset saat slider dilepas
+        });
+    });
+
+    // --- STARTUP ---
+    window.onload = function() {
         initChart();
-        setInterval(simulate, 100);
-		document.querySelectorAll('input[type=range], select').forEach(el => {
-			el.addEventListener('change', () => {
-				console.log("Parameter berubah, mereset data untuk akurasi...");
-				resetData();
-			});
-		});
-    </script>
+        updateGeneratedCode();
+        // Jalankan simulasi setiap 50ms (20 FPS)
+        setInterval(simulate, 50);
+    };
+
+</script>
 </body>
 </html>
