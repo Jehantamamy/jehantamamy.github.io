@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Noise Filter Simulator (SMA vs EMA) - Aries Tech</title>
+    <title>Sensor Noise Filter Simulator (SMA vs EMA) - Aries Techlab</title>
     <meta name="description" content="Simulasi filter digital sensor (SMA vs EMA) untuk Arduino/IoT. Visualisasikan reduksi noise secara realtime dan generate kode C++ otomatis.">
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
 	<script>
@@ -17,7 +17,15 @@
 	</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }

@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solenoid & Toroid Lab - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Canvas Styling */
+        #sim-canvas {
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            border: 1px solid #334155;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #f59e0b; margin-top: -6px; cursor: pointer; border: 2px solid #fff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+
+        /* Select Dropdown */
+        select { 
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .meter-glow {
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+	
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+
+            <div class="font-mono text-xs text-amber-400 font-bold bg-slate-800 px-3 py-1 rounded border border-amber-500/20">
+                SOLENOID & TOROID LAB
+            </div>
+        </div>
+    
+    <div class="max-w-7xl mx-auto p-6 w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            
+            <div class="relative w-full h-[450px] rounded-2xl overflow-hidden shadow-2xl">
+                <canvas id="sim-canvas" class="w-full h-full"></canvas>
+                
+                <div class="absolute top-4 left-4 pointer-events-none">
+                    <div class="bg-slate-900/80 backdrop-blur px-3 py-2 rounded-lg border border-slate-700">
+                        <div class="text-[10px] text-slate-400 uppercase font-bold">Visual Mode</div>
+                        <div id="mode-display" class="text-xs font-bold text-white">Solenoid (Air Core)</div>
+                    </div>
+                </div>
+
+                <div class="absolute bottom-4 left-4 w-48">
+                    <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                        <span>Field Density</span>
+                        <span id="density-val">Low</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                        <div id="density-bar" class="h-full bg-amber-500 w-10 transition-all duration-300"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">Turns Density ($n$)</div>
+                        <div class="font-mono text-sm text-sky-400" id="formula-n">$n = N / L$</div>
+                    </div>
+                </div>
+                <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 flex items-center justify-center">
+                    <div class="text-center">
+                        <div class="text-[10px] text-slate-400 font-bold uppercase mb-1">Magnetic Permeability ($\mu$)</div>
+                        <div class="font-mono text-sm text-rose-400">$\mu = \mu_0 \cdot \mu_r$</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Select Device</label>
+                <select id="device-selector" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-amber-500 focus:border-amber-500 block p-2.5">
+                    <option value="solenoid">Solenoid (Linear)</option>
+                    <option value="toroid">Toroid (Circular)</option>
+                </select>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-5 text-6xl font-bold text-amber-500 select-none">B</div>
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Magnetic Field ($B$)</h3>
+                
+                <div class="flex items-baseline gap-2">
+                    <span id="val-b" class="text-4xl font-mono font-bold text-amber-400 meter-glow">0.00</span>
+                    <span class="text-sm text-slate-400 font-bold">mT</span>
+                </div>
+                <div class="text-[10px] text-slate-500 mt-1">
+                    (Milli-Tesla)
+                </div>
+                
+                <div class="mt-4 w-full bg-slate-800 h-2 rounded-full overflow-hidden relative">
+                    <div class="absolute left-[20%] w-0.5 h-full bg-slate-600"></div>
+                    <div class="absolute left-[50%] w-0.5 h-full bg-slate-600"></div>
+                    <div class="absolute left-[80%] w-0.5 h-full bg-slate-600"></div>
+                    <div id="bar-b" class="h-full bg-gradient-to-r from-amber-600 to-yellow-400 w-0 transition-all duration-200"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex-grow">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Parameters</h3>
+                
+                <div class="space-y-6">
+                    
+                    <div>
+                        <label class="text-xs font-bold text-white mb-2 block">Core Material ($\mu_r$)</label>
+                        <select id="core-selector" class="w-full bg-slate-900 border border-slate-700 text-xs text-white rounded p-2">
+                            <option value="1">Air / Vacuum ($\mu_r \approx 1$)</option>
+                            <option value="5">Wood / Plastic ($\mu_r \approx 1$)</option>
+                            <option value="200">Nickel ($\mu_r \approx 200$)</option>
+                            <option value="500">Soft Iron ($\mu_r \approx 500$)</option>
+                            <option value="1000">Permalloy ($\mu_r \approx 1000$)</option>
+                        </select>
+                        <div class="text-[9px] text-rose-400 mt-1" id="core-warning" style="display:none;">
+                            ⚠️ Iron Core increases B-field drastically!
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Current ($I$)</span><span id="disp-i" class="font-bold text-yellow-400">2.0 A</span></div>
+                        <input type="range" id="slider-i" min="0.1" max="10" step="0.1" value="2.0" class="w-full">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Turns ($N$)</span><span id="disp-n" class="font-bold text-emerald-400">50</span></div>
+                        <input type="range" id="slider-n" min="10" max="200" step="10" value="50" class="w-full">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2"><span id="label-geom">Length ($L$)</span><span id="disp-geom" class="font-bold text-sky-400">0.20 m</span></div>
+                        <input type="range" id="slider-geom" min="0.05" max="0.5" step="0.01" value="0.2" class="w-full">
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="border-t border-slate-800 bg-slate-900 py-16 px-6 mt-auto relative z-10 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                        <span class="text-amber-500">🌀</span> Modul Elektromagnetik
+                    </h2>
+                    <p class="text-slate-400">Analisis Medan Magnet pada Kumparan Berarus dan Efek Inti Besi.</p>
+                </div>
+                <div class="hidden md:block text-right">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Permeabilitas Total</div>
+                    <div class="font-mono text-lg text-amber-400 bg-slate-800 px-4 py-2 rounded border border-slate-700">
+                        $\mu = \mu_0 \cdot \mu_r$
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-lg text-slate-300">
+                    
+                    <h3 class="text-amber-400 font-bold text-xl mb-4">1. Solenoida (Kumparan Lurus)</h3>
+                    
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/solenoid.jpg" 
+							alt="Medan magnet pada Solenoida" 
+							class="w-full max-w-xs h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Medan magnet pada Solenoida</p>
+					</div>
+                    <p>
+                        Solenoida adalah kawat panjang yang dililitkan rapat. Di bagian dalam solenoida ideal, medan magnet ($B$) bersifat <strong>seragam (uniform)</strong> dan sejajar sumbu.
+                    </p>
+                    
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 my-4 text-center">
+                        $$ B = \mu \cdot n \cdot I = \mu \frac{N}{L} I $$
+                    </div>
+                    <ul class="list-disc pl-5 space-y-1 text-sm">
+                        <li>$n$: Kerapatan lilitan (Lilitan per meter).</li>
+                        <li>$L$: Panjang solenoida.</li>
+                    </ul>
+
+                    <h3 class="text-sky-400 font-bold text-xl mt-8 mb-4">2. Toroida (Kumparan Cincin)</h3>
+                    
+                    <p>
+                        Jika solenoida dilengkungkan hingga ujungnya bertemu, terbentuklah Toroida. Medan magnet terkurung sepenuhnya di dalam inti toroida.
+                    </p>
+                    $$ B = \frac{\mu N I}{2\pi R} $$
+                    <p class="text-sm italic text-slate-400">*Dimana $R$ adalah jari-jari rata-rata toroida.*</p>
+
+                    <h3 class="text-rose-400 font-bold text-xl mt-8 mb-4">3. Efek Inti Besi ($\mu_r$)</h3>
+                    
+                    <p>
+                        Medan magnet di udara ($\mu_0$) relatif lemah. Jika kita memasukkan bahan <strong>Ferromagnetik</strong> (seperti Besi Lunak) ke dalam kumparan:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-1 text-sm">
+                        <li>Domain magnetik dalam besi akan sejajar dengan medan luar.</li>
+                        <li>Medan magnet total diperkuat sebesar faktor $\mu_r$ (bisa mencapai 500x - 5000x lipat).</li>
+                        <li>Inilah prinsip dasar <strong>Elektromagnet</strong> dan <strong>Transformator</strong>.</li>
+                    </ul>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-amber-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-amber-500 select-none">Fe</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-amber-500">🧲</span> Lab 1: Kekuatan Inti Besi
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Melihat dampak penggantian material inti terhadap kekuatan medan $B$.
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Pilih <strong>Solenoid</strong>. Set Arus ($I$) ke <strong>2.0 A</strong>.</li>
+                            <li>Pastikan Core Material: <strong>Air (Vacuum)</strong>. Catat nilai $B$ (biasanya kecil, satuan mT).</li>
+                            <li>Ubah Core Material menjadi <strong>Soft Iron</strong> ($\mu_r = 500$).</li>
+                            <li><strong>Analisis:</strong> Berapa kali lipat kenaikan nilai $B$? Apakah sesuai dengan teori $B_{besi} = 500 \times B_{udara}$?</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-sky-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-sky-500 select-none">n</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-sky-500">📏</span> Lab 2: Variabel Geometri ($L$)
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Hubungan antara panjang solenoida dan kerapatan fluks.
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Gunakan Inti Udara. Set Jumlah Lilitan ($N$) = 100 (tetap).</li>
+                            <li>Ubah Panjang ($L$) dari <strong>0.50 m</strong> menjadi <strong>0.25 m</strong> (memendek).</li>
+                            <li><strong>Pertanyaan:</strong> Mengapa medan magnet justru <strong>Meningkat</strong> saat kawat diperpendek?</li>
+                            <li class="text-sky-400 text-xs italic">Clue: Perhatikan rumus $n = N/L$. Apa yang terjadi pada kerapatan lilitan?</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-rose-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-rose-500 select-none">O</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-rose-500">🍩</span> Lab 3: Geometri Toroida
+                        </h4>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Pilih Device: <strong>Toroid</strong>.</li>
+                            <li>Set jari-jari ($R$) ke maksimum (0.5 m). Catat nilai $B$.</li>
+                            <li>Kecilkan jari-jari ke minimum (0.05 m).</li>
+                            <li><strong>Analisis:</strong> Toroida dengan lilitan yang sama ($N$) akan menghasilkan medan magnet yang jauh lebih kuat jika ukurannya kecil (padat). Buktikan dengan rumus $B \propto 1/R$.</li>
+                        </ol>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-12 text-center border-t border-slate-800 pt-8">
+                <p class="text-slate-500 italic font-serif">
+                    "Inti besi pada transformator bukan sekadar penguat, tapi jalan tol bagi fluks magnetik."
+                </p>
+            </div>
+
+        </div>
+    </section>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+    <script>
+        // --- SETUP ---
+        const canvas = document.getElementById('sim-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // UI Elements
+        const deviceSelector = document.getElementById('device-selector');
+        const coreSelector = document.getElementById('core-selector');
+        const sliderI = document.getElementById('slider-i');
+        const sliderN = document.getElementById('slider-n');
+        const sliderGeom = document.getElementById('slider-geom');
+        
+        const dispI = document.getElementById('disp-i');
+        const dispN = document.getElementById('disp-n');
+        const dispGeom = document.getElementById('disp-geom');
+        const labelGeom = document.getElementById('label-geom');
+        const valB = document.getElementById('val-b');
+        const barB = document.getElementById('bar-b');
+        const densityVal = document.getElementById('density-val');
+        const densityBar = document.getElementById('density-bar');
+        const coreWarning = document.getElementById('core-warning');
+        
+        const modeDisplay = document.getElementById('mode-display');
+        const theorySolenoid = document.getElementById('theory-solenoid');
+        const theoryToroid = document.getElementById('theory-toroid');
+        const formulaN = document.getElementById('formula-n');
+
+        // Physics Constants
+        const MU_0 = 4 * Math.PI * 1e-7;
+
+        // State
+        let mode = 'solenoid';
+        let params = {
+            I: 2.0,
+            N: 50,
+            dim: 0.2, // L or R
+            mu_r: 1
+        };
+        let B_field = 0; // Tesla
+        let time = 0;
+
+        // --- INIT ---
+        function resize() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => { resize(); updateUI(); loop(); });
+
+        // --- EVENT LISTENERS ---
+        deviceSelector.addEventListener('change', (e) => {
+            mode = e.target.value;
+            // Update Labels
+            if(mode === 'solenoid') {
+                labelGeom.innerText = "Length (L)";
+                modeDisplay.innerText = "Solenoid";
+                theorySolenoid.style.display = 'block';
+                theoryToroid.style.display = 'none';
+                formulaN.innerText = "n = N / L";
+            } else {
+                labelGeom.innerText = "Mean Radius (R)";
+                modeDisplay.innerText = "Toroid";
+                theorySolenoid.style.display = 'none';
+                theoryToroid.style.display = 'block';
+                formulaN.innerText = "n = N / (2πR)";
+            }
+            updateUI();
+        });
+
+        coreSelector.addEventListener('change', updateUI);
+        sliderI.addEventListener('input', updateUI);
+        sliderN.addEventListener('input', updateUI);
+        sliderGeom.addEventListener('input', updateUI);
+
+        function updateUI() {
+            // Get Values
+            params.I = parseFloat(sliderI.value);
+            params.N = parseInt(sliderN.value);
+            params.dim = parseFloat(sliderGeom.value);
+            params.mu_r = parseInt(coreSelector.value);
+
+            // Update Displays
+            dispI.innerText = `${params.I.toFixed(1)} A`;
+            dispN.innerText = params.N;
+            dispGeom.innerText = `${params.dim.toFixed(2)} m`;
+            
+            // Core Warning
+            coreWarning.style.display = params.mu_r > 10 ? 'block' : 'none';
+            modeDisplay.innerText = `${mode.charAt(0).toUpperCase() + mode.slice(1)} (${coreSelector.options[coreSelector.selectedIndex].text.split('(')[0].trim()})`;
+
+            // Calculate Physics
+            if (mode === 'solenoid') {
+                // B = mu * (N/L) * I
+                B_field = (MU_0 * params.mu_r * params.N * params.I) / params.dim;
+            } else {
+                // B = mu * (N / 2*pi*R) * I
+                B_field = (MU_0 * params.mu_r * params.N * params.I) / (2 * Math.PI * params.dim);
+            }
+
+            // Update Meter
+            // Display in mT (milli Tesla)
+            const B_mT = B_field * 1000;
+            valB.innerText = B_mT.toFixed(2);
+            
+            // Bar visualization (Logarithmic scale because Iron core is huge)
+            // Max typical for this sim ~ 2 Tesla (2000 mT)
+            // Let's use a log scale so air core is visible too
+            const logScale = Math.log10(B_mT + 1); // +1 to avoid log(0)
+            const maxLog = Math.log10(2000); // approx max value
+            const pct = (logScale / maxLog) * 100;
+            
+            barB.style.width = `${Math.min(100, Math.max(1, pct))}%`;
+            
+            // Density Bar
+            densityBar.style.width = `${Math.min(100, pct)}%`;
+            if(pct < 30) densityVal.innerText = "Weak";
+            else if(pct < 70) densityVal.innerText = "Moderate";
+            else densityVal.innerText = "Strong (Saturated)";
+        }
+
+        // --- ANIMATION LOOP ---
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (mode === 'solenoid') drawSolenoid();
+            else drawToroid();
+
+            time += 0.05 * (params.I / 5); // Speed of flow depends on Current
+            requestAnimationFrame(loop);
+        }
+
+        // --- DRAW SOLENOID ---
+        function drawSolenoid() {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            // Visual scaling: L relates to width on screen
+            // dim 0.05m -> 100px, 0.5m -> 300px
+            const visualL = 100 + (params.dim / 0.5) * 200;
+            const radius = 60; // Fixed visual radius
+
+            // 1. Draw Core
+            ctx.fillStyle = params.mu_r > 10 ? '#94a3b8' : '#1e293b'; // Gray for Iron, Dark for Air
+            ctx.fillRect(cx - visualL/2, cy - radius + 5, visualL, radius * 2 - 10);
+            
+            // Core Label
+            if(params.mu_r > 10) {
+                ctx.fillStyle = '#1e293b';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText("IRON CORE", cx, cy);
+            }
+
+            // 2. Draw B-Field Lines (Inside)
+            // Opacity depends on B strength
+            const opacity = Math.min(1, B_field * 100); // 10mT is fully visible
+            ctx.strokeStyle = `rgba(251, 191, 36, ${opacity})`; // Amber
+            ctx.lineWidth = 2;
+            
+            // Draw flowing arrows inside
+            const lines = 5;
+            for(let i=0; i<lines; i++) {
+                const yOff = (i - (lines-1)/2) * (radius * 0.5);
+                ctx.beginPath();
+                ctx.moveTo(cx - visualL/2 - 50, cy + yOff);
+                ctx.lineTo(cx + visualL/2 + 50, cy + yOff);
+                ctx.stroke();
+
+                // Moving flow dots
+                const offset = (time * 5 + i * 20) % (visualL + 100);
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(cx - visualL/2 - 50 + offset, cy + yOff, 2, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // 3. Draw Windings (Front and Back)
+            // We only draw N visual loops, capped at 20 for performance/clarity
+            const visualN = Math.min(30, Math.max(5, Math.floor(params.N / 5)));
+            const spacing = visualL / visualN;
+            const startX = cx - visualL / 2;
+
+            ctx.lineWidth = 4;
+            
+            for (let i = 0; i < visualN; i++) {
+                const x = startX + i * spacing + spacing/2;
+                
+                // Back part of loop (Darker)
+                ctx.beginPath();
+                ctx.strokeStyle = '#78350f'; // Dark copper
+                ctx.arc(x, cy, radius, Math.PI, 0); // Bottom half arc? No, simpler: line behind
+                // Actually 3D coil illusion:
+                // Draw vertical line back?
+                // Let's do: Ellipse back half
+                ctx.ellipse(x, cy, 10, radius, 0, Math.PI/2, 3*Math.PI/2);
+                ctx.stroke();
+            }
+
+            // Redraw Core (Front Mask) - optional if we want coils *around* core
+            // But simple: Back coil -> Core -> Front coil
+
+            for (let i = 0; i < visualN; i++) {
+                const x = startX + i * spacing + spacing/2;
+                // Front part of loop (Bright)
+                ctx.beginPath();
+                ctx.strokeStyle = '#f59e0b'; // Bright copper
+                ctx.ellipse(x, cy, 10, radius, 0, -Math.PI/2, Math.PI/2);
+                ctx.stroke();
+            }
+        }
+
+        // --- DRAW TOROID ---
+        function drawToroid() {
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            
+            // Visual R
+            const R_visual = 80 + (params.dim / 0.5) * 50; 
+            const tubeRadius = 30;
+
+            // 1. Core Ring
+            ctx.beginPath();
+            ctx.arc(cx, cy, R_visual, 0, Math.PI*2);
+            ctx.lineWidth = tubeRadius * 2;
+            ctx.strokeStyle = params.mu_r > 10 ? '#64748b' : '#1e293b'; // Iron vs Air
+            ctx.stroke();
+
+            // 2. B-Field (Concentric circles inside)
+            const opacity = Math.min(1, B_field * 100);
+            ctx.strokeStyle = `rgba(251, 191, 36, ${opacity})`;
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.arc(cx, cy, R_visual, 0, Math.PI*2);
+            ctx.stroke();
+
+            // Moving dots along the circle
+            const numDots = 8;
+            for(let i=0; i<numDots; i++) {
+                const angle = (time * 0.05 + (i * (Math.PI*2)/numDots)) % (Math.PI*2);
+                const dx = cx + Math.cos(angle) * R_visual;
+                const dy = cy + Math.sin(angle) * R_visual;
+                
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(dx, dy, 3, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // 3. Windings
+            const visualN = Math.min(40, params.N);
+            const angleStep = (Math.PI * 2) / visualN;
+
+            for(let i=0; i<visualN; i++) {
+                const angle = i * angleStep;
+                const x = cx + Math.cos(angle) * R_visual;
+                const y = cy + Math.sin(angle) * R_visual;
+
+                // Rotate coil ellipse to match tangent
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(angle);
+                
+                // Draw Coil Loop
+                ctx.beginPath();
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 3;
+                // Ellipse perpendicular to radius
+                ctx.ellipse(0, 0, tubeRadius + 2, 8, 0, 0, Math.PI*2);
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+        }
+
+    </script>
+</body>
+</html>

@@ -15,7 +15,17 @@
 
 	  gtag('config', 'G-2BL3DSGJ4Z');
 	</script>
-    <style>
+    <link rel="icon" type="image/png" href="favicon.png?v=2">
+	<meta property="og:title" content="Engineering Sandbox - Aries Tech">
+	<meta property="og:description" content="Free secure client-side tools for Engineers & Creatives. PDF Merger, Resistor Calc, Circuit Sim, and more.">
+	<meta property="og:image" content="https://www.domainanda.com/assets/thumbnail.jpg"> <meta property="og:url" content="https://www.domainanda.com/">
+	<meta property="og:type" content="website">
+
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Engineering Sandbox - Aries Tech">
+	<meta name="twitter:description" content="Free secure tools for Engineers. No server upload required.">
+	<meta name="twitter:image" content="https://www.domainanda.com/assets/thumbnail.jpg">
+	<style>
         :root { scroll-behavior: smooth; }
         body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .font-mono { font-family: 'Fira Code', monospace; }
@@ -657,6 +667,13 @@
 			{ name: "PDF Splitter", file: "pdf_splitter.html", category: "Utility", icon: "🖼️", color: "amber", desc: "Split or remove PDF pages into different document. 100% Client-side processing." },
 			{ name: "PDF to Image", file: "pdf_converter.html", category: "Utility", icon: "🖼️", color: "amber", desc: "Convert PDF pages to high-quality JPG/PNG images. Download as ZIP." },
 			{ name: "Cine-Capture", file: "screen_recorder.html", category: "Utility", icon: "🎥", color: "amber", desc: "Free, watermark-free screen recorder. Supports microphone & system audio. (Desktop Only)." },
+			{ name: "Electrostatics Lab", file: "elmag_sim.html", category: "Physics Lab", icon: "⚡", color: "emerald", desc: "Visualisasi Hukum Coulomb, Medan Vektor & Potensial." },
+			{ name: "Magnetostatics Lab", file: "magnet_sim.html", category: "Physics Lab", icon: "🧲", color: "emerald", desc: "Hukum Biot-Savart, Lorentz & Kaidah Tangan Kanan." },
+			{ name: "Lorentz Chamber", file: "lorentz_sim.html", category: "Physics Lab", icon: "⚛️", color: "emerald", desc: "Simulasi Gerak Partikel, Siklotron & Velocity Selector." },
+			{ name: "Solenoid & Toroid", file: "solenoid_sim.html", category: "Physics Lab", icon: "🌀", color: "emerald", desc: "Kalkulator Medan Magnet Kumparan & Efek Inti Besi." },
+			{ name: "Faraday's Lab", file: "induction_sim.html", category: "Physics Lab", icon: "💡", color: "emerald", desc: "Induksi Elektromagnetik, Hukum Lenz & Generator AC." },
+			{ name: "Transformer Lab", file: "transformer_sim.html", category: "Physics Lab", icon: "🔌", color: "emerald", desc: "Trafo Step-Up/Down, Efisiensi & Dual Oscilloscope." },
+			{ name: "RLC Resonance", file: "rlc_sim.html", category: "Physics Lab", icon: "〰️", color: "emerald", desc: "Rangkaian AC Seri/Paralel, Diagram Fasor & Resonansi." },
 			{ name: "Resistor Decoder", file: "resistor_calc.html", category: "Tutorial/Simulation", icon: "📟", color: "emerald", desc: "Interactive Resistor Color Code Calculator. Visual decoder for 4, 5, and 6-band resistors." },
 			{ name: "Sensor Noise Filter", file: "filter_sim.html", category: "Tutorial/Simulation", icon: "📡", color: "emerald", desc: "Interactive visualization comparing SMA & EMA filters for noise reduction in sensor data." },
 			{ name: "Motor Torque Lab", file: "motor_sim.html", category: "Tutorial/Simulation", icon: "⚙️", color: "emerald", desc: "Simulation for calculating torque, pulley loads, and gearbox impact on drive systems." },
@@ -1160,6 +1177,25 @@
 		});		
 		
     </script>
+	<div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 p-4 shadow-2xl z-[100] hidden">
+		<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+			<p class="text-xs text-slate-400 text-center md:text-left">
+				We use cookies to personalize content and ads, and to analyze our traffic. By using our site, you consent to our <a href="legal.html" class="text-sky-400 underline">Privacy Policy</a>.
+			</p>
+			<button onclick="acceptCookies()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-full transition-colors">
+				Accept & Close
+			</button>
+		</div>
+	</div>
 
+	<script>
+		if (!localStorage.getItem('cookieConsent')) {
+			document.getElementById('cookie-banner').classList.remove('hidden');
+		}
+		function acceptCookies() {
+			localStorage.setItem('cookieConsent', 'true');
+			document.getElementById('cookie-banner').classList.add('hidden');
+		}
+	</script>
 </body>
 </html>

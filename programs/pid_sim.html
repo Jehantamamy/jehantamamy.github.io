@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Ultimate Differential Drive Lab</title>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<title>Ultimate Differential Drive Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<!-- Google tag (gtag.js) -->
@@ -14,6 +15,15 @@
 
 	  gtag('config', 'G-2BL3DSGJ4Z');
 	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
     <style>
         .motor-bar-container { height: 100px; background: #0f172a; border-radius: 6px; position: relative; overflow: hidden; border: 1px solid #334155; }
         .motor-bar { bottom: 0; position: absolute; width: 100%; transition: height 0.05s linear; }

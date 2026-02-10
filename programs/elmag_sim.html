@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Electrostatics Lab - Aries Techlab</title>
+    <meta name="description" content="Physics simulation for Coulomb's Law. Calculate forces between charges, measure distances, and visualize electric fields.">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        canvas { touch-action: none; cursor: crosshair; }
+        
+        /* Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none; background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #cbd5e1; margin-top: -6px; cursor: pointer; border: 2px solid #475569;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500 selection:text-white">
+
+    <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-indigo-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold hidden sm:block">Dashboard</span>
+            </a>
+
+            <div class="flex items-center gap-2 cursor-pointer select-none" onclick="closeApp()">
+                <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-indigo-400 text-not-italic font-light">TechLab</span></span>
+            </div>
+
+            <a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-1.5 bg-rose-600/90 hover:bg-rose-500 text-white rounded-lg transition-all group hover:shadow-lg hover:shadow-rose-500/30 border border-rose-500">
+                <span class="text-lg group-hover:scale-110 transition-transform">🍕</span> 
+                <div class="text-left hidden sm:block">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Support</span>
+                    <span class="block text-xs font-bold">Traktir Kopi</span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row h-[85vh] border-b border-slate-800 relative bg-slate-950">
+        
+        <aside class="w-full lg:w-80 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-6 z-20 overflow-y-auto shadow-[4px_0_24px_rgba(0,0,0,0.3)] shrink-0">
+            <div>
+                <h1 class="text-xl font-bold text-white mb-1 flex items-center gap-2">
+                    <span class="text-indigo-500">⚡</span> Electrostatics
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">Scale: <span class="text-indigo-400 font-bold">100px = 1.0 m</span></p>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 hover:border-indigo-500/30 transition-colors">
+                <label class="text-[10px] font-mono uppercase text-indigo-300 font-bold mb-3 block tracking-wider">Create Source Charge</label>
+                
+                <div class="mb-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-xs text-slate-400">Magnitude ($q$)</span>
+                        <span class="text-xs font-mono font-bold text-white bg-slate-900 px-2 py-0.5 rounded border border-slate-700" id="charge-val-display">+1.0 µC</span>
+                    </div>
+                    <input type="range" id="charge-slider" min="-20" max="20" step="0.5" value="1" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500" oninput="updateSliderUI(this.value)">
+                    <div class="flex justify-between text-[9px] text-slate-500 mt-2 font-mono">
+                        <span>-20µC</span>
+                        <span>0</span>
+                        <span>+20µC</span>
+                    </div>
+                </div>
+
+                <button onclick="spawnCharge()" id="btn-spawn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    Spawn Charge
+                </button>
+            </div>
+
+            <div class="space-y-4 bg-slate-800/30 p-4 rounded-xl border border-slate-700/50">
+                <label class="text-[10px] font-mono uppercase text-slate-500 font-bold tracking-wider">Visual Aids</label>
+                
+                <div class="flex items-center justify-between group">
+                    <span class="text-sm text-slate-300 group-hover:text-white transition-colors">E-Field Vectors</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="show-vectors" checked class="sr-only peer" onchange="draw()">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between group">
+                    <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Distance Grid</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="show-ruler" checked class="sr-only peer" onchange="draw()">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-emerald-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
+                </div>
+
+                <div class="flex items-center justify-between group">
+                    <span class="text-sm text-slate-300 group-hover:text-white transition-colors">Force Lines ($F$)</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="show-forces" checked class="sr-only peer" onchange="draw()">
+                        <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:bg-rose-600 peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="resetSim()" class="mt-auto py-3 text-xs text-rose-400 border border-rose-500/30 hover:bg-rose-500/10 hover:border-rose-500/50 rounded-lg transition-all flex items-center justify-center gap-2 group">
+                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Clear All Charges
+            </button>
+        </aside>
+
+        <div class="relative flex-grow bg-slate-950 overflow-hidden cursor-crosshair">
+            <canvas id="simCanvas" class="absolute top-0 left-0 w-full h-full block"></canvas>
+            
+            <div id="data-monitor" class="absolute bottom-6 right-6 w-72 bg-slate-900/90 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl pointer-events-none transition-all duration-300 opacity-0 transform translate-y-4">
+                <div class="flex items-center gap-2 mb-3 pb-2 border-b border-slate-700">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+                    <h3 class="text-xs font-bold text-white uppercase tracking-wider">Live Data Probe</h3>
+                </div>
+                
+                <div class="space-y-3 font-mono text-[10px] text-slate-300">
+                    <div class="flex justify-between items-center bg-slate-800/50 px-2 py-1 rounded">
+                        <span>Charge ($q$):</span>
+                        <span id="mon-q" class="text-white font-bold text-xs">--</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-slate-800/50 px-2 py-1 rounded border border-rose-500/20">
+                        <span>Net Force ($F_{net}$):</span>
+                        <span id="mon-f" class="text-rose-400 font-bold text-xs">--</span>
+                    </div>
+                    
+                    <div class="pt-1">
+                        <div class="text-[9px] text-slate-500 italic mb-1 uppercase font-bold">Nearest Interactions</div>
+                        <ul id="mon-list" class="space-y-1 max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700 pr-1">
+                            </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute top-4 left-4 lg:hidden pointer-events-none opacity-50">
+                <span class="text-[10px] bg-black/50 px-2 py-1 rounded text-white">Tap to interact</span>
+            </div>
+        </div>
+    </div>
+
+    <section class="relative z-10 bg-slate-900 border-t border-slate-800 py-16 px-6 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        <div class="max-w-5xl mx-auto">
+            
+            <div class="flex gap-4 mb-10 border-b border-slate-700 pb-4 items-end">
+                <h2 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <span class="text-indigo-400 text-4xl">📚</span> 
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Education Module</span>
+                        <span>Teori & Praktikum</span>
+                    </div>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                
+                <div class="prose prose-invert prose-sm text-slate-300">
+                    <h3 class="text-indigo-400 font-bold text-xl mb-4">1. Hukum Coulomb</h3>
+                    <p class="leading-relaxed">
+                        Hukum Coulomb adalah pondasi elektrostatika. Hukum ini menyatakan bahwa gaya $F$ antara dua muatan titik berbanding lurus dengan perkalian besar muatannya dan berbanding terbalik dengan kuadrat jaraknya.
+                    </p>
+                    
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 my-4 shadow-inner text-center">
+                        $$ F = k \frac{|q_1 \cdot q_2|}{r^2} $$
+                    </div>
+                    
+                    <ul class="list-disc pl-5 space-y-2 mt-4 text-xs marker:text-indigo-500">
+                        <li>$k$ : Konstanta Coulomb ($8.99 \times 10^9 \text{ N m}^2/\text{C}^2$)</li>
+                        <li>$q$ : Besar muatan (Coulomb)</li>
+                        <li>$r$ : Jarak antar muatan (meter)</li>
+                    </ul>
+
+                    <h3 class="text-indigo-400 font-bold text-xl mt-10 mb-4">2. Prinsip Superposisi</h3>
+                    
+                    <div class="my-6">
+                        
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/Superposition-of-Electric-Field.jpg" 
+							alt="Superposisi pada Medan Listrik" 
+							class="w-full max-w-xs h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Gambar 1. Superposisi pada Medan Listrik</p>
+					</div>
+
+                        <p class="text-[10px] text-center text-slate-500 mt-2 italic">Ilustrasi vektor resultan medan listrik dari dua sumber muatan.</p>
+                    </div>
+
+                    <p class="leading-relaxed">
+                        Di dunia nyata, muatan jarang sendirian. Medan listrik total $\vec{E}_{net}$ di suatu titik adalah <strong>penjumlahan vektor</strong> geometris dari medan listrik yang dihasilkan oleh setiap muatan di sekitarnya.
+                    </p>
+                    <div class="bg-slate-800/50 px-4 py-2 rounded-lg border-l-4 border-indigo-500 mt-2">
+                        $$ \vec{E}_{net} = \vec{E}_1 + \vec{E}_2 + ... + \vec{E}_n $$
+                    </div>
+                    <p class="mt-4 text-xs text-slate-400">
+                        Simulasi di atas melakukan perhitungan vektor ini ribuan kali per detik untuk memvisualisasikan medan yang tidak terlihat mata.
+                    </p>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-1 rounded-2xl border border-slate-700 shadow-xl">
+                        <div class="bg-slate-900/50 rounded-xl p-6 h-full">
+                            <h3 class="text-emerald-400 font-bold text-lg mb-6 flex items-center gap-2 border-b border-slate-700 pb-3">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                Lembar Kerja Mahasiswa
+                            </h3>
+
+                            <div class="space-y-8">
+                                <div class="group">
+                                    <h4 class="font-bold text-white text-sm mb-2 group-hover:text-indigo-400 transition-colors flex items-center gap-2">
+                                        <span class="bg-indigo-500/20 text-indigo-400 text-[10px] px-2 py-0.5 rounded uppercase">Percobaan 1</span>
+                                        Verifikasi "Inverse Square Law"
+                                    </h4>
+                                    <p class="text-xs text-slate-400 mb-3 italic">
+                                        Tujuan: Membuktikan hubungan kuadrat terbalik antara Gaya dan Jarak.
+                                    </p>
+                                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                                        <ol class="list-decimal pl-4 text-xs text-slate-300 space-y-2">
+                                            <li>Tekan tombol <strong class="text-white">Clear All Charges</strong>.</li>
+                                            <li>Buat muatan <strong>+4.0 µC</strong> dan <strong>-4.0 µC</strong>.</li>
+                                            <li>Atur jarak keduanya tepat <strong>1.0 meter</strong> (gunakan grid). Catat nilai Gaya $F$.</li>
+                                            <li>Geser hingga jarak menjadi <strong>2.0 meter</strong>.</li>
+                                            <li><strong class="text-emerald-400">Analisis:</strong> Hitung rasio gaya akhir terhadap gaya awal. Apakah nilainya mendekati 1/4?</li>
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                <div class="group">
+                                    <h4 class="font-bold text-white text-sm mb-2 group-hover:text-indigo-400 transition-colors flex items-center gap-2">
+                                        <span class="bg-indigo-500/20 text-indigo-400 text-[10px] px-2 py-0.5 rounded uppercase">Percobaan 2</span>
+                                        Mencari Titik Nol (Null Point)
+                                    </h4>
+                                    <p class="text-xs text-slate-400 mb-3 italic">
+                                        Tujuan: Menemukan koordinat di mana medan listrik saling meniadakan.
+                                    </p>
+                                    <div class="bg-slate-800/50 p-4 rounded-lg border border-slate-700/50">
+                                        <ol class="list-decimal pl-4 text-xs text-slate-300 space-y-2">
+                                            <li>Letakkan <strong>+4.0 µC</strong> di kiri dan <strong>+1.0 µC</strong> di kanan.</li>
+                                            <li>Amati arah panah vektor di antara kedua muatan.</li>
+                                            <li>Cari area "kosong" di mana vektor menghilang.</li>
+                                            <li><strong class="text-emerald-400">Pertanyaan:</strong> Mengapa titik nol lebih dekat ke muatan kecil (+1µC)? Jelaskan menggunakan rumus $E = kQ/r^2$.</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-16 pt-8 border-t border-slate-800 text-center">
+                <blockquote class="text-sm text-slate-500 italic font-serif max-w-2xl mx-auto">
+                    "Ilmu pengetahuan adalah bahasa yang digunakan Tuhan untuk menulis alam semesta."
+                    <br><span class="text-xs not-italic text-slate-600 mt-2 block">— Galileo Galilei</span>
+                </blockquote>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 bg-slate-900 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <p class="text-xs text-slate-500">&copy; 2026 Aries Jehan Tamamy. All Rights Reserved.</p>
+                <p class="text-[10px] text-slate-600 mt-1">Simulasi ini dilisensikan untuk penggunaan edukasi non-komersial.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">Developed with <span class="text-rose-500 animate-pulse">❤️</span> by</span>
+                <span class="text-xs font-bold text-slate-300 bg-slate-800 px-2 py-1 rounded border border-slate-700">Aries TechLab</span>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const monitorEl = document.getElementById('data-monitor');
+        
+        // Physics Constants
+        const PIXEL_SCALE = 100; // 100px = 0.1 meter (10cm)
+        const K_CONST = 9e9; // Coulomb Constant
+        const GRID_SIZE = 40;
+
+        // State
+        let charges = []; 
+        let isDragging = false;
+        let selectedIdx = -1; // Index muatan yang sedang diklik/drag
+        let nextId = 1;
+
+        // --- INIT & RESIZE ---
+        function resize() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => {
+            resize();
+            // Demo Scenario: Dipole
+            charges.push({id: nextId++, x: canvas.width/2 - 150, y: canvas.height/2, q: 2.0});
+            charges.push({id: nextId++, x: canvas.width/2 + 150, y: canvas.height/2, q: -2.0});
+            draw();
+        });
+
+        // --- UI HANDLERS ---
+        function updateSliderUI(val) {
+            const num = parseFloat(val);
+            const sign = num > 0 ? '+' : '';
+            document.getElementById('charge-val-display').innerText = `${sign}${num.toFixed(1)} µC`;
+            
+            // Update spawn button color
+            const btn = document.getElementById('btn-spawn');
+            if(num > 0) btn.className = btn.className.replace(/bg-\w+-600/, 'bg-red-600').replace(/hover:bg-\w+-500/, 'hover:bg-red-500').replace(/shadow-\w+-500/, 'shadow-red-500');
+            else if(num < 0) btn.className = btn.className.replace(/bg-\w+-600/, 'bg-blue-600').replace(/hover:bg-\w+-500/, 'hover:bg-blue-500').replace(/shadow-\w+-500/, 'shadow-blue-500');
+            else btn.className = btn.className.replace(/bg-\w+-600/, 'bg-slate-600').replace(/hover:bg-\w+-500/, 'hover:bg-slate-500').replace(/shadow-\w+-500/, 'shadow-slate-500');
+        }
+
+        function spawnCharge() {
+            const qVal = parseFloat(document.getElementById('charge-slider').value);
+            if(qVal === 0) return;
+
+            charges.push({
+                id: nextId++,
+                x: canvas.width / 2 + (Math.random() - 0.5) * 50,
+                y: canvas.height / 2 + (Math.random() - 0.5) * 50,
+                q: qVal
+            });
+            draw();
+        }
+
+        function resetSim() {
+            charges = [];
+            selectedIdx = -1;
+            monitorEl.classList.add('opacity-0', 'translate-y-4');
+            draw();
+        }
+
+        // --- MOUSE INTERACTION ---
+        canvas.addEventListener('mousedown', e => {
+            const { x, y } = getMousePos(e);
+            
+            // Hit Test
+            let hit = -1;
+            for(let i=0; i<charges.length; i++) {
+                const dist = Math.hypot(charges[i].x - x, charges[i].y - y);
+                if(dist < 20) { hit = i; break; }
+            }
+
+            if(hit !== -1) {
+                isDragging = true;
+                selectedIdx = hit;
+                updateMonitor();
+                draw(); // Redraw to show selection highlight
+            } else {
+                selectedIdx = -1;
+                monitorEl.classList.add('opacity-0', 'translate-y-4'); // Hide monitor
+                draw();
+            }
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if(!isDragging || selectedIdx === -1) return;
+            const { x, y } = getMousePos(e);
+            charges[selectedIdx].x = x;
+            charges[selectedIdx].y = y;
+            updateMonitor();
+            draw();
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        // --- PHYSICS & RENDER CORE ---
+        
+        function draw() {
+            // 1. Background
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const showVectors = document.getElementById('show-vectors').checked;
+            const showRuler = document.getElementById('show-ruler').checked;
+            const showForces = document.getElementById('show-forces').checked;
+
+            // 2. Draw Vector Field (Optimized Grid)
+            if (showVectors && charges.length > 0) {
+                ctx.beginPath();
+                for (let x = 0; x < canvas.width; x += GRID_SIZE) {
+                    for (let y = 0; y < canvas.height; y += GRID_SIZE) {
+                        let Ex = 0, Ey = 0;
+                        
+                        for (let c of charges) {
+                            const dx = x - c.x;
+                            const dy = y - c.y;
+                            const r2 = dx*dx + dy*dy;
+                            const r = Math.sqrt(r2);
+                            if(r < 15) continue; // Skip if too close
+
+                            // E = k * q / r^2
+                            const E = (c.q * 500) / r2; // Visual scaling only
+                            Ex += E * (dx / r);
+                            Ey += E * (dy / r);
+                        }
+
+                        const E_mag = Math.hypot(Ex, Ey);
+                        if (E_mag > 0.1) {
+                            const angle = Math.atan2(Ey, Ex);
+                            const alpha = Math.min(1, E_mag);
+                            const len = Math.min(20, E_mag * 15);
+                            
+                            ctx.strokeStyle = `rgba(255,255,255,${alpha * 0.4})`;
+                            drawArrow(x, y, angle, len);
+                        }
+                    }
+                }
+                ctx.stroke();
+            }
+
+            // 3. Draw Measurements (Ruler) & Forces
+            // Only draw lines connected to the SELECTED charge to reduce clutter
+            if (selectedIdx !== -1 && charges[selectedIdx]) {
+                const c1 = charges[selectedIdx];
+                let Fnet_x = 0;
+                let Fnet_y = 0;
+
+                for (let i = 0; i < charges.length; i++) {
+                    if (i === selectedIdx) continue;
+                    const c2 = charges[i];
+
+                    const dx = c2.x - c1.x;
+                    const dy = c2.y - c1.y;
+                    const pixelDist = Math.hypot(dx, dy);
+                    const realDistM = pixelDist * (0.1 / 100); // 100px = 0.1m
+
+                    // A. Draw Ruler
+                    if (showRuler) {
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.setLineDash([5, 5]);
+                        ctx.strokeStyle = '#10b981'; // Emerald
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(c1.x, c1.y);
+                        ctx.lineTo(c2.x, c2.y);
+                        ctx.stroke();
+
+                        // Distance Label (Midpoint)
+                        const midX = (c1.x + c2.x) / 2;
+                        const midY = (c1.y + c2.y) / 2;
+                        ctx.fillStyle = '#10b981';
+                        ctx.font = '10px monospace';
+                        ctx.globalAlpha = 1;
+                        // Show cm if < 1m, m if > 1m
+                        const label = realDistM < 1 
+                            ? `${(realDistM * 100).toFixed(1)} cm` 
+                            : `${realDistM.toFixed(2)} m`;
+                        
+                        // Background for text for readability
+                        ctx.fillStyle = 'rgba(2, 6, 23, 0.8)';
+                        const metrics = ctx.measureText(label);
+                        ctx.fillRect(midX - metrics.width/2 - 2, midY - 6, metrics.width + 4, 12);
+                        
+                        ctx.fillStyle = '#10b981';
+                        ctx.fillText(label, midX - metrics.width/2, midY + 3);
+                        ctx.restore();
+                    }
+
+                    // B. Calculate Force (Coulomb)
+                    // F = k * q1 * q2 / r^2
+                    // q in microCoulomb -> convert to Coulomb (1e-6)
+                    const q1_C = c1.q * 1e-6;
+                    const q2_C = c2.q * 1e-6;
+                    const F = (K_CONST * Math.abs(q1_C * q2_C)) / (realDistM * realDistM);
+                    
+                    // Direction: Repel if same sign, Attract if diff
+                    const isRepel = (c1.q * c2.q) > 0;
+                    const angle = Math.atan2(dy, dx);
+                    
+                    // F vector components on c1
+                    // If repel: Force is away from c2 (opposite angle)
+                    // If attract: Force is towards c2 (same angle)
+                    const forceAngle = isRepel ? angle + Math.PI : angle;
+                    
+                    Fnet_x += F * Math.cos(forceAngle);
+                    Fnet_y += F * Math.sin(forceAngle);
+                }
+
+                // C. Draw Net Force Arrow on Selected Charge
+                if (showForces) {
+                    const Fnet_mag = Math.hypot(Fnet_x, Fnet_y);
+                    if (Fnet_mag > 0.01) {
+                        const F_angle = Math.atan2(Fnet_y, Fnet_x);
+                        // Logarithmic scaling for visualization (Force varies wildly)
+                        const visualLen = Math.min(100, Math.log10(Fnet_mag + 1) * 150); 
+                        
+                        ctx.save();
+                        ctx.translate(c1.x, c1.y);
+                        ctx.rotate(F_angle);
+                        
+                        // Thick Arrow
+                        ctx.beginPath();
+                        ctx.strokeStyle = 'white'; // Rose
+                        ctx.fillStyle = 'white';
+                        ctx.lineWidth = 3;
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(visualLen, 0);
+                        ctx.stroke();
+                        
+                        // Arrow Head
+                        ctx.beginPath();
+                        ctx.moveTo(visualLen, 0);
+                        ctx.lineTo(visualLen - 8, -4);
+                        ctx.lineTo(visualLen - 8, 4);
+                        ctx.fill();
+                        
+                        // Label
+                        ctx.rotate(-F_angle); // Reset rotation for text
+                        ctx.fillStyle = '#f43f5e';
+                        ctx.font = 'bold 12px sans-serif';
+                        ctx.fillText(`${Fnet_mag.toFixed(2)} N`, 15, -15);
+                        
+                        ctx.restore();
+                    }
+                }
+            }
+
+            // 4. Draw Charges
+            for (let i = 0; i < charges.length; i++) {
+                const c = charges[i];
+                const isSel = (i === selectedIdx);
+                
+                // Color based on polarity
+                const baseColor = c.q > 0 ? '#ef4444' : '#3b82f6'; // Red vs Blue
+                const glowColor = c.q > 0 ? 'rgba(239, 68, 68, 0.6)' : 'rgba(59, 130, 246, 0.6)';
+
+                // Selection Ring
+                if (isSel) {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, 22, 0, Math.PI * 2);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([3, 3]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+
+                ctx.beginPath();
+                // Size slightly depends on magnitude
+                const r = 12 + Math.min(20, Math.abs(c.q)); 
+                ctx.arc(c.x, c.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = baseColor;
+                ctx.shadowColor = glowColor;
+                ctx.shadowBlur = 15;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                // Label
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const sign = c.q > 0 ? '+' : '';
+                ctx.fillText(`${sign}${c.q}`, c.x, c.y);
+            }
+        }
+
+        function drawArrow(x, y, angle, len) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(-len/2, 0);
+            ctx.lineTo(len/2, 0);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // --- DATA MONITOR LOGIC ---
+        function updateMonitor() {
+            if (selectedIdx === -1) return;
+            
+            monitorEl.classList.remove('opacity-0', 'translate-y-4');
+            const c1 = charges[selectedIdx];
+            
+            // Header
+            document.getElementById('mon-q').innerText = `${c1.q > 0 ? '+' : ''}${c1.q} µC`;
+            const list = document.getElementById('mon-list');
+            list.innerHTML = '';
+
+            let Fnet_x = 0;
+            let Fnet_y = 0;
+
+            // List interactions
+            charges.forEach((c2, i) => {
+                if(i === selectedIdx) return;
+                
+                const dx = c2.x - c1.x;
+                const dy = c2.y - c1.y;
+                const distM = Math.hypot(dx, dy) * (0.1 / 100);
+                
+                const q1 = c1.q * 1e-6;
+                const q2 = c2.q * 1e-6;
+                const F = (K_CONST * Math.abs(q1 * q2)) / (distM * distM);
+                
+                // Add to Net Force
+                const angle = Math.atan2(dy, dx);
+                const isRepel = (c1.q * c2.q) > 0;
+                const forceAngle = isRepel ? angle + Math.PI : angle;
+                Fnet_x += F * Math.cos(forceAngle);
+                Fnet_y += F * Math.sin(forceAngle);
+
+                // Add list item
+                const li = document.createElement('li');
+                li.className = "flex justify-between border-b border-slate-800 pb-1";
+                li.innerHTML = `
+                    <span>vs Charge ${i+1} (${c2.q}µC):</span>
+                    <span class="text-emerald-400">${F.toFixed(2)} N</span>
+                `;
+                list.appendChild(li);
+            });
+
+            // Update Net Force
+            const Fnet = Math.hypot(Fnet_x, Fnet_y);
+            document.getElementById('mon-f').innerText = `${Fnet.toFixed(2)} N`;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorentz Force Chamber - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Retro CRT Effect for Canvas */
+        .crt-screen {
+            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+            border: 1px solid #334155;
+            box-shadow: inset 0 0 20px #000;
+        }
+
+        /* Custom Slider Styling */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            margin-top: -6px; cursor: pointer; border: 2px solid #fff; 
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+        
+        /* Thumb Colors per Type */
+        #slider-e::-webkit-slider-thumb { background: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.5); }
+        #slider-b::-webkit-slider-thumb { background: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        #slider-v::-webkit-slider-thumb { background: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+	<div class="max-w-7xl mx-auto flex items-center justify-between">
+	   
+		<div class="font-mono text-xs text-indigo-400 font-bold bg-slate-800 px-3 py-1 rounded-full border border-indigo-500/20">
+			LORENTZ CHAMBER
+		</div>
+	</div>
+
+    <div class="flex flex-col lg:flex-row h-auto lg:h-[85vh] border-b border-slate-800">
+        
+        <div class="relative w-full lg:w-3/4 h-[50vh] lg:h-full bg-slate-950 p-4 flex items-center justify-center">
+            <canvas id="simCanvas" class="crt-screen w-full h-full rounded-xl cursor-crosshair"></canvas>
+            
+            <div class="absolute top-8 left-8 pointer-events-none space-y-1">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    <span class="text-xs font-mono text-red-400 font-bold">E-FIELD: <span id="val-e">0</span> N/C</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                    <span class="text-xs font-mono text-blue-400 font-bold">B-FIELD: <span id="val-b">0</span> T</span>
+                </div>
+            </div>
+
+            <div id="target-ui" class="absolute right-12 top-1/2 -translate-y-1/2 w-16 h-16 border-4 border-emerald-500/30 rounded-full flex items-center justify-center pointer-events-none">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full"></div>
+            </div>
+        </div>
+
+        <div class="w-full lg:w-1/4 bg-slate-900 p-6 flex flex-col gap-6 overflow-y-auto border-l border-slate-800 shadow-2xl z-10">
+            <div>
+                <h1 class="text-xl font-bold text-white">Particle Beam</h1>
+                <p class="text-[10px] text-slate-400">Control fields to guide the beam.</p>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <label class="flex justify-between text-[10px] uppercase font-bold text-red-400 mb-2">
+                    <span>Electric Field ($E$)</span>
+                    <span>Up / Down</span>
+                </label>
+                <input type="range" id="slider-e" min="-10" max="10" step="0.5" value="0" class="w-full">
+                <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+                    <span>-10</span> <span>0</span> <span>+10</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <label class="flex justify-between text-[10px] uppercase font-bold text-blue-400 mb-2">
+                    <span>Magnetic Field ($B$)</span>
+                    <span>In $\otimes$ / Out $\odot$</span>
+                </label>
+                <input type="range" id="slider-b" min="-10" max="10" step="0.5" value="0" class="w-full">
+                <div class="flex justify-between text-[10px] text-slate-500 mt-1 font-mono">
+                    <span>-10</span> <span>0</span> <span>+10</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                <label class="flex justify-between text-[10px] uppercase font-bold text-emerald-400 mb-2">
+                    <span>Initial Velocity ($v_0$)</span>
+                    <span>Speed</span>
+                </label>
+                <input type="range" id="slider-v" min="1" max="10" step="0.5" value="3" class="w-full">
+            </div>
+
+            <div class="flex gap-2 mt-auto">
+                <button onclick="fireParticle()" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition-all shadow-lg shadow-indigo-500/20 active:scale-95">
+                    🔥 FIRE BEAM
+                </button>
+                <button onclick="clearCanvas()" class="px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg transition-colors">
+                    Clear
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="setPreset('cyclotron')" class="text-[10px] py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">
+                    Preset: Cyclotron
+                </button>
+                <button onclick="setPreset('selector')" class="text-[10px] py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700">
+                    Preset: V-Selector
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <section class="bg-slate-900 border-t border-slate-800 py-16 px-6 relative z-20 shadow-[0_-20px_60px_rgba(0,0,0,0.6)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                        <span class="text-indigo-400">⚛️</span> Modul Elektrodinamika Partikel
+                    </h2>
+                    <p class="text-slate-400">Analisis Gerak Muatan dalam Medan Listrik ($E$) dan Magnet ($B$).</p>
+                </div>
+                <div class="text-right hidden md:block">
+                    <div class="text-xs font-mono text-slate-500 uppercase tracking-widest mb-1">Partikel Standar (Elektron)</div>
+                    <div class="font-mono text-xs text-indigo-300 bg-slate-800 px-3 py-2 rounded border border-slate-700">
+                        $q = -1.6 \times 10^{-19} \text{ C}$ <br> 
+                        $m = 9.11 \times 10^{-31} \text{ kg}$
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-lg text-slate-300">
+                    
+                    <h3 class="text-indigo-400 font-bold text-xl mb-4">1. Persamaan Gaya Lorentz</h3>
+                    
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/righthand_rule.png" 
+							alt="Ilustrasi Kaidah Tangan Kanan" 
+							class="w-full max-w-xs h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Ilustrasi Kaidah Tangan Kanan</p>
+					</div>
+
+                    <p>
+                        Sebuah partikel bermuatan $q$ yang bergerak dengan kecepatan $\vec{v}$ di dalam ruang yang mengandung medan listrik $\vec{E}$ dan medan magnet $\vec{B}$ akan mengalami gaya total:
+                    </p>
+                    
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 my-4 text-center">
+                        $$ \vec{F} = q\vec{E} + q(\vec{v} \times \vec{B}) $$
+                    </div>
+
+                    <div class="space-y-6 mt-6">
+                        <div class="border-l-4 border-rose-500 pl-4">
+                            <h4 class="text-rose-400 font-bold text-lg">A. Gaya Listrik ($F_e$)</h4>
+                            <p class="text-sm">
+                                $$ \vec{F}_e = q\vec{E} $$
+                                Gaya sejajar dengan medan. Menyebabkan percepatan linier. Lintasan partikel akan berbentuk <strong>Parabola</strong> (seperti gerak peluru).
+                            </p>
+                        </div>
+
+                        <div class="border-l-4 border-sky-500 pl-4">
+                            <h4 class="text-sky-400 font-bold text-lg">B. Gaya Magnet ($F_b$)</h4>
+                            <p class="text-sm">
+                                $$ \vec{F}_b = qvB \sin\theta $$
+                                Gaya selalu tegak lurus terhadap kecepatan ($v$). Tidak mengubah laju (speed), hanya mengubah arah. Lintasan berbentuk <strong>Lingkaran</strong> atau Heliks.
+                            </p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-emerald-400 font-bold text-xl mt-10 mb-4">2. Aplikasi: Selektor Kecepatan</h3>
+                    
+                    <p>
+                        Jika kita mengatur $\vec{E}$ dan $\vec{B}$ agar saling tegak lurus, kita bisa membuat gaya listrik dan magnet saling meniadakan ($F_e = F_b$). Partikel akan bergerak lurus hanya jika kecepatannya:
+                    </p>
+                    $$ v = \frac{E}{B} $$
+                    <p class="text-sm text-slate-400 italic">
+                        Prinsip ini digunakan pada Spektrometer Massa untuk memisahkan isotop.
+                    </p>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-rose-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-rose-500 select-none">CRT</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-rose-500">📺</span> Lab 1: Prinsip Tabung TV (CRT)
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Tabung televisi lama menggunakan medan listrik untuk membelokkan berkas elektron ke layar.
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Klik tombol <strong>Clear</strong>.</li>
+                            <li>Matikan Medan Magnet ($B = 0$).</li>
+                            <li>Nyalakan Medan Listrik ($E$). Coba nilai positif dan negatif.</li>
+                            <li><strong>Analisis:</strong> Perhatikan bentuk lintasannya. Apakah berupa garis lurus atau melengkung parabola? Buktikan bahwa $y \propto x^2$.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-sky-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-sky-500 select-none">CERN</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-sky-500">🌀</span> Lab 2: Jari-jari Siklotron
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Medan magnet memaksa muatan bergerak melingkar. Jari-jari lintasannya adalah:
+                            $ R = \frac{mv}{qB} $
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Klik preset <strong>Cyclotron</strong> (atau set $E=0, B=5$).</li>
+                            <li>Tembakkan partikel. Ukur diameter lingkaran secara visual.</li>
+                            <li>Sekarang, <strong>Gandakan Kecepatan ($v_0$)</strong>.</li>
+                            <li><strong>Hipotesis:</strong> Menurut rumus, jika $v$ naik 2x, jari-jari $R$ harusnya naik berapa kali? Buktikan dengan simulasi.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-emerald-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-emerald-500 select-none">VEL</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-emerald-500">🎯</span> Lab 3: Tantangan "Velocity Selector"
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Tugas Anda adalah menembak target lurus di depan.
+                        </p>
+                        <div class="bg-emerald-900/20 border border-emerald-500/30 p-3 rounded text-xs text-emerald-200 font-mono mb-3">
+                            Tantangan: Set $v_0 = 5.0$. Set $B = -2.0$ (Masuk).
+                            Berapakah nilai $E$ yang dibutuhkan agar partikel lurus?
+                        </div>
+                        <ul class="list-disc pl-4 text-sm text-slate-300 space-y-1">
+                            <li>Gunakan rumus keseimbangan gaya: $qE = qvB$.</li>
+                            <li>Hitung nilai $E$ yang diperlukan secara manual, lalu masukkan ke slider simulasi.</li>
+                            <li>Tekan <strong>FIRE BEAM</strong>. Apakah tepat sasaran?</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-12 text-center border-t border-slate-800 pt-8">
+                <p class="text-slate-500 italic font-serif">
+                    "Gerak elektron dalam medan magnet adalah dasar dari teknologi akselerator partikel modern."
+                </p>
+            </div>
+
+        </div>
+    </section>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Configuration
+        const DT = 0.1; // Time step
+        const TRAIL_LENGTH = 500;
+        
+        // Physics State
+        let particles = [];
+        let animationId;
+        
+        // Slider Elements
+        const sliderE = document.getElementById('slider-e');
+        const sliderB = document.getElementById('slider-b');
+        const sliderV = document.getElementById('slider-v');
+        
+        // Labels
+        const labelE = document.getElementById('val-e');
+        const labelB = document.getElementById('val-b');
+
+        function resize() {
+            canvas.width = canvas.parentElement.offsetWidth;
+            canvas.height = canvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => {
+            resize();
+            loop();
+        });
+
+        // --- PARTICLE CLASS ---
+        class Particle {
+            constructor(x, y, vx, vy) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.trail = [];
+                this.color = `hsl(${Math.random()*60 + 200}, 100%, 70%)`; // Blue-ish
+                this.life = 1.0;
+            }
+
+            update(E, B) {
+                // Physics: F = qE + q(v x B)
+                // Assume q = 1, m = 1 for simplicity visual
+                
+                // 1. Electric Force (Fe)
+                // E is vertical (Up/Down) in this sim
+                // E > 0 pushes Down (Canvas Y is down), E < 0 pushes Up
+                const Fe_y = E * 0.5; 
+                
+                // 2. Magnetic Force (Fm) = v x B
+                // v = (vx, vy, 0), B = (0, 0, Bz)
+                // Cross product:
+                // Fx = vy * Bz
+                // Fy = -vx * Bz
+                const Fm_x = this.vy * B * 0.2;
+                const Fm_y = -this.vx * B * 0.2;
+
+                // Total Acceleration (a = F/m, m=1)
+                const ax = Fm_x;
+                const ay = Fe_y + Fm_y;
+
+                // Euler Integration
+                this.vx += ax * DT;
+                this.vy += ay * DT;
+                this.x += this.vx * DT;
+                this.y += this.vy * DT;
+
+                // Trail Management
+                this.trail.push({x: this.x, y: this.y});
+                if (this.trail.length > TRAIL_LENGTH) this.trail.shift();
+
+                // Boundary Check (Kill if far off screen)
+                if (this.x > canvas.width + 100 || this.x < -100 || 
+                    this.y > canvas.height + 100 || this.y < -100) {
+                    this.life = 0;
+                }
+            }
+
+            draw() {
+                // Draw Trail
+                if (this.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) {
+                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                }
+
+                // Draw Head
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                
+                // Glow
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 10;
+            }
+        }
+
+        // --- CONTROLLER ---
+        function fireParticle() {
+            const v0 = parseFloat(sliderV.value) * 5; // Scale up
+            // Start from left middle
+            particles.push(new Particle(50, canvas.height/2, v0, 0));
+        }
+
+        function clearCanvas() {
+            particles = [];
+        }
+
+        function setPreset(type) {
+            clearCanvas();
+            if (type === 'cyclotron') {
+                sliderE.value = 0;
+                sliderB.value = 5; // Strong B field
+                sliderV.value = 4;
+            } else if (type === 'selector') {
+                sliderE.value = 5; // Downward E
+                sliderB.value = -3; // Inward B creates Upward Force
+                sliderV.value = 5;
+            }
+            // Trigger UI update logic
+            // (Simulated manual update)
+        }
+
+        // --- MAIN LOOP ---
+        function loop() {
+            // 1. Read Inputs
+            const E = parseFloat(sliderE.value);
+            const B = parseFloat(sliderB.value);
+            
+            // Update UI Labels
+            labelE.innerText = E.toFixed(1);
+            labelB.innerText = B.toFixed(1);
+
+            // 2. Clear Screen (with Fade Effect for Trails)
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.3)'; // Semi-transparent clear
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 3. Draw Field Visuals (Background)
+            drawFieldBackground(E, B);
+
+            // 4. Update Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.update(E, B);
+                p.draw();
+                if (p.life <= 0) particles.splice(i, 1);
+            }
+
+            // 5. Draw Emitter Gun
+            ctx.fillStyle = '#475569';
+            ctx.fillRect(0, canvas.height/2 - 10, 50, 20);
+            ctx.fillStyle = '#10b981'; // Green Tip
+            ctx.fillRect(45, canvas.height/2 - 5, 5, 10);
+
+            requestAnimationFrame(loop);
+        }
+
+        // --- HELPER VISUALS ---
+        function drawFieldBackground(E, B) {
+            ctx.save();
+            const spacing = 60;
+            
+            // Draw B-Field (Circles/Crosses)
+            if (Math.abs(B) > 0.5) {
+                ctx.fillStyle = B > 0 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+                ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                for (let x = spacing/2; x < canvas.width; x += spacing) {
+                    for (let y = spacing/2; y < canvas.height; y += spacing) {
+                        if (B > 0) {
+                            // OUT (Dot)
+                            ctx.beginPath();
+                            ctx.arc(x, y, 2, 0, Math.PI*2);
+                            ctx.fill();
+                            ctx.beginPath();
+                            ctx.arc(x, y, 6, 0, Math.PI*2);
+                            ctx.stroke();
+                        } else {
+                            // IN (Cross)
+                            ctx.beginPath();
+                            ctx.moveTo(x-4, y-4); ctx.lineTo(x+4, y+4);
+                            ctx.moveTo(x+4, y-4); ctx.lineTo(x-4, y+4);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Draw E-Field (Arrows Up/Down)
+            if (Math.abs(E) > 0.5) {
+                ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+                ctx.lineWidth = 1;
+                const arrowLen = 20;
+                
+                for (let x = spacing; x < canvas.width; x += spacing) {
+                    for (let y = spacing; y < canvas.height; y += spacing) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, y - arrowLen/2);
+                        ctx.lineTo(x, y + arrowLen/2);
+                        // Arrowhead
+                        if (E > 0) { // Down
+                            ctx.lineTo(x - 3, y + arrowLen/2 - 5);
+                            ctx.moveTo(x, y + arrowLen/2);
+                            ctx.lineTo(x + 3, y + arrowLen/2 - 5);
+                        } else { // Up
+                            ctx.moveTo(x, y - arrowLen/2);
+                            ctx.lineTo(x - 3, y - arrowLen/2 + 5);
+                            ctx.moveTo(x, y - arrowLen/2);
+                            ctx.lineTo(x + 3, y - arrowLen/2 + 5);
+                        }
+                        ctx.stroke();
+                    }
+                }
+            }
+            ctx.restore();
+        }
+
+    </script>
+</body>
+</html>

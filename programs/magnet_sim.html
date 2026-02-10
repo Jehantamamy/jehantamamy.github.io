@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High-Fidelity Magnetostatics Lab - Aries Tech</title>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* HAPUS overflow:hidden di sini agar bisa scroll */
+        body { background-color: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Canvas hanya crosshair saat di area simulasi */
+        #sim-container canvas { cursor: none; } 
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
+            background: #f59e0b; margin-top: -7px; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-950 text-slate-200 font-sans selection:bg-amber-500 selection:text-slate-900">
+
+    <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-amber-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold hidden sm:block">Dashboard</span>
+            </a>
+
+            <div class="flex items-center gap-2 cursor-pointer select-none" onclick="closeApp()">
+                <div class="w-8 h-8 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-amber-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-amber-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+
+            <a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-1.5 bg-rose-600/90 hover:bg-rose-500 text-white rounded-lg transition-all group hover:shadow-lg hover:shadow-rose-500/30 border border-rose-500">
+                <span class="text-lg group-hover:scale-110 transition-transform">🍕</span> 
+                <div class="text-left hidden sm:block">
+                    <span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Support</span>
+                    <span class="block text-xs font-bold">Traktir Kopi</span>
+                </div>
+            </a>
+        </div>
+    </nav>
+
+    <div id="sim-container" class="relative w-full h-[85vh] bg-slate-950 border-b border-slate-800 overflow-hidden group">
+        
+        <canvas id="simCanvas" class="absolute top-0 left-0 w-full h-full block cursor-crosshair"></canvas>
+
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 z-20 transition-transform duration-300 group-hover:translate-y-0 translate-y-2">
+            <div class="bg-slate-900/80 backdrop-blur-md border border-slate-700/50 rounded-2xl p-4 md:p-6 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex flex-col md:flex-row gap-6 items-center justify-between">
+                
+                <div class="w-full md:w-1/3 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Arus Listrik ($I$)</label>
+                        <span id="current-display" class="font-mono text-xs font-bold text-amber-400">+5.0 A (OUT)</span>
+                    </div>
+                    <input type="range" id="current-slider" min="-10" max="10" step="1" value="5" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500" oninput="updateUI()">
+                    <div class="flex gap-2">
+                        <button onclick="spawnWire()" class="flex-1 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold rounded-lg transition-colors shadow-lg shadow-amber-500/20">
+                            + Add Wire
+                        </button>
+                        <button onclick="resetSim()" class="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold rounded-lg transition-colors">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 bg-slate-800/50 p-1.5 rounded-xl border border-slate-700/50">
+                    <label class="relative cursor-pointer group" title="Vector Grid">
+                        <input type="radio" name="viewMode" value="vectors" checked class="sr-only peer" onchange="draw()">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all peer-checked:bg-amber-500 peer-checked:text-slate-900 peer-checked:shadow-lg text-slate-400 hover:text-white hover:bg-slate-700">➶</div>
+                    </label>
+                    <label class="relative cursor-pointer group" title="Iron Filings">
+                        <input type="radio" name="viewMode" value="iron" class="sr-only" onchange="draw()">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all peer-checked:bg-amber-500 peer-checked:text-slate-900 peer-checked:shadow-lg text-slate-400 hover:text-white hover:bg-slate-700">♒</div>
+                    </label>
+                    <label class="relative cursor-pointer group" title="Streamlines">
+                        <input type="radio" name="viewMode" value="lines" class="sr-only" onchange="draw()">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-lg transition-all peer-checked:bg-amber-500 peer-checked:text-slate-900 peer-checked:shadow-lg text-slate-400 hover:text-white hover:bg-slate-700">◎</div>
+                    </label>
+                </div>
+
+                <div class="space-y-2 text-[10px] text-slate-300 min-w-[120px]">
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                        <input type="checkbox" id="show-forces" checked onchange="draw()" class="accent-rose-500 w-3.5 h-3.5 rounded-sm">
+                        <span>Show Forces ($F$)</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                        <input type="checkbox" id="show-compass" checked onchange="draw()" class="accent-emerald-500 w-3.5 h-3.5 rounded-sm">
+                        <span>Show Compass</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="absolute top-4 left-4 lg:hidden pointer-events-none opacity-50">
+            <span class="text-[10px] bg-black/50 px-2 py-1 rounded text-white">Tap canvas to interact</span>
+        </div>
+    </div>
+
+    <section class="relative z-10 bg-slate-900 border-t border-slate-800 py-12 px-6 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        
+        <div class="w-full max-w-4xl mx-auto h-24 bg-slate-800/30 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-12 text-slate-600 text-xs">
+            [Space Iklan AdSense Leaderboard 728x90]
+        </div>
+
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                        <span class="text-amber-500 text-4xl">🧲</span> 
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-amber-500 uppercase tracking-widest">Education Module</span>
+                            <span>Magnetostatika</span>
+                        </div>
+                    </h2>
+                    <p class="text-slate-400 text-sm max-w-xl">Analisis Medan Magnet ($B$) pada Kawat Lurus Berarus (Biot-Savart) dan Interaksi Gaya Lorentz antar kawat sejajar.</p>
+                </div>
+                <div class="text-right hidden md:block">
+                    <div class="text-[10px] font-mono text-slate-500 uppercase tracking-widest mb-1">Permeabilitas Vakum</div>
+                    <div class="font-mono text-sm text-amber-400 bg-slate-800 px-3 py-1.5 rounded border border-slate-700">
+                        $$\mu_0 = 4\pi \times 10^{-7} \text{ T}\cdot\text{m/A}$$
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-sm text-slate-300">
+                    
+                    <h3 class="text-amber-400 font-bold text-xl mb-4 flex items-center gap-2">
+                        1. Medan Magnet Kawat Lurus
+                    </h3>
+    
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/righthand_rule.png" 
+							alt="Ilustrasi Kaidah Tangan Kanan" 
+							class="w-full max-w-xs h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Ilustrasi Kaidah Tangan Kanan</p>
+					</div>
+
+                    <p class="leading-relaxed">
+                        Berdasarkan <strong>Hukum Ampere</strong>, kawat lurus panjang yang dialiri arus listrik $I$ akan menghasilkan induksi magnet $B$ di sekelilingnya. Garis-garis medan magnet ini berbentuk lingkaran konsentris.
+                    </p>
+                    
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 my-4 shadow-inner">
+                        <p class="text-center font-mono text-xl text-white my-2">
+                            $$ B = \frac{\mu_0 I}{2\pi r} $$
+                        </p>
+                        <p class="text-xs text-center text-slate-400 mt-2">
+                            Dimana $r$ adalah jarak radial dari pusat kawat ke titik ukur.
+                        </p>
+                    </div>
+
+                    <h4 class="text-white font-bold text-base mt-6 mb-2">Kaidah Tangan Kanan</h4>
+                    <p>Arah putaran medan magnet ditentukan dengan:</p>
+                    <ul class="list-disc pl-5 space-y-2 text-sm marker:text-amber-500">
+                        <li><strong>Ibu Jari:</strong> Menunjukkan arah arus ($I$).</li>
+                        <li><strong>Lipatan Jari:</strong> Menunjukkan arah putaran medan magnet ($B$).</li>
+                    </ul>
+                    <div class="text-sm mt-3 bg-slate-800/80 p-3 rounded-lg border-l-4 border-amber-500">
+                        <strong>Tips Visual:</strong> Jika arus keluar ($\odot$ Out), medan berputar <em>Counter-Clockwise</em> (Berlawanan Jarum Jam). Jika masuk ($\otimes$ In), medan berputar <em>Clockwise</em>.
+                    </div>
+
+                    <h3 class="text-rose-400 font-bold text-xl mt-10 mb-4 flex items-center gap-2">
+                        2. Gaya Lorentz Antar Kawat
+                    </h3>
+                    
+                    <p class="leading-relaxed">
+                        Dua kawat sejajar yang dialiri arus akan saling mengerahkan gaya magnetik. Besarnya gaya per satuan panjang ($F/L$) adalah:
+                    </p>
+                    <div class="my-2">
+                        $$ \frac{F}{L} = \frac{\mu_0 I_1 I_2}{2\pi d} $$
+                    </div>
+                    <p>
+                        Sifat interaksinya unik:
+                        <br>
+                        <span class="text-emerald-400 font-bold">✓ Arus Searah:</span> Tarik-menarik (Attraction).
+                        <br>
+                        <span class="text-rose-400 font-bold">✗ Arus Berlawanan:</span> Tolak-menolak (Repulsion).
+                    </p>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-1 rounded-2xl border border-slate-700 shadow-xl group hover:border-amber-500/30 transition-colors">
+                        <div class="bg-slate-900/50 rounded-xl p-6 h-full">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center text-xl text-amber-500">🧭</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Lab 1: Verifikasi Arah Medan</h4>
+                                    <p class="text-xs text-slate-400 mb-3 italic">Tujuan: Membuktikan Kaidah Tangan Kanan secara visual.</p>
+                                    <ol class="list-decimal pl-4 text-xs text-slate-300 space-y-2 marker:text-amber-500">
+                                        <li>Reset simulasi. Buat <strong>satu kawat</strong> saja dengan arus positif (+10 A, Out $\odot$).</li>
+                                        <li>Gerakkan mouse (Kompas) mengelilingi kawat tersebut searah jarum jam.</li>
+                                        <li>Perhatikan jarum merah kompas (Utara). Ke mana arahnya?</li>
+                                        <li><strong>Analisis:</strong> Apakah jarum merah selalu menunjuk garis singgung lingkaran yang berlawanan arah jarum jam? Ubah arus menjadi negatif (-10 A) dan amati perubahannya.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-1 rounded-2xl border border-slate-700 shadow-xl group hover:border-rose-500/30 transition-colors">
+                        <div class="bg-slate-900/50 rounded-xl p-6 h-full">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-rose-500/10 flex items-center justify-center text-xl text-rose-500">⚡</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Lab 2: Interaksi Lorentz</h4>
+                                    <p class="text-xs text-slate-400 mb-3 italic">Tujuan: Analisis gaya tarik-menarik dan tolak-menolak.</p>
+                                    <ol class="list-decimal pl-4 text-xs text-slate-300 space-y-2 marker:text-rose-500">
+                                        <li>Buat dua kawat sejajar. Atur keduanya menjadi <strong>+5 A (Out)</strong>.</li>
+                                        <li>Perhatikan panah tebal berwarna <span class="text-rose-400 font-bold">Pink (F)</span>. Apakah kedua kawat saling mendekat?</li>
+                                        <li>Klik salah satu kawat, ubah arusnya menjadi <strong>-5 A (In)</strong>.</li>
+                                        <li><strong>Pertanyaan:</strong> Mengapa arah panah gaya ($F$) berbalik arah menjauh? Jelaskan dengan menggunakan konsep vektor medan magnet $B$.</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-1 rounded-2xl border border-slate-700 shadow-xl group hover:border-sky-500/30 transition-colors">
+                        <div class="bg-slate-900/50 rounded-xl p-6 h-full">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-sky-500/10 flex items-center justify-center text-xl text-sky-500">🎯</div>
+                                <div>
+                                    <h4 class="text-lg font-bold text-white mb-2">Lab 3: Titik Nol (Null Point)</h4>
+                                    <p class="text-xs text-slate-400 mb-3 italic">Tujuan: Mencari lokasi resultan nol.</p>
+                                    <ol class="list-decimal pl-4 text-xs text-slate-300 space-y-2 marker:text-sky-500">
+                                        <li>Letakkan dua kawat dengan arus sama (+10 A dan +10 A).</li>
+                                        <li>Gerakkan mouse (Kompas) tepat ke tengah-tengah antara kedua kawat.</li>
+                                        <li>Apa yang terjadi pada jarum kompas? Apakah ia berputar liar atau diam?</li>
+                                        <li>Sekarang ubah salah satu arus menjadi -10 A. Apakah titik nol masih berada di tengah?</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-16 text-center border-t border-slate-800 pt-8">
+                <blockquote class="text-slate-500 italic font-serif text-lg max-w-2xl mx-auto">
+                    "Elektromagnetisme adalah gaya yang mengikat atom-atom menjadi materi, dan materi menjadi kita."
+                </blockquote>
+            </div>
+
+            <div class="w-full max-w-xs mx-auto h-64 bg-slate-800/30 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
+                [Space Iklan AdSense Rectangle 300x250]
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 bg-slate-900 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="text-center md:text-left">
+                <p class="text-xs text-slate-500">&copy; 2026 Aries Jehan Tamamy. All Rights Reserved.</p>
+                <p class="text-[10px] text-slate-600 mt-1">Simulasi ini dilisensikan untuk penggunaan edukasi non-komersial.</p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-slate-500">Developed with <span class="text-rose-500 animate-pulse">❤️</span> by</span>
+                <span class="text-xs font-bold text-slate-300 bg-slate-800 px-2 py-1 rounded border border-slate-700">Aries Tech Labs</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const container = document.getElementById('sim-container'); // Referensi Container
+        const ctx = canvas.getContext('2d');
+        
+        const CONFIG = {
+            gridSize: 30,
+            scale: 500,
+            wireRadius: 18,
+            forceScale: 200
+        };
+
+        let wires = [];
+        let mouse = { x: -100, y: -100 };
+        let isDragging = false;
+        let selectedIdx = -1;
+        let nextId = 1;
+
+        // --- INIT & RESIZE ---
+        function resize() {
+            // PENTING: Resize mengikuti ukuran Container, bukan Window
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            draw();
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => {
+            resize();
+            wires.push({id: nextId++, x: canvas.width/2 - 120, y: canvas.height/2, i: 5});
+            wires.push({id: nextId++, x: canvas.width/2 + 120, y: canvas.height/2, i: 5});
+            updateUI();
+            draw();
+        });
+
+        // --- MOUSE LOGIC (Updated for Container) ---
+        // Kita harus menghitung offset mouse relatif terhadap Canvas, bukan Window
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousemove', e => {
+            const pos = getMousePos(e);
+            mouse.x = pos.x;
+            mouse.y = pos.y;
+
+            if (isDragging && selectedIdx !== -1) {
+                wires[selectedIdx].x = mouse.x;
+                wires[selectedIdx].y = mouse.y;
+            }
+            draw();
+        });
+
+        canvas.addEventListener('mousedown', e => {
+            const pos = getMousePos(e);
+            let hit = -1;
+            for (let i = wires.length - 1; i >= 0; i--) {
+                const dist = Math.hypot(wires[i].x - pos.x, wires[i].y - pos.y);
+                if (dist < CONFIG.wireRadius * 1.5) {
+                    hit = i;
+                    break;
+                }
+            }
+
+            if (hit !== -1) {
+                isDragging = true;
+                selectedIdx = hit;
+                document.getElementById('current-slider').value = wires[hit].i;
+                updateUI();
+            } else {
+                selectedIdx = -1;
+            }
+            draw();
+        });
+
+        canvas.addEventListener('mouseup', () => { isDragging = false; });
+        
+        canvas.addEventListener('dblclick', e => {
+            const pos = getMousePos(e);
+            for (let i = wires.length - 1; i >= 0; i--) {
+                const dist = Math.hypot(wires[i].x - pos.x, wires[i].y - pos.y);
+                if (dist < CONFIG.wireRadius * 1.5) {
+                    wires.splice(i, 1);
+                    selectedIdx = -1;
+                    draw();
+                    break;
+                }
+            }
+        });
+
+        // --- UI UPDATES ---
+        function updateUI() {
+            const val = parseInt(document.getElementById('current-slider').value);
+            const labelEl = document.getElementById('current-display');
+            
+            if(val > 0) {
+                labelEl.innerHTML = `+${val}.0 A <span class="text-amber-500">(OUT ⊙)</span>`;
+                labelEl.className = "font-mono text-xs font-bold text-amber-400";
+            } else if (val < 0) {
+                labelEl.innerHTML = `${val}.0 A <span class="text-sky-400">(IN ⊗)</span>`;
+                labelEl.className = "font-mono text-xs font-bold text-sky-400";
+            } else {
+                labelEl.innerHTML = `0.0 A <span class="text-slate-500">(OFF)</span>`;
+                labelEl.className = "font-mono text-xs font-bold text-slate-500";
+            }
+
+            if (selectedIdx !== -1) {
+                wires[selectedIdx].i = val;
+                draw();
+            }
+        }
+
+        function spawnWire() {
+            const val = parseInt(document.getElementById('current-slider').value);
+            wires.push({
+                id: nextId++,
+                x: canvas.width/2 + (Math.random()-0.5)*100,
+                y: canvas.height/2 + (Math.random()-0.5)*100,
+                i: val === 0 ? 5 : val
+            });
+            draw();
+        }
+
+        function resetSim() {
+            wires = [];
+            selectedIdx = -1;
+            draw();
+        }
+
+        // --- PHYSICS & DRAWING ---
+        function calculateB(x, y) {
+            let Bx = 0, By = 0;
+            for (let w of wires) {
+                const dx = x - w.x;
+                const dy = y - w.y;
+                const r2 = dx*dx + dy*dy;
+                const r = Math.sqrt(r2);
+                if (r < CONFIG.wireRadius) continue;
+
+                const mag = (w.i * CONFIG.scale) / r2;
+                Bx += -dy * mag;
+                By += dx * mag;
+            }
+            return { x: Bx, y: By };
+        }
+
+        function draw() {
+            ctx.fillStyle = '#020617';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const viewMode = document.querySelector('input[name="viewMode"]:checked').value;
+            const showForces = document.getElementById('show-forces').checked;
+            const showCompass = document.getElementById('show-compass').checked;
+
+            if (wires.length > 0) {
+                if (viewMode === 'vectors') drawVectorGrid();
+                else if (viewMode === 'iron') drawIronFilings();
+                else if (viewMode === 'lines') drawStreamlines();
+            }
+
+            if (showForces) drawLorentzForces();
+            
+            for (let i = 0; i < wires.length; i++) {
+                drawCopperWire(wires[i], i === selectedIdx);
+            }
+
+            if (showCompass) drawMouseCompass();
+        }
+
+        // --- DRAWING HELPERS (Sama seperti sebelumnya) ---
+        function drawCopperWire(w, isSelected) {
+            ctx.save();
+            ctx.translate(w.x, w.y);
+            
+            // Glow
+            if (isSelected) {
+                ctx.beginPath();
+                ctx.arc(0, 0, CONFIG.wireRadius + 6, 0, Math.PI * 2);
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+            }
+
+            // Copper Gradient
+            const grad = ctx.createRadialGradient(-5, -5, 2, 0, 0, CONFIG.wireRadius);
+            grad.addColorStop(0, '#fdba74');
+            grad.addColorStop(0.5, '#b45309');
+            grad.addColorStop(1, '#451a03');
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, CONFIG.wireRadius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            
+            // Ring Color
+            ctx.beginPath();
+            ctx.arc(0, 0, CONFIG.wireRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = w.i > 0 ? '#fbbf24' : (w.i < 0 ? '#38bdf8' : '#64748b');
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Symbol
+            ctx.fillStyle = 'white';
+            if (w.i > 0) {
+                ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+            } else if (w.i < 0) {
+                ctx.lineWidth = 3; ctx.strokeStyle = 'white';
+                ctx.beginPath(); ctx.moveTo(-6, -6); ctx.lineTo(6, 6); ctx.moveTo(6, -6); ctx.lineTo(-6, 6); ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawVectorGrid() {
+            ctx.beginPath();
+            for (let x = 0; x < canvas.width; x += CONFIG.gridSize) {
+                for (let y = 0; y < canvas.height; y += CONFIG.gridSize) {
+                    const B = calculateB(x, y);
+                    const mag = Math.hypot(B.x, B.y);
+                    if (mag > 0.05) {
+                        const angle = Math.atan2(B.y, B.x);
+                        const len = Math.min(CONFIG.gridSize * 0.8, mag * 15);
+                        const alpha = Math.min(1, mag * 0.8);
+                        ctx.strokeStyle = `rgba(56, 189, 248, ${alpha})`;
+                        drawArrow(x, y, angle, len);
+                    }
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawIronFilings() {
+            const count = 1500;
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            for (let i = 0; i < count; i++) {
+                const rx = Math.random() * canvas.width;
+                const ry = Math.random() * canvas.height;
+                const B = calculateB(rx, ry);
+                const mag = Math.hypot(B.x, B.y);
+                if (mag > 0.02) {
+                    const angle = Math.atan2(B.y, B.x);
+                    const len = 6;
+                    const dx = Math.cos(angle) * len/2;
+                    const dy = Math.sin(angle) * len/2;
+                    ctx.moveTo(rx - dx, ry - dy);
+                    ctx.lineTo(rx + dx, ry + dy);
+                }
+            }
+            ctx.stroke();
+        }
+
+        function drawStreamlines() {
+            ctx.strokeStyle = 'rgba(56, 189, 248, 0.2)';
+            ctx.lineWidth = 1;
+            const step = 60;
+            for (let x = 0; x < canvas.width; x += step) {
+                for (let y = 0; y < canvas.height; y += step) {
+                    const B = calculateB(x, y);
+                    if (Math.hypot(B.x, B.y) < 0.05) continue;
+                    ctx.beginPath();
+                    let cx = x, cy = y;
+                    ctx.moveTo(cx, cy);
+                    for(let i=0; i<25; i++){
+                        const bLocal = calculateB(cx, cy);
+                        const mag = Math.hypot(bLocal.x, bLocal.y);
+                        if(mag < 0.01) break;
+                        cx += (bLocal.x / mag) * 10;
+                        cy += (bLocal.y / mag) * 10;
+                        ctx.lineTo(cx, cy);
+                    }
+                    ctx.stroke();
+                }
+            }
+        }
+
+        function drawLorentzForces() {
+            wires.forEach((w1, i) => {
+                let Fx = 0, Fy = 0;
+                wires.forEach((w2, j) => {
+                    if (i === j) return;
+                    const dx = w2.x - w1.x;
+                    const dy = w2.y - w1.y;
+                    const r = Math.hypot(dx, dy);
+                    const forceMag = (CONFIG.forceScale * Math.abs(w1.i * w2.i)) / r;
+                    const isAttract = (w1.i * w2.i) > 0;
+                    const angle = Math.atan2(dy, dx);
+                    const forceAngle = isAttract ? angle : angle + Math.PI;
+                    Fx += Math.cos(forceAngle) * forceMag;
+                    Fy += Math.sin(forceAngle) * forceMag;
+                });
+
+                const F_total = Math.hypot(Fx, Fy);
+                if (F_total > 1) {
+                    const F_angle = Math.atan2(Fy, Fx);
+                    const len = Math.min(100, F_total);
+                    ctx.save();
+                    ctx.translate(w1.x, w1.y);
+                    ctx.rotate(F_angle);
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#f43f5e';
+                    ctx.lineWidth = 4;
+                    ctx.moveTo(CONFIG.wireRadius + 5, 0);
+                    ctx.lineTo(CONFIG.wireRadius + 5 + len, 0);
+                    ctx.stroke();
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    const tip = CONFIG.wireRadius + 5 + len;
+                    ctx.moveTo(tip, 0);
+                    ctx.lineTo(tip - 10, -5);
+                    ctx.lineTo(tip - 10, 5);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 12px sans-serif';
+                    ctx.rotate(-F_angle);
+                    ctx.fillText("F", 15, -25);
+                    ctx.restore();
+                }
+            });
+        }
+
+        function drawMouseCompass() {
+            const B = calculateB(mouse.x, mouse.y);
+            const mag = Math.hypot(B.x, B.y);
+            let angle = mag > 0.001 ? Math.atan2(B.y, B.x) : -Math.PI / 2;
+
+            ctx.save();
+            ctx.translate(mouse.x, mouse.y);
+            ctx.beginPath();
+            ctx.arc(0, 0, 20, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.fillStyle = '#ef4444';
+            ctx.moveTo(0, -4); ctx.lineTo(14, 0); ctx.lineTo(0, 4); ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = '#fff';
+            ctx.moveTo(0, -4); ctx.lineTo(-14, 0); ctx.lineTo(0, 4); ctx.fill();
+            ctx.beginPath(); ctx.arc(0,0, 2, 0, Math.PI*2); ctx.fillStyle = '#0f172a'; ctx.fill();
+            ctx.restore();
+        }
+
+        function drawArrow(x, y, angle, len) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.moveTo(-len/2, 0);
+            ctx.lineTo(len/2, 0);
+            ctx.lineTo(len/2 - 3, -2);
+            ctx.moveTo(len/2, 0);
+            ctx.lineTo(len/2 - 3, 2);
+            ctx.restore();
+        }
+    </script>
+</body>
+</html>

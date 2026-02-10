@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RLC Circuit Analysis Lab - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Oscilloscope Screen Style */
+        .scope-screen {
+            background-color: #020617;
+            background-image: 
+                linear-gradient(rgba(30, 41, 59, 0.5) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.5) 1px, transparent 1px);
+            background-size: 40px 40px;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
+            border: 1px solid #334155;
+        }
+
+        /* Custom Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            margin-top: -6px; cursor: pointer; border: 2px solid #fff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+        input[type=range]:disabled { opacity: 0.3; cursor: not-allowed; }
+        input[type=range]:disabled::-webkit-slider-thumb { cursor: not-allowed; border-color: #64748b; }
+        
+        #slider-f::-webkit-slider-thumb { background: #facc15; } /* Yellow */
+        #slider-l::-webkit-slider-thumb { background: #3b82f6; } /* Blue */
+        #slider-c::-webkit-slider-thumb { background: #ef4444; } /* Red */
+
+        /* Select Dropdown */
+        select { 
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23cbd5e1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+	<div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+	
+		<div class="font-mono text-xs text-sky-400 font-bold bg-slate-800 px-3 py-1 rounded border border-sky-500/20">
+			AC CIRCUIT LAB
+		</div>
+	</div>
+
+    <div class="max-w-7xl mx-auto p-6 w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            
+            <div class="relative w-full h-[320px] rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                <canvas id="scopeCanvas" class="scope-screen w-full h-full"></canvas>
+                <div class="absolute top-4 right-4 flex flex-col gap-2 bg-slate-900/80 p-2 rounded border border-slate-700 backdrop-blur">
+                    <div class="flex items-center gap-2"><div class="w-3 h-1 bg-emerald-400"></div><span class="text-[10px] text-emerald-400 font-bold">Voltage ($V$)</span></div>
+                    <div class="flex items-center gap-2"><div class="w-3 h-1 bg-yellow-400"></div><span class="text-[10px] text-yellow-400 font-bold">Current ($I$)</span></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 h-[220px]">
+                
+                <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 relative flex items-center justify-center" id="circuit-diagram-container">
+                     <div class="absolute top-2 left-3 text-[10px] text-slate-400 font-bold uppercase">Circuit Diagram</div>
+                     <div id="circuit-svg-placeholder" class="w-full h-full flex items-center justify-center text-slate-500">Loading...</div>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl border border-slate-700 p-4 relative flex flex-col">
+                    <div class="text-[10px] text-slate-400 font-bold uppercase mb-2">Phasor & Impedance</div>
+                    
+                    <div class="flex-grow flex items-center justify-center relative">
+                         <canvas id="phasorCanvas" class="w-32 h-32"></canvas>
+                         <div class="absolute bottom-0 right-0 text-xs font-mono bg-slate-900/50 px-2 rounded">
+                            $\phi =$ <span id="val-phase" class="text-white font-bold">0°</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-2 grid grid-cols-2 gap-2 font-mono text-[10px] border-t border-slate-700 pt-2">
+                        <div>$X_L$: <span id="val-xl" class="text-blue-400">-</span></div>
+                        <div>$X_C$: <span id="val-xc" class="text-rose-400">-</span></div>
+                        <div class="col-span-2">$Z_{total}$: <span id="val-z" class="text-white font-bold">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-4">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 block">Select Configuration</label>
+                <select id="circuit-selector" class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block p-2.5">
+                    <option value="series-rlc" selected>Series R-L-C</option>
+                    <option value="parallel-rlc">Parallel R-L-C</option>
+                    <option value="series-rc">Series R-C (RC Filter)</option>
+                    <option value="series-rl">Series R-L (RL Filter)</option>
+                </select>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">Output Metrics</h3>
+                
+                <div class="mb-4">
+                    <div class="flex justify-between text-yellow-400 mb-1 font-mono text-sm">
+                        <span>Total Current ($I_{rms}$)</span>
+                        <span id="val-i" class="font-bold">0.00 A</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="bar-i" class="h-full bg-yellow-400 w-0 transition-all duration-100"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 bg-slate-800 p-3 rounded-lg border border-slate-700">
+                    <div id="res-bulb" class="w-4 h-4 rounded-full bg-slate-600 transition-all duration-300"></div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase">Resonance State ($X_L \approx X_C$)</div>
+                        <div id="res-text" class="text-xs font-bold text-slate-500">OFF</div>
+                    </div>
+                </div>
+                 <div id="parallel-note" class="hidden text-[9px] text-slate-400 italic mt-1 px-1">
+                    *Note: Parallel resonance results in MINIMUM total current.
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex-grow">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Parameters</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Freq ($f$)</span><span id="disp-f" class="font-bold text-yellow-400">50 Hz</span></div>
+                        <input type="range" id="slider-f" min="10" max="200" value="50" class="w-full">
+                    </div>
+                    <div id="container-l">
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Inductance ($L$)</span><span id="disp-l" class="font-bold text-blue-400">100 mH</span></div>
+                        <input type="range" id="slider-l" min="10" max="500" value="100" class="w-full">
+                    </div>
+                    <div id="container-c">
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Capacitance ($C$)</span><span id="disp-c" class="font-bold text-rose-400">50 µF</span></div>
+                        <input type="range" id="slider-c" min="10" max="200" value="50" class="w-full">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2"><span>Resistance ($R$)</span><span id="disp-r" class="font-bold text-slate-300">50 Ω</span></div>
+                        <input type="range" id="slider-r" min="10" max="200" value="50" class="w-full">
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-700">
+                         <button onclick="setResonance()" id="btn-resonance" class="w-full py-2 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-lg transition-colors shadow-lg shadow-sky-500/20">
+                            ✨ Auto-Tune Resonance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="border-t border-slate-800 bg-slate-900 py-16 px-6 mt-auto relative z-10 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                        <span class="text-sky-500">〰️</span> Modul Rangkaian Arus Bolak-Balik (AC)
+                    </h2>
+                    <p class="text-slate-400">Analisis Impedansi, Fasor, dan Resonansi pada RLC.</p>
+                </div>
+                <div class="hidden md:block text-right">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Frekuensi Resonansi</div>
+                    <div class="font-mono text-lg text-sky-400 bg-slate-800 px-4 py-2 rounded border border-slate-700">
+                        $f_{res} = \frac{1}{2\pi\sqrt{LC}}$
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-lg text-slate-300">
+                    
+                    <h3 class="text-sky-400 font-bold text-xl mb-4">1. Konsep Impedansi ($Z$)</h3>
+                    
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/impedancetriangle.webp" 
+							alt="Diagram Segitiga Impedansi" 
+							class="w-full max-w-md h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Diagram Segitiga Impedansi</p>
+					</div>
+
+                    <p>
+                        Dalam arus AC, hambatan total disebut Impedansi ($Z$), yang merupakan penjumlahan vektor dari Resistor ($R$) dan Reaktansi ($X$).
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-4 my-4">
+                        <div class="bg-slate-800 p-3 rounded border-l-2 border-blue-500">
+                            <strong class="text-blue-400 text-sm">Induktif ($X_L$)</strong>
+                            <div class="text-xs mt-1">$X_L = 2\pi f L$</div>
+                            <div class="text-[10px] text-slate-400 mt-1">Meningkat seiring frekuensi.</div>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded border-l-2 border-rose-500">
+                            <strong class="text-rose-400 text-sm">Kapasitif ($X_C$)</strong>
+                            <div class="text-xs mt-1">$X_C = \frac{1}{2\pi f C}$</div>
+                            <div class="text-[10px] text-slate-400 mt-1">Menurun seiring frekuensi.</div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-yellow-400 font-bold text-xl mt-8 mb-4">2. Seri vs Paralel</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="group">
+                            <h4 class="font-bold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Rangkaian Seri RLC
+                            </h4>
+                            <p class="text-sm text-slate-400 mb-2">
+                                Tegangan terbagi, Arus sama. Impedansi total:
+                            </p>
+                            $$ Z = \sqrt{R^2 + (X_L - X_C)^2} $$
+                            <p class="text-sm bg-emerald-900/20 p-2 rounded border border-emerald-500/20">
+                                <strong>Resonansi Seri:</strong> Saat $X_L = X_C$, impedansi menjadi MINIMAL ($Z=R$). Akibatnya, <span class="text-emerald-400 font-bold">Arus Maksimal</span>.
+                            </p>
+                        </div>
+
+                        <div class="group">
+                            <h4 class="font-bold text-white flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span> Rangkaian Paralel RLC
+                            </h4>
+                            <p class="text-sm text-slate-400 mb-2">
+                                Tegangan sama, Arus terbagi. Arus total:
+                            </p>
+                            $$ I_{tot} = \sqrt{I_R^2 + (I_C - I_L)^2} $$
+                            <p class="text-sm bg-rose-900/20 p-2 rounded border border-rose-500/20">
+                                <strong>Resonansi Paralel:</strong> Saat $I_C = I_L$, arus reaktif saling meniadakan. Impedansi menjadi MAKSIMAL. Akibatnya, <span class="text-rose-400 font-bold">Arus Sumber Minimal</span>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-emerald-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-emerald-500 select-none">SERI</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-emerald-500">📈</span> Lab 1: Puncak Resonansi Seri
+                        </h4>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Pilih <strong>Series RLC</strong> pada selector.</li>
+                            <li>Klik tombol <strong>Auto-Tune Resonance</strong>.</li>
+                            <li>Perhatikan grafik osiloskop: Gelombang Kuning (Arus) akan mencapai amplitudo tertinggi.</li>
+                            <li>Lihat Diagram Fasor: Panah $V$ dan $I$ sejajar (Fase $0^\circ$).</li>
+                            <li><strong>Analisis:</strong> Geser frekuensi sedikit ke kiri/kanan. Mengapa arus langsung turun drastis? (Hubungkan dengan $Z$).</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-rose-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-rose-500 select-none">PAR</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-rose-500">📉</span> Lab 2: Anti-Resonansi Paralel
+                        </h4>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Ubah selector ke <strong>Parallel RLC</strong>.</li>
+                            <li>Klik <strong>Auto-Tune Resonance</strong>.</li>
+                            <li>Perhatikan Meter Arus: Nilainya justru sangat KECIL (mendekati nol).</li>
+                            <li><strong>Tantangan:</strong> Energi sebenarnya tidak hilang, tapi "terperangkap" bolak-balik antara Induktor dan Kapasitor (Arus Sirkulasi). Bisakah Anda menjelaskan fenomena "Tank Circuit" ini?</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-sky-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-sky-500 select-none">FILT</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-sky-500">🎚️</span> Lab 3: Filter Pasif (RC/RL)
+                        </h4>
+                        <p class="text-xs text-slate-400 mb-2">Analisis sifat High-Pass dan Low-Pass.</p>
+                        <ul class="list-disc pl-4 text-sm text-slate-300 space-y-2">
+                            <li><strong>Percobaan RC (High Pass):</strong> Pilih <em>Series RC</em>. Turunkan frekuensi ke 10 Hz. Arus mati (diblokir kapasitor). Naikkan ke 200 Hz. Arus naik.</li>
+                            <li><strong>Percobaan RL (Low Pass):</strong> Pilih <em>Series RL</em>. Set frekuensi 10 Hz. Arus besar. Naikkan ke 200 Hz. Arus mengecil (dicekik induktor).</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-12 text-center border-t border-slate-800 pt-8">
+                <p class="text-slate-500 italic font-serif">
+                    "Dalam resonansi, hambatan menjadi minimal dan energi mengalir tanpa henti. Seperti itulah seharusnya ilmu pengetahuan."
+                </p>
+            </div>
+
+        </div>
+    </section>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+    <script>
+        // --- CANVAS SETUP ---
+        const scopeCanvas = document.getElementById('scopeCanvas');
+        const phasorCanvas = document.getElementById('phasorCanvas');
+        const scopeCtx = scopeCanvas.getContext('2d');
+        const phasorCtx = phasorCanvas.getContext('2d');
+
+        // --- DOM ELEMENTS ---
+        const circuitSelector = document.getElementById('circuit-selector');
+        const circuitSvgPlaceholder = document.getElementById('circuit-svg-placeholder');
+        const parallelNote = document.getElementById('parallel-note');
+        const btnResonance = document.getElementById('btn-resonance');
+
+        const sliderF = document.getElementById('slider-f');
+        const sliderL = document.getElementById('slider-l');
+        const sliderC = document.getElementById('slider-c');
+        const sliderR = document.getElementById('slider-r');
+        
+        const containerL = document.getElementById('container-l');
+        const containerC = document.getElementById('container-c');
+
+        const dispF = document.getElementById('disp-f');
+        const dispL = document.getElementById('disp-l');
+        const dispC = document.getElementById('disp-c');
+        const dispR = document.getElementById('disp-r');
+        
+        const valXL = document.getElementById('val-xl');
+        const valXC = document.getElementById('val-xc');
+        const valZ = document.getElementById('val-z');
+        const valPhase = document.getElementById('val-phase');
+        const valI = document.getElementById('val-i');
+        const barI = document.getElementById('bar-i');
+        const resBulb = document.getElementById('res-bulb');
+        const resText = document.getElementById('res-text');
+
+        // --- STATE ---
+        let activeCircuit = 'series-rlc';
+        let params = { f: 50, L: 0.1, C: 0.00005, R: 50 };
+        let t = 0;
+        let traceV = [];
+        let traceI = [];
+        const MAX_TRACE = 300;
+
+        // --- SVG DIAGRAMS (Inline for simplicity) ---
+        const SVGs = {
+            'series-rlc': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" class="w-full h-auto" stroke="currentColor" fill="none" stroke-width="2"><text x="10" y="20" fill="#94a3b8" font-size="10">SERIES RLC</text><path d="M20,50 H40" stroke="#34d399"/><circle cx="30" cy="50" r="8" stroke="#34d399"/><text x="24" y="53" fill="#34d399" font-size="10" font-weight="bold">~</text><path d="M40,50 l5,-5 l10,10 l10,-10 l10,10 l10,-10 l5,5 H100" stroke="#cbd5e1"/><text x="65" y="35" fill="#cbd5e1" font-size="10">R</text><path d="M100,50 q5,-10 10,0 t10,0 t10,0 t10,0 H150" stroke="#3b82f6"/><text x="120" y="35" fill="#3b82f6" font-size="10">L</text><path d="M150,50 H160 M160,40 V60 M170,40 V60 M170,50 H180" stroke="#ef4444"/><text x="162" y="35" fill="#ef4444" font-size="10">C</text><path d="M180,50 H190 V80 H10 V50 H20" stroke="#64748b"/></svg>`,
+            'parallel-rlc': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" class="w-full h-auto" stroke="currentColor" fill="none" stroke-width="2"><text x="10" y="20" fill="#94a3b8" font-size="10">PARALLEL RLC</text><path d="M20,50 H40" stroke="#34d399"/><circle cx="30" cy="50" r="8" stroke="#34d399"/><text x="24" y="53" fill="#34d399" font-size="10" font-weight="bold">~</text><path d="M40,50 H60 V30 H160 V50 H180" stroke="#64748b"/><path d="M60,50 V70 H160 V50" stroke="#64748b"/><path d="M180,50 H190 V90 H10 V50 H20" stroke="#64748b"/><path d="M80,30 V35 l-5,5 l10,10 l-10,10 l10,10 l-5,5 V70" stroke="#cbd5e1"/><text x="75" y="25" fill="#cbd5e1" font-size="10">R</text><path d="M110,30 V35 q-10,5 0,10 t0,10 t0,10 t0,5 V70" stroke="#3b82f6"/><text x="105" y="25" fill="#3b82f6" font-size="10">L</text><path d="M140,30 V45 M130,45 H150 M130,55 H150 M140,55 V70" stroke="#ef4444"/><text x="135" y="25" fill="#ef4444" font-size="10">C</text></svg>`,
+            'series-rc': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" class="w-full h-auto" stroke="currentColor" fill="none" stroke-width="2"><text x="10" y="20" fill="#94a3b8" font-size="10">SERIES RC</text><path d="M20,50 H40" stroke="#34d399"/><circle cx="30" cy="50" r="8" stroke="#34d399"/><text x="24" y="53" fill="#34d399" font-size="10" font-weight="bold">~</text><path d="M40,50 l5,-5 l10,10 l10,-10 l10,10 l10,-10 l5,5 H100" stroke="#cbd5e1"/><text x="65" y="35" fill="#cbd5e1" font-size="10">R</text><path d="M100,50 H120 M120,40 V60 M130,40 V60 M130,50 H150" stroke="#ef4444"/><text x="122" y="35" fill="#ef4444" font-size="10">C</text><path d="M150,50 H170 V80 H10 V50 H20" stroke="#64748b"/></svg>`,
+            'series-rl': `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 100" class="w-full h-auto" stroke="currentColor" fill="none" stroke-width="2"><text x="10" y="20" fill="#94a3b8" font-size="10">SERIES RL</text><path d="M20,50 H40" stroke="#34d399"/><circle cx="30" cy="50" r="8" stroke="#34d399"/><text x="24" y="53" fill="#34d399" font-size="10" font-weight="bold">~</text><path d="M40,50 l5,-5 l10,10 l10,-10 l10,10 l10,-10 l5,5 H100" stroke="#cbd5e1"/><text x="65" y="35" fill="#cbd5e1" font-size="10">R</text><path d="M100,50 q5,-10 10,0 t10,0 t10,0 t10,0 H150" stroke="#3b82f6"/><text x="120" y="35" fill="#3b82f6" font-size="10">L</text><path d="M150,50 H170 V80 H10 V50 H20" stroke="#64748b"/></svg>`
+        };
+
+        // --- INIT & HANDLERS ---
+        function resize() {
+            scopeCanvas.width = scopeCanvas.parentElement.offsetWidth;
+            scopeCanvas.height = scopeCanvas.parentElement.offsetHeight;
+            phasorCanvas.width = phasorCanvas.parentElement.offsetWidth;
+            phasorCanvas.height = phasorCanvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => { resize(); updateCircuitUI(); loop(); });
+
+        circuitSelector.addEventListener('change', (e) => {
+            activeCircuit = e.target.value;
+            updateCircuitUI();
+            traceV = []; traceI = []; // Clear scope trace on change
+        });
+
+        function updateCircuitUI() {
+            // 1. Update SVG
+            circuitSvgPlaceholder.innerHTML = SVGs[activeCircuit];
+
+            // 2. Enable/Disable Sliders based on circuit
+            sliderL.disabled = activeCircuit === 'series-rc';
+            sliderC.disabled = activeCircuit === 'series-rl';
+            
+            containerL.style.opacity = sliderL.disabled ? 0.4 : 1;
+            containerC.style.opacity = sliderC.disabled ? 0.4 : 1;
+
+            // 3. Resonance Button & Note visibility
+            const hasResonance = activeCircuit.includes('rlc');
+            btnResonance.style.display = hasResonance ? 'block' : 'none';
+            parallelNote.style.display = activeCircuit === 'parallel-rlc' ? 'block' : 'none';
+        }
+
+
+        // --- MAIN LOOP ---
+        function loop() {
+            updateParams();
+            const calc = calculateCircuitEngine();
+            updateUI(calc);
+            drawScope(calc);
+            drawPhasor(calc);
+            t += 0.06;
+            requestAnimationFrame(loop);
+        }
+
+        // --- PHYSICS ENGINE (MULTI-CIRCUIT) ---
+        function updateParams() {
+            params.f = parseFloat(sliderF.value);
+            params.L = parseFloat(sliderL.value) / 1000;
+            params.C = parseFloat(sliderC.value) / 1000000;
+            params.R = parseFloat(sliderR.value);
+            dispF.innerText = `${params.f} Hz`;
+            dispL.innerText = `${(params.L*1000).toFixed(0)} mH`;
+            dispC.innerText = `${(params.C*1000000).toFixed(0)} µF`;
+            dispR.innerText = `${params.R} Ω`;
+        }
+
+        function calculateCircuitEngine() {
+            const omega = 2 * Math.PI * params.f;
+            const XL = activeCircuit === 'series-rc' ? 0 : omega * params.L;
+            const XC = activeCircuit === 'series-rl' ? 0 : 1 / (omega * params.C);
+            let Z, phase, I_rms;
+            const V_rms = 100; // Fixed source voltage
+
+            switch(activeCircuit) {
+                case 'series-rlc':
+                    Z = Math.sqrt(Math.pow(params.R, 2) + Math.pow(XL - XC, 2));
+                    phase = Math.atan2((XL - XC), params.R); // V leads I if XL>XC
+                    break;
+                case 'series-rc':
+                    Z = Math.sqrt(Math.pow(params.R, 2) + Math.pow(XC, 2));
+                    phase = Math.atan2(-XC, params.R); // I leads V (negative phase for V ref)
+                    break;
+                case 'series-rl':
+                    Z = Math.sqrt(Math.pow(params.R, 2) + Math.pow(XL, 2));
+                    phase = Math.atan2(XL, params.R); // V leads I
+                    break;
+                case 'parallel-rlc':
+                    // Admittance Y = sqrt(G^2 + (Bc - Bl)^2)
+                    // Bc = 1/Xc, Bl = 1/Xl, G = 1/R
+                    // Current reference: Ic leads V, Il lags V.
+                    // Tan(phi) for current = (Ic - Il) / Ir
+                    const Ir = V_rms / params.R;
+                    const Il = V_rms / XL;
+                    const Ic = V_rms / XC;
+                    // Total current I_tot = sqrt(Ir^2 + (Ic-Il)^2)
+                    I_rms = Math.sqrt(Math.pow(Ir, 2) + Math.pow(Ic - Il, 2));
+                    Z = V_rms / I_rms; // Equivalent Z
+                    // Phase of total current relative to Voltage
+                    // If Ic > Il (Capacitive), Current leads Voltage -> negative phase relative to V ref.
+                     phase = Math.atan2(-(Ic - Il), Ir); 
+                    break;
+            }
+
+            if (activeCircuit !== 'parallel-rlc') {
+                I_rms = V_rms / Z;
+            }
+
+            // Scale for visualization
+            const I_peak_visual = I_rms * (activeCircuit === 'parallel-rlc' ? 20 : 100); 
+
+            return { XL, XC, Z, phase, I_peak_visual, I_rms };
+        }
+
+        // --- DRAWING ---
+        function drawScope(calc) {
+            const w = scopeCanvas.width;
+            const h = scopeCanvas.height;
+            const centerY = h / 2;
+            const vVal = Math.sin(t) * (h * 0.3); 
+            const iVal = Math.sin(t - calc.phase) * (calc.I_peak_visual * 0.8);
+
+            traceV.push(vVal);
+            traceI.push(iVal);
+            if(traceV.length > w) { traceV.shift(); traceI.shift(); }
+
+            scopeCtx.clearRect(0, 0, w, h);
+            drawTrace(scopeCtx, traceV, '#34d399', centerY);
+            drawTrace(scopeCtx, traceI, '#facc15', centerY);
+        }
+        
+        function drawTrace(ctx, data, color, cy) {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            for(let i=0; i<data.length; i++) ctx.lineTo(i, cy - data[i]);
+            ctx.stroke();
+        }
+
+        function drawPhasor(calc) {
+            const ctx = phasorCtx;
+            const w = phasorCanvas.width, h = phasorCanvas.height;
+            const cx = w/2, cy = h/2;
+            const radius = 35;
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = '#475569'; ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(w, cy); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+
+            const angleT = -t;
+            drawVector(ctx, cx, cy, radius, angleT, '#34d399'); // V (Ref)
+            // Scale I vector length visually based on I_rms, clamp it
+            const iLen = Math.min(radius * 1.5, calc.I_rms * (activeCircuit === 'parallel-rlc' ? 5 : 25));
+            drawVector(ctx, cx, cy, iLen, angleT - calc.phase, '#facc15'); // I
+        }
+
+        function drawVector(ctx, x, y, len, angle, color) {
+            ctx.save(); ctx.translate(x, y); ctx.rotate(angle);
+            ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(len, 0); ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(len, 0); ctx.lineTo(len-4, -3); ctx.lineTo(len-4, 3); ctx.fillStyle = color; ctx.fill();
+            ctx.restore();
+        }
+
+        function updateUI(calc) {
+            valXL.innerText = activeCircuit.includes('rc') ? '-' : `${calc.XL.toFixed(0)}Ω`;
+            valXC.innerText = activeCircuit.includes('rl') && !activeCircuit.includes('rlc') ? '-' : `${calc.XC.toFixed(0)}Ω`;
+            valZ.innerText = isFinite(calc.Z) ? `${calc.Z.toFixed(0)}Ω` : '∞';
+            
+            const deg = (calc.phase * 180 / Math.PI).toFixed(1);
+            valPhase.innerText = `${deg}°`;
+
+            valI.innerText = `${calc.I_rms.toFixed(2)} A`;
+            // Scale bar differently for parallel vs series
+            const maxIScale = activeCircuit === 'parallel-rlc' ? 10 : 3;
+            const pct = (calc.I_rms / maxIScale) * 100;
+            barI.style.width = `${Math.min(100, pct)}%`;
+
+            // Resonance Check
+            let isResonant = false;
+            if(activeCircuit.includes('rlc')) {
+                const ratio = calc.XL / calc.XC;
+                isResonant = ratio > 0.95 && ratio < 1.05;
+            }
+            
+            if(isResonant) {
+                resBulb.className = "w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.8)] transition-all duration-300";
+                resText.innerText = activeCircuit === 'parallel-rlc' ? "RESONANCE (MIN I)" : "RESONANCE (MAX I)";
+                resText.className = "text-xs font-bold text-emerald-400 animate-pulse";
+            } else {
+                resBulb.className = "w-4 h-4 rounded-full bg-slate-600 transition-all duration-300";
+                resText.innerText = "OFF";
+                resText.className = "text-xs font-bold text-slate-500";
+            }
+        }
+
+        function setResonance() {
+            if(!activeCircuit.includes('rlc')) return;
+            const f_res = 1 / (2 * Math.PI * Math.sqrt(params.L * params.C));
+            sliderF.value = Math.min(200, Math.max(10, f_res));
+        }
+
+    </script>
+</body>
+</html>

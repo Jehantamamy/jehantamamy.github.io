@@ -2,7 +2,8 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Motor Torque & Gearbox Simulator</title>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<title>Motor Torque & Gearbox Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
 	<!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
@@ -13,6 +14,15 @@
 
 	  gtag('config', 'G-2BL3DSGJ4Z');
 	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
     <style>
         /* Animasi Putaran */
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

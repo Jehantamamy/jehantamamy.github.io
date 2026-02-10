@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true}, // Rumus besar di tengah
+              {left: '$', right: '$', display: false}   // Rumus inline (di dalam kalimat)
+            ]
+        });">
+    </script>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faraday's Law Lab - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Canvas Styling */
+        #sim-canvas {
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            cursor: grab;
+        }
+        #sim-canvas:active { cursor: grabbing; }
+
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #10b981; margin-top: -6px; cursor: pointer; border: 2px solid #fff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+
+        .meter-bar { transition: width 0.1s linear; }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+
+	<div class="max-w-7xl mx-auto flex items-center justify-between">
+		
+		<div class="font-mono text-xs text-emerald-400 font-bold bg-slate-800 px-3 py-1 rounded border border-emerald-500/20">
+			FARADAY'S LAB
+		</div>
+	</div>
+
+
+    <div class="max-w-7xl mx-auto p-6 w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 flex flex-col gap-4">
+            <div id="canvas-container" class="relative w-full h-[450px] rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
+                <canvas id="sim-canvas" class="w-full h-full"></canvas>
+                
+                <div class="absolute top-4 left-4 pointer-events-none">
+                    <div class="bg-slate-900/80 backdrop-blur px-3 py-1 rounded text-[10px] text-slate-400 border border-slate-700">
+                        Drag Magnet to Induce Current
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 rounded-xl p-4 flex items-center justify-between border border-slate-700">
+                <div class="flex items-center gap-3">
+                    <div id="bulb-icon" class="w-8 h-8 rounded-full bg-slate-700 border-2 border-slate-500 transition-all duration-100 shadow-[0_0_0_0_rgba(253,224,71,0)]"></div>
+                    <div>
+                        <div class="text-xs font-bold text-white uppercase">Output Load</div>
+                        <div class="text-[10px] text-slate-400">Filament Lamp</div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-xs font-bold text-emerald-400" id="current-direction">NO CURRENT</div>
+                    <div class="w-32 h-2 bg-slate-700 rounded-full mt-1 relative overflow-hidden">
+                        <div id="flow-bar" class="absolute top-0 h-full bg-emerald-500 w-0 left-1/2 transition-all duration-75"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col gap-4">
+            
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-lg">
+                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2">Sensor Readings</h3>
+                
+                <div class="space-y-4 font-mono text-sm">
+                    <div>
+                        <div class="flex justify-between text-amber-400 mb-1">
+                            <span>Magnetic Flux ($\Phi_B$)</span>
+                            <span id="val-flux">0.00 mWb</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div id="bar-flux" class="h-full bg-amber-500 w-0 transition-all duration-75"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-sky-400 mb-1">
+                            <span>Magnet Speed ($v$)</span>
+                            <span id="val-speed">0.0 m/s</span>
+                        </div>
+                        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                            <div id="bar-speed" class="h-full bg-sky-500 w-0 transition-all duration-75"></div>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <div class="flex justify-between text-emerald-400 mb-1 font-bold">
+                            <span>Induced EMF ($\varepsilon$)</span>
+                            <span id="val-emf">0.00 V</span>
+                        </div>
+                        <div class="relative w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                            <div class="absolute left-1/2 w-0.5 h-full bg-white/20"></div> <div id="bar-emf" class="absolute top-0 h-full bg-emerald-500 w-0 left-1/2 transition-all duration-75"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-600 mt-1">
+                            <span>-10V</span><span>0</span><span>+10V</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl p-5 flex-grow">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Experiment Config</h3>
+                
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2">
+                            <span>Number of Loops ($N$)</span>
+                            <span id="display-loops" class="font-bold text-emerald-400">3</span>
+                        </div>
+                        <input type="range" id="slider-loops" min="1" max="5" value="3" class="w-full">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-xs text-white mb-2">
+                            <span>Magnet Strength ($B$)</span>
+                            <span id="display-strength" class="font-bold text-amber-400">100%</span>
+                        </div>
+                        <input type="range" id="slider-strength" min="10" max="150" value="100" class="w-full accent-amber-500">
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-700">
+                        <button onclick="flipPolarity()" class="w-full py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-lg transition-colors border border-slate-600 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                            Flip Magnet Polarity (N/S)
+                        </button>
+                    </div>
+                    
+                    <div class="pt-2">
+                         <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="show-field" checked class="accent-emerald-500 w-4 h-4">
+                            <span class="text-xs text-slate-300">Show Field Lines</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <section class="border-t border-slate-800 bg-slate-900 py-16 px-6 relative z-10 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-white mb-2 flex items-center gap-3">
+                        <span class="text-emerald-500">⚡</span> Modul Induksi Elektromagnetik
+                    </h2>
+                    <p class="text-slate-400">Analisis GGL Induksi akibat perubahan Fluks Magnetik.</p>
+                </div>
+                <div class="hidden md:block">
+                    <div class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 text-right">Persamaan Faraday</div>
+                    <div class="font-mono text-lg text-emerald-400 bg-slate-800 px-4 py-2 rounded border border-slate-700">
+                        $\varepsilon = -N \frac{d\Phi_B}{dt}$
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-lg text-slate-300">
+                    
+                    <h3 class="text-emerald-400 font-bold text-xl mb-4">1. Hukum Faraday</h3>
+                    
+                    <p>
+                        Michael Faraday menemukan bahwa arus listrik dapat dihasilkan (diinduksi) dengan cara mengubah-ubah medan magnet yang menembus suatu kumparan kawat. Besarnya GGL Induksi ($\varepsilon$) adalah:
+                    </p>
+                    
+                    <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700 my-4 text-center">
+                        $$ \varepsilon = -N \frac{\Delta \Phi_B}{\Delta t} $$
+                    </div>
+
+                    <ul class="list-disc pl-5 space-y-2 text-sm">
+                        <li><strong>$N$:</strong> Jumlah lilitan kawat. Semakin banyak lilitan, semakin besar tegangan.</li>
+                        <li><strong>$\Delta \Phi_B$:</strong> Perubahan Fluks Magnetik (Weber).</li>
+                        <li><strong>$\Delta t$:</strong> Selang waktu perubahan (Detik).</li>
+                    </ul>
+                    <p class="text-sm italic text-slate-400 mt-2">
+                        *Artinya: Semakin cepat perubahan fluks terjadi (dt makin kecil), semakin besar tegangan listrik yang dihasilkan.*
+                    </p>
+
+                    <h3 class="text-rose-400 font-bold text-xl mt-10 mb-4">2. Hukum Lenz (Tanda Negatif)</h3>
+                    
+					<div class="my-6 p-2 bg-slate-800/50 rounded-xl border border-slate-700 flex flex-col items-center">
+						<img 
+							src="../assets/Lenz_law_demonstration.png" 
+							alt="Ilustrasi Hukum Lenz" 
+							class="w-full max-w-sm h-auto rounded-lg shadow-lg"
+						>
+						<p class="text-[10px] text-slate-400 mt-2 italic">Ilustrasi Prisip Hukum Lenz</p>
+					</div>
+                    <p>
+                        Tanda <strong>negatif (-)</strong> pada rumus di atas bukan hiasan. Ini adalah <strong>Hukum Lenz</strong>, yang menyatakan:
+                    </p>
+                    <blockquote class="border-l-4 border-rose-500 pl-4 italic text-white bg-slate-800 py-2 pr-2 rounded-r">
+                        "Arah arus induksi selalu sedemikian rupa sehingga medan magnet yang dihasilkannya <strong>melawan</strong> perubahan fluks penyebabnya."
+                    </blockquote>
+                    <p class="text-sm mt-3">
+                        Contoh: Jika Kutub Utara magnet <em>mendekati</em> kumparan, kumparan akan menolaknya dengan menjadi Kutub Utara juga (Arus berlawanan jarum jam).
+                    </p>
+                </div>
+
+                <div class="space-y-8">
+                    
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-sky-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-sky-500 select-none">v</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-sky-500">🚀</span> Lab 1: Pengaruh Kecepatan ($v$)
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Buktikan bahwa laju perubahan fluks mempengaruhi GGL.
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Set lilitan ($N$) ke <strong>3 Loops</strong>.</li>
+                            <li>Gerakkan magnet masuk ke dalam kumparan secara <strong>Sangat Lambat</strong>. Perhatikan bar <span class="text-emerald-400 font-bold">EMF</span> dan cahaya lampu.</li>
+                            <li>Keluarkan magnet, lalu masukkan lagi secara <strong>Sangat Cepat (Disentak)</strong>.</li>
+                            <li><strong>Analisis:</strong> Bandingkan simpangan jarum voltmeter pada kedua percobaan. Mengapa gerakan lambat hampir tidak menyalakan lampu?</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-amber-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-amber-500 select-none">N</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-amber-500">🌀</span> Lab 2: Variabel Lilitan ($N$)
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Hubungan linear antara jumlah lilitan dan tegangan output.
+                        </p>
+                        <ol class="list-decimal pl-4 text-sm text-slate-300 space-y-2">
+                            <li>Turunkan slider ke <strong>1 Loop</strong>. Gerakkan magnet dengan kecepatan sedang. Catat perkiraan tegangan (panjang bar).</li>
+                            <li>Naikkan slider ke <strong>5 Loops</strong>. Gerakkan magnet dengan kecepatan yang sama.</li>
+                            <li><strong>Pertanyaan:</strong> Apakah tegangan menjadi 5x lipat lebih besar? Jelaskan hubungannya dengan rumus $\varepsilon = -N \dots$.</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-slate-800/40 backdrop-blur border border-slate-700 rounded-2xl p-6 hover:border-rose-500/50 transition-colors group relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 text-6xl font-bold text-rose-500 select-none">+/-</div>
+                        <h4 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-rose-500">↔</span> Lab 3: Arah Arus (Hukum Lenz)
+                        </h4>
+                        <p class="text-sm text-slate-400 mb-4">
+                            Mengamati polaritas tegangan (Positif/Negatif).
+                        </p>
+                        <div class="bg-rose-900/20 border border-rose-500/30 p-3 rounded text-xs text-rose-200 font-mono mb-3">
+                            Perhatikan Bar EMF: Hijau (Kanan) vs Merah (Kiri).
+                        </div>
+                        <ul class="list-disc pl-4 text-sm text-slate-300 space-y-1">
+                            <li>Masukkan kutub <strong>Utara (N)</strong> ke dalam kumparan. Perhatikan arah bar EMF (misal: ke Kiri/Merah).</li>
+                            <li>Tarik keluar kutub Utara tersebut. Ke mana arah bar EMF sekarang?</li>
+                            <li><strong>Kesimpulan:</strong> Arah arus saat magnet <em>masuk</em> selalu berlawanan dengan saat magnet <em>keluar</em>. Ini bukti Hukum Lenz.</li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="mt-12 text-center border-t border-slate-800 pt-8">
+                <p class="text-slate-500 italic font-serif">
+                    "Tanpa induksi elektromagnetik, dunia modern tidak akan memiliki generator listrik, transformator, maupun motor listrik."
+                </p>
+            </div>
+
+        </div>
+    </section>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+    <script>
+        const canvas = document.getElementById('sim-canvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+
+        // UI Elements
+        const elFluxVal = document.getElementById('val-flux');
+        const elFluxBar = document.getElementById('bar-flux');
+        const elSpeedVal = document.getElementById('val-speed');
+        const elSpeedBar = document.getElementById('bar-speed');
+        const elEmfVal = document.getElementById('val-emf');
+        const elEmfBar = document.getElementById('bar-emf');
+        const bulbIcon = document.getElementById('bulb-icon');
+        const currentDirText = document.getElementById('current-direction');
+        const flowBar = document.getElementById('flow-bar');
+
+        // Physics Config
+        const CONFIG = {
+            coilRadius: 70,
+            magnetW: 160,
+            magnetH: 50,
+            baseB: 200 // Base field strength
+        };
+
+        // State
+        let magnet = { x: 0, y: 0 };
+        let velocity = 0;
+        let lastPos = 0;
+        let isDragging = false;
+        let loops = 3;
+        let polarity = 1; // 1: N-S, -1: S-N
+        let strengthPct = 100;
+        let flux = 0;
+        let prevFlux = 0;
+        let emf = 0;
+        let lastTime = 0;
+
+        // --- INIT & RESIZE ---
+        function resize() {
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
+            if(!isDragging) {
+                magnet.x = canvas.width / 2 - 250;
+                magnet.y = canvas.height / 2;
+                lastPos = magnet.x;
+            }
+        }
+        window.addEventListener('resize', resize);
+        window.addEventListener('load', () => {
+            resize();
+            loop();
+        });
+
+        // --- MAIN LOOP ---
+        function loop(timestamp) {
+            const dt = (timestamp - lastTime) / 1000 || 0.016;
+            lastTime = timestamp;
+
+            // 1. Calculate Velocity (Smoothed)
+            const currentVel = (magnet.x - lastPos) / dt; // Pixels per sec
+            velocity = velocity * 0.8 + currentVel * 0.2; // Smooth filter
+            lastPos = magnet.x;
+
+            // 2. Calculate Flux
+            // Model: Gaussian drop-off based on distance from coil center
+            const coilX = canvas.width / 2;
+            const dist = (magnet.x - coilX);
+            const sigma = 180; // Width of field influence
+            
+            // Flux Formula: Phi = B * A * Factor
+            // Polarity affects sign of Flux
+            const B_actual = CONFIG.baseB * (strengthPct/100);
+            const rawFlux = polarity * B_actual * Math.exp(-(dist*dist)/(2*sigma*sigma));
+            
+            flux = rawFlux;
+
+            // 3. Calculate EMF (Faraday)
+            // e = -N * dPhi/dt
+            const dPhi = (flux - prevFlux);
+            // Scaling for readable numbers
+            let rawEmf = -loops * dPhi * 2.5; 
+            
+            // Smooth EMF for visual stability
+            emf = emf * 0.9 + rawEmf * 0.1;
+            prevFlux = flux;
+
+            // 4. Update UI
+            updateDashboard(dt);
+
+            // 5. Draw
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function updateDashboard(dt) {
+            // Flux Display
+            const displayFlux = Math.abs(flux).toFixed(1);
+            elFluxVal.innerText = `${(flux).toFixed(1)} mWb`;
+            elFluxBar.style.width = `${Math.min(100, (Math.abs(flux)/250)*100)}%`;
+
+            // Speed Display
+            const speedMps = Math.abs(velocity / 100).toFixed(2); // Convert px/s to fake m/s
+            elSpeedVal.innerText = `${speedMps} m/s`;
+            elSpeedBar.style.width = `${Math.min(100, Math.abs(velocity)/20)}%`;
+
+            // EMF Display
+            elEmfVal.innerText = `${emf.toFixed(2)} V`;
+            
+            // EMF Bar (Center Zero)
+            // Max range +/- 10V
+            const maxV = 150; 
+            const pct = (emf / maxV) * 50; // 50% is max swing
+            elEmfBar.style.left = emf > 0 ? `50%` : `${50 + pct}%`;
+            elEmfBar.style.width = `${Math.abs(pct)}%`;
+            elEmfBar.className = `absolute top-0 h-full transition-all duration-75 ${emf > 0 ? 'bg-emerald-400' : 'bg-rose-400'}`;
+
+            // Bulb & Flow Bar
+            const brightness = Math.min(1, Math.abs(emf) / 50);
+            
+            // Flow Bar
+            const flowPct = (emf / 100) * 50;
+            flowBar.style.left = emf > 0 ? `50%` : `${50 + flowPct}%`;
+            flowBar.style.width = `${Math.abs(flowPct)}%`;
+            flowBar.className = `absolute top-0 h-full transition-all duration-75 ${emf > 0 ? 'bg-emerald-500' : 'bg-rose-500'}`;
+
+            if(Math.abs(emf) > 1) {
+                currentDirText.innerText = emf > 0 ? "CURRENT >>>" : "<<< CURRENT";
+                currentDirText.className = `text-xs font-bold ${emf > 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+                
+                bulbIcon.style.backgroundColor = '#fef08a';
+                bulbIcon.style.borderColor = '#facc15';
+                bulbIcon.style.boxShadow = `0 0 ${brightness * 40}px ${brightness * 20}px rgba(253, 224, 71, 0.5)`;
+            } else {
+                currentDirText.innerText = "NO CURRENT";
+                currentDirText.className = "text-xs font-bold text-slate-500";
+                bulbIcon.style.backgroundColor = '#334155';
+                bulbIcon.style.borderColor = '#475569';
+                bulbIcon.style.boxShadow = 'none';
+            }
+        }
+
+        // --- CONTROLS ---
+        document.getElementById('slider-loops').addEventListener('input', (e) => {
+            loops = parseInt(e.target.value);
+            document.getElementById('display-loops').innerText = loops;
+        });
+
+        document.getElementById('slider-strength').addEventListener('input', (e) => {
+            strengthPct = parseInt(e.target.value);
+            document.getElementById('display-strength').innerText = `${strengthPct}%`;
+        });
+
+        function flipPolarity() {
+            polarity *= -1;
+        }
+
+        // --- MOUSE INPUT ---
+        canvas.addEventListener('mousedown', e => {
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            
+            // Hitbox Magnet
+            if (mx > magnet.x - CONFIG.magnetW/2 && mx < magnet.x + CONFIG.magnetW/2 &&
+                my > magnet.y - CONFIG.magnetH/2 && my < magnet.y + CONFIG.magnetH/2) {
+                isDragging = true;
+                canvas.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mousemove', e => {
+            if (isDragging) {
+                const rect = canvas.getBoundingClientRect();
+                let mx = e.clientX - rect.left;
+                // Clamp horizontal
+                mx = Math.max(100, Math.min(canvas.width - 100, mx));
+                magnet.x = mx;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+
+        // --- DRAWING ---
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            if(document.getElementById('show-field').checked) drawFieldLines();
+            
+            drawCoil(cx, cy, false); // Back
+            drawMagnet();
+            drawCoil(cx, cy, true); // Front
+        }
+
+        function drawMagnet() {
+            ctx.save();
+            ctx.translate(magnet.x, magnet.y);
+            const w = CONFIG.magnetW;
+            const h = CONFIG.magnetH;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(-w/2 + 10, -h/2 + 10, w, h);
+
+            // N/S Poles
+            // Polarity 1: S | N
+            // Polarity -1: N | S
+            const leftColor = polarity === 1 ? '#3b82f6' : '#ef4444';
+            const rightColor = polarity === 1 ? '#ef4444' : '#3b82f6';
+            const leftText = polarity === 1 ? 'S' : 'N';
+            const rightText = polarity === 1 ? 'N' : 'S';
+
+            // Left
+            ctx.fillStyle = leftColor;
+            ctx.fillRect(-w/2, -h/2, w/2, h);
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(leftText, -w/4, 0);
+
+            // Right
+            ctx.fillStyle = rightColor;
+            ctx.fillRect(0, -h/2, w/2, h);
+            ctx.fillStyle = 'white';
+            ctx.fillText(rightText, w/4, 0);
+
+            // Border
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-w/2, -h/2, w, h);
+
+            ctx.restore();
+        }
+
+        function drawCoil(cx, cy, isFront) {
+            const r = CONFIG.coilRadius;
+            const spacing = 25;
+            const totalW = (loops - 1) * spacing;
+            const startX = cx - totalW / 2;
+
+            ctx.lineWidth = 8;
+            ctx.lineCap = 'round';
+
+            for (let i = 0; i < loops; i++) {
+                const x = startX + i * spacing;
+                
+                // Copper Gradient
+                const grad = ctx.createLinearGradient(x-r, cy-r, x+r, cy+r);
+                grad.addColorStop(0, '#78350f');
+                grad.addColorStop(0.4, '#fbbf24');
+                grad.addColorStop(1, '#b45309');
+                ctx.strokeStyle = grad;
+
+                ctx.beginPath();
+                if(isFront) {
+                    // Front Arc
+                    ctx.ellipse(x, cy, 20, r, 0, 0, Math.PI);
+                } else {
+                    // Back Arc (Darker)
+                    ctx.strokeStyle = '#7c2d12'; // Darker for back
+                    ctx.ellipse(x, cy, 20, r, 0, Math.PI, 2 * Math.PI);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function drawFieldLines() {
+            ctx.save();
+            ctx.translate(magnet.x, magnet.y);
+            ctx.globalAlpha = 0.15;
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            const w = CONFIG.magnetW;
+
+            // Simple Bezier curves simulating B-Field
+            // Flip direction based on polarity
+            const dir = polarity; 
+
+            for(let i=1; i<=3; i++) {
+                const scale = i * 80;
+                ctx.beginPath();
+                ctx.moveTo(dir * w/2, -10);
+                ctx.bezierCurveTo(dir*(w/2+scale), -scale, -dir*(w/2+scale), -scale, -dir*w/2, -10);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(dir * w/2, 10);
+                ctx.bezierCurveTo(dir*(w/2+scale), scale, -dir*(w/2+scale), scale, -dir*w/2, 10);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+    </script>
+</body>
+</html>

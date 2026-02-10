@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mass-Spring-Damper Lab - Aries Tech</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Canvas Styling */
+        #sim-container {
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        /* Grid Background for Canvas */
+        #simCanvas {
+            background-image: 
+                linear-gradient(rgba(30, 41, 59, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 41, 59, 0.3) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Custom Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            margin-top: -6px; cursor: pointer; border: 2px solid #fff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #334155; border-radius: 2px;
+        }
+
+        #slider-m::-webkit-slider-thumb { background: #3b82f6; } /* Mass - Blue */
+        #slider-k::-webkit-slider-thumb { background: #ef4444; } /* Spring - Red */
+        #slider-c::-webkit-slider-thumb { background: #10b981; } /* Damper - Green */
+        #slider-setpoint::-webkit-slider-thumb { background: #facc15; } /* Setpoint - Yellow */
+    </style>
+</head>
+<body class="flex flex-col min-h-screen bg-slate-950">
+
+    <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur border-b border-slate-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-sky-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold hidden sm:block">Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer select-none" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">M</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">Controls</span></span>
+            </div>
+            <div class="w-24"></div> </div>
+    </nav>
+
+    <div class="flex flex-col lg:flex-row h-[85vh] border-b border-slate-800 relative bg-slate-950">
+        
+        <aside class="w-full lg:w-80 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-6 z-20 overflow-y-auto shrink-0 shadow-2xl">
+            <div>
+                <h1 class="text-xl font-bold text-white mb-1">🏗️ Mass Spring Damper</h1>
+                <p class="text-xs text-slate-400">Analisis Respon Sistem Orde 2</p>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                <label class="text-[10px] font-mono uppercase text-yellow-400 font-bold mb-2 block tracking-wider">Step Input (Target)</label>
+                <input type="range" id="slider-setpoint" min="0" max="600" step="10" value="300" class="w-full">
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>0m</span> <span>Target Pos ($x_{ref}$)</span> <span>Max</span>
+                </div>
+                <button onclick="triggerStep()" class="mt-3 w-full py-2 bg-yellow-600 hover:bg-yellow-500 text-slate-900 text-xs font-bold rounded-lg transition-colors shadow-lg shadow-yellow-500/20">
+                    Apply Step Input
+                </button>
+            </div>
+
+            <div class="space-y-5 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                <div class="text-[10px] font-mono uppercase text-slate-500 font-bold mb-2">System Properties</div>
+                
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-slate-300">Mass ($m$)</span>
+                        <span id="val-m" class="text-xs font-mono font-bold text-blue-400">5.0 kg</span>
+                    </div>
+                    <input type="range" id="slider-m" min="1" max="20" step="0.5" value="5" class="w-full">
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-slate-300">Stiffness ($k$)</span>
+                        <span id="val-k" class="text-xs font-mono font-bold text-rose-400">20 N/m</span>
+                    </div>
+                    <input type="range" id="slider-k" min="1" max="50" step="1" value="20" class="w-full">
+                </div>
+
+                <div>
+                    <div class="flex justify-between mb-1">
+                        <span class="text-xs text-slate-300">Damping ($c$)</span>
+                        <span id="val-c" class="text-xs font-mono font-bold text-emerald-400">2.0 Ns/m</span>
+                    </div>
+                    <input type="range" id="slider-c" min="0" max="20" step="0.5" value="2" class="w-full">
+                </div>
+            </div>
+
+            <div class="mt-auto bg-slate-900 border border-slate-800 p-4 rounded-xl">
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="text-[10px] text-slate-500 uppercase">Damping Ratio ($\zeta$)</div>
+                        <div id="val-zeta" class="text-lg font-mono font-bold text-white">0.10</div>
+                    </div>
+                    <div>
+                        <div class="text-[10px] text-slate-500 uppercase">Nat. Freq ($\omega_n$)</div>
+                        <div id="val-wn" class="text-lg font-mono font-bold text-white">2.00</div>
+                    </div>
+                </div>
+                <div id="sys-status" class="mt-2 text-center text-xs font-bold text-emerald-400 bg-emerald-900/20 py-1 rounded border border-emerald-500/20">
+                    Underdamped
+                </div>
+            </div>
+        </aside>
+
+        <div class="relative flex-grow bg-slate-950 overflow-hidden flex flex-col">
+            <div class="relative h-[60%] w-full border-b border-slate-800">
+                <canvas id="simCanvas" class="w-full h-full block"></canvas>
+                <div class="absolute top-4 left-4 text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-1 rounded">Physical View</div>
+            </div>
+            
+            <div class="relative h-[40%] w-full bg-slate-900">
+                <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                <div class="absolute top-4 left-4 text-xs font-mono text-slate-500 bg-slate-900/80 px-2 py-1 rounded">Response Graph (x vs t)</div>
+                <div class="absolute top-4 right-4 flex gap-3 text-[10px]">
+                    <div class="flex items-center gap-1"><div class="w-2 h-2 bg-yellow-500 rounded-full"></div><span class="text-slate-400">Setpoint</span></div>
+                    <div class="flex items-center gap-1"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-slate-400">Position</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section class="relative z-10 bg-slate-900 border-t border-slate-800 py-12 px-6 shadow-[0_-20px_60px_rgba(0,0,0,0.5)]">
+        <div class="max-w-6xl mx-auto">
+            
+            <div class="flex flex-col md:flex-row gap-6 justify-between items-end mb-12 border-b border-slate-700 pb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                        <span class="text-sky-500 text-4xl">📐</span> 
+                        <div class="flex flex-col">
+                            <span class="text-xs font-bold text-sky-500 uppercase tracking-widest">Sistem Kendali</span>
+                            <span>Model Massa-Pegas-Peredam</span>
+                        </div>
+                    </h2>
+                    <p class="text-slate-400 text-sm">Analisis respon transient sistem orde dua terhadap input langkah (Step Input).</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+                
+                <div class="prose prose-invert prose-sm text-slate-300">
+                    <h3 class="text-sky-400 font-bold text-xl mb-4">Persamaan Gerak</h3>
+                    
+
+[Image of mass spring damper free body diagram]
+
+                    <p>
+                        Berdasarkan Hukum Newton II, persamaan gerak untuk sistem ini adalah:
+                    </p>
+                    <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700 my-4 text-center font-mono text-lg">
+                        $$ m\ddot{x} + c\dot{x} + kx = F(t) $$
+                    </div>
+                    <ul class="list-disc pl-5 space-y-1 text-xs marker:text-sky-500">
+                        <li>$m$: Massa (Inersia sistem)</li>
+                        <li>$c$: Koefisien Redaman (Gesekan/Viskositas)</li>
+                        <li>$k$: Konstanta Pegas (Kekakuan)</li>
+                    </ul>
+
+                    <h4 class="text-white font-bold text-base mt-6">Parameter Karakteristik</h4>
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <div class="bg-slate-800 p-3 rounded border-l-2 border-emerald-500">
+                            <strong class="text-emerald-400 text-xs">Natural Frequency ($\omega_n$)</strong>
+                            <div class="mt-1">$$ \omega_n = \sqrt{\frac{k}{m}} $$</div>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded border-l-2 border-rose-500">
+                            <strong class="text-rose-400 text-xs">Damping Ratio ($\zeta$)</strong>
+                            <div class="mt-1">$$ \zeta = \frac{c}{2\sqrt{mk}} $$</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700">
+                        <h3 class="text-yellow-400 font-bold text-lg mb-4 flex items-center gap-2">
+                            🧪 Eksperimen Laboratorium
+                        </h3>
+
+                        <div class="mb-6">
+                            <h4 class="font-bold text-white text-sm mb-2">1. Underdamped (Osilasi)</h4>
+                            <p class="text-xs text-slate-400 mb-2">Terjadi jika $\zeta < 1$. Sistem akan bergetar sebelum stabil.</p>
+                            <ul class="list-disc pl-4 text-xs text-slate-300 space-y-1">
+                                <li>Set Massa $m=5$, Pegas $k=20$.</li>
+                                <li>Set Peredam $c$ ke nilai kecil (misal <strong>1.0</strong>).</li>
+                                <li>Klik <strong>Apply Step Input</strong>.</li>
+                                <li><strong>Amati:</strong> Berapa kali massa berayun melewati garis target (Overshoot)?</li>
+                            </ul>
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="font-bold text-white text-sm mb-2">2. Critically Damped (Ideal)</h4>
+                            <p class="text-xs text-slate-400 mb-2">Terjadi jika $\zeta = 1$. Sistem mencapai target secepat mungkin tanpa osilasi.</p>
+                            <ul class="list-disc pl-4 text-xs text-slate-300 space-y-1">
+                                <li>Hitung nilai $c$ kritis: $c_{crit} = 2\sqrt{mk}$.</li>
+                                <li>Jika $m=5, k=20$, maka $c_{crit} = 2\sqrt{100} = 20$.</li>
+                                <li>Set slider $c$ ke <strong>20</strong>. Klik Step Input.</li>
+                                <li><strong>Amati:</strong> Grafik akan naik mulus tanpa melewati garis kuning.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs max-w-4xl mx-auto">
+            [Space Iklan AdSense Leaderboard]
+        </div>
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 bg-slate-900 mt-auto text-center text-xs text-slate-500">
+        &copy; 2026 Aries Jehan Tamamy. Developed by Aries Tech Labs.
+    </footer>
+
+    <script>
+        // Setup Canvases
+        const simCanvas = document.getElementById('simCanvas');
+        const graphCanvas = document.getElementById('graphCanvas');
+        const simCtx = simCanvas.getContext('2d');
+        const graphCtx = graphCanvas.getContext('2d');
+
+        // UI Elements
+        const sliderM = document.getElementById('slider-m');
+        const sliderK = document.getElementById('slider-k');
+        const sliderC = document.getElementById('slider-c');
+        const sliderSet = document.getElementById('slider-setpoint');
+        
+        const dispM = document.getElementById('val-m');
+        const dispK = document.getElementById('val-k');
+        const dispC = document.getElementById('val-c');
+        const dispZeta = document.getElementById('val-zeta');
+        const dispWn = document.getElementById('val-wn');
+        const sysStatus = document.getElementById('sys-status');
+
+        // Physics State
+        let state = {
+            m: 5, k: 20, c: 2,
+            x: 0, v: 0, a: 0,
+            target: 0
+        };
+        
+        // Graph History
+        let historyX = [];
+        let historyTarget = [];
+        const maxHistory = 600;
+
+        // Init
+        function resize() {
+            simCanvas.width = simCanvas.parentElement.offsetWidth;
+            simCanvas.height = simCanvas.parentElement.offsetHeight;
+            graphCanvas.width = graphCanvas.parentElement.offsetWidth;
+            graphCanvas.height = graphCanvas.parentElement.offsetHeight;
+        }
+        window.addEventListener('resize', resize);
+        
+        // --- PHYSICS ENGINE ---
+        function updatePhysics(dt) {
+            // Read Inputs
+            state.m = parseFloat(sliderM.value);
+            state.k = parseFloat(sliderK.value);
+            state.c = parseFloat(sliderC.value);
+            
+            // F = -kx - cv
+            // Force from spring based on distance from target? 
+            // NO, typically in Control step input means:
+            // Force applied = k * step_distance OR Setpoint is the new equilibrium
+            // Let's model Setpoint as the wall moving, or simply: F_spring = k * (target - x)
+            
+            const F_spring = state.k * (state.target - state.x);
+            const F_damper = -state.c * state.v;
+            
+            const F_total = F_spring + F_damper;
+            
+            state.a = F_total / state.m;
+            state.v += state.a * dt;
+            state.x += state.v * dt;
+
+            // Update Displays
+            dispM.innerText = state.m.toFixed(1) + " kg";
+            dispK.innerText = state.k.toFixed(0) + " N/m";
+            dispC.innerText = state.c.toFixed(1) + " Ns/m";
+
+            // Calc Zeta & Wn
+            const wn = Math.sqrt(state.k / state.m);
+            const cc = 2 * Math.sqrt(state.m * state.k);
+            const zeta = state.c / cc;
+
+            dispWn.innerText = wn.toFixed(2) + " rad/s";
+            dispZeta.innerText = zeta.toFixed(2);
+
+            if (zeta < 1) {
+                sysStatus.innerText = "Underdamped (Oscillating)";
+                sysStatus.className = "mt-2 text-center text-xs font-bold text-rose-400 bg-rose-900/20 py-1 rounded border border-rose-500/20";
+            } else if (zeta > 1) {
+                sysStatus.innerText = "Overdamped (Sluggish)";
+                sysStatus.className = "mt-2 text-center text-xs font-bold text-blue-400 bg-blue-900/20 py-1 rounded border border-blue-500/20";
+            } else {
+                sysStatus.innerText = "Critically Damped";
+                sysStatus.className = "mt-2 text-center text-xs font-bold text-emerald-400 bg-emerald-900/20 py-1 rounded border border-emerald-500/20";
+            }
+
+            // Update Graph Data
+            historyX.push(state.x);
+            historyTarget.push(state.target);
+            if(historyX.length > maxHistory) {
+                historyX.shift();
+                historyTarget.shift();
+            }
+        }
+
+        function triggerStep() {
+            state.target = parseFloat(sliderSet.value);
+        }
+
+        // --- DRAWING ---
+        function drawSim() {
+            const w = simCanvas.width;
+            const h = simCanvas.height;
+            const ctx = simCtx;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            const wallX = 50;
+            const groundY = h/2 + 60;
+            const scale = 0.8; // px per meter unit
+
+            const massW = 80;
+            const massH = 50;
+            
+            // Current X position in pixels (relative to wall)
+            // state.x is theoretical displacement. Let's say rest pos is at 100px from wall
+            const zeroOffset = 150;
+            const posX = wallX + zeroOffset + state.x * scale; 
+
+            // 1. Draw Floor
+            ctx.strokeStyle = '#334155';
+            ctx.beginPath();
+            ctx.moveTo(0, groundY);
+            ctx.lineTo(w, groundY);
+            ctx.stroke();
+            
+            // Friction hashes
+            ctx.beginPath();
+            for(let i=0; i<w; i+=20) {
+                ctx.moveTo(i, groundY);
+                ctx.lineTo(i-10, groundY+10);
+            }
+            ctx.stroke();
+
+            // 2. Draw Wall
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(0, groundY - 150, wallX, 150);
+            ctx.strokeStyle = '#475569';
+            ctx.strokeRect(0, groundY - 150, wallX, 150);
+
+            // 3. Draw Spring (Zigzag)
+            ctx.beginPath();
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 4;
+            const springStart = wallX;
+            const springEnd = posX;
+            const segments = 12;
+            const segLen = (springEnd - springStart) / segments;
+            
+            ctx.moveTo(springStart, groundY - massH/2 - 20); // Top attachment
+            for(let i=0; i<=segments; i++) {
+                const yOffset = (i % 2 === 0) ? 0 : 20;
+                // Simple zigzag logic
+                const x = springStart + i * segLen;
+                const y = (groundY - massH/2 - 30) + (i%2===0 ? -10 : 10);
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            
+            // 4. Draw Damper (Piston)
+            // Cylinder attached to wall
+            const damperY = groundY - massH/2 + 15;
+            ctx.fillStyle = '#334155';
+            ctx.fillRect(wallX, damperY - 10, (posX - wallX)/2, 20); // Cylinder
+            
+            // Piston rod attached to mass
+            ctx.beginPath();
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 3;
+            ctx.moveTo(wallX + (posX - wallX)/2, damperY);
+            ctx.lineTo(posX, damperY);
+            ctx.stroke();
+            
+            // Piston head inside
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(wallX + (posX - wallX)/2 - 5, damperY - 8, 5, 16);
+
+            // 5. Draw Mass
+            ctx.fillStyle = '#3b82f6';
+            ctx.fillRect(posX, groundY - massH, massW, massH);
+            ctx.strokeStyle = '#93c5fd';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(posX, groundY - massH, massW, massH);
+            
+            // Text on Mass
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 12px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("M", posX + massW/2, groundY - massH/2 + 4);
+            
+            // Target Marker (Ghost)
+            const targetPx = wallX + zeroOffset + state.target * scale;
+            ctx.strokeStyle = 'rgba(250, 204, 21, 0.5)'; // Yellow transparent
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(targetPx, groundY - massH, massW, massH);
+            ctx.setLineDash([]);
+            ctx.fillStyle = '#facc15';
+            ctx.fillText("Ref", targetPx + massW/2, groundY - massH - 10);
+        }
+
+        function drawGraph() {
+            const w = graphCanvas.width;
+            const h = graphCanvas.height;
+            const ctx = graphCtx;
+            
+            ctx.clearRect(0, 0, w, h);
+            
+            // Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2); // Zero line
+            ctx.stroke();
+
+            if (historyX.length < 2) return;
+
+            // Auto-scale Y
+            // Max typical amplitude ~ 600
+            const Y_SCALE = h / 800; 
+
+            // Draw Setpoint (Yellow)
+            ctx.beginPath();
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < historyTarget.length; i++) {
+                const x = (i / maxHistory) * w;
+                const y = h - (historyTarget[i] * Y_SCALE + 20); // +20 padding bottom
+                if (i===0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+
+            // Draw Position (Blue)
+            ctx.beginPath();
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < historyX.length; i++) {
+                const x = (i / maxHistory) * w;
+                const y = h - (historyX[i] * Y_SCALE + 20);
+                if (i===0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+        }
+
+        // Animation Loop
+        function loop() {
+            // Run physics slightly faster than framerate for stability
+            for(let i=0; i<5; i++) updatePhysics(0.016 / 5);
+            
+            drawSim();
+            drawGraph();
+            requestAnimationFrame(loop);
+        }
+
+        // Start
+        resize();
+        triggerStep(); // Initial step
+        loop();
+
+    </script>
+</body>
+</html>
