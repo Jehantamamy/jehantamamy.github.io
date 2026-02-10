@@ -2,76 +2,130 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     
     <url>
-        <loc>https://www.yourdomain.com/index.html</loc>
+        <loc>https://ariestechlab.com/index.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
     </url>
 
     <url>
-        <loc>https://www.yourdomain.com/about.html</loc>
+        <loc>https://ariestechlab.com/about.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/legal.html</loc>
+        <loc>https://ariestechlab.com/legal.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://www.yourdomain.com/programs/resistor_calc.html</loc>
+        <loc>https://ariestechlab.com/programs/resistor_calc.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/filter_sim.html</loc>
+        <loc>https://ariestechlab.com/programs/filter_sim.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/motor_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/pid_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/elmag_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/induction_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/lorentz_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/magnet_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/rlc_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	<url>
+        <loc>https://ariestechlab.com/programs/solenoid_sim.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+	
     <url>
-        <loc>https://www.yourdomain.com/programs/transkrip.html</loc>
+        <loc>https://ariestechlab.com/programs/transkrip.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>
-
+	<url>
+        <loc>https://ariestechlab.com/programs/GraderA/index.html</loc>
+        <lastmod>2026-02-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/pdf_forge.html</loc>
+        <loc>https://ariestechlab.com/programs/pdf_forge.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/pdf_converter.html</loc>
+        <loc>https://ariestechlab.com/programs/pdf_converter.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/pdf_splitter.html</loc>
+        <loc>https://ariestechlab.com/programs/pdf_splitter.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/image_tools.html</loc>
+        <loc>https://ariestechlab.com/programs/image_tools.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.9</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/screen_recorder.html</loc>
+        <loc>https://ariestechlab.com/programs/screen_recorder.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
     <url>
-        <loc>https://www.yourdomain.com/programs/qr_studio.html</loc>
+        <loc>https://ariestechlab.com/programs/qr_studio.html</loc>
         <lastmod>2026-02-09</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>

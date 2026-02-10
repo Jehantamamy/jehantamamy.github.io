@@ -1,7 +1,18 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<link rel="icon" type="image/png" href="../../favicon.png?v=2">
+	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GraderA+</title>
     <script src="libs/tailwind.js"></script>
@@ -20,40 +31,60 @@
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans h-screen flex flex-col overflow-hidden">
-
-    <div id="view-dashboard" class="h-full flex flex-col">
-        <header class="bg-slate-900 text-white p-6 shadow-md">
-            <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <div>
-                    <h1 class="font-bold text-2xl flex items-center gap-3"><i data-lucide="layout-grid"></i> GraderA+</h1>
-                    <p class="text-slate-400 text-sm mt-1">DASHBOARD DOSEN</p>
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="openSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-slate-700 transition-all">
-                        <i data-lucide="settings"></i> Aturan Nilai
-                    </button>
-                    <button onclick="bukaModalKelas()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-indigo-500 shadow-lg">
-                        <i data-lucide="plus"></i> Buat Kelas
-                    </button>
-                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
             </div>
-        </header>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+	
+	<div id="view-dashboard" class="h-full flex flex-col">
+		<header class="bg-slate-900 text-white p-6 shadow-md">
+			<div class="max-w-6xl mx-auto flex justify-between items-center">
+				<div>
+					<h1 class="font-bold text-2xl flex items-center gap-3"><i data-lucide="layout-grid"></i> GraderA+</h1>
+					<p class="text-slate-400 text-sm mt-1">DASHBOARD DOSEN</p>
+				</div>
+				<div class="flex gap-3">
+					<button onclick="openSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-slate-700 transition-all">
+						<i data-lucide="settings"></i> Aturan Nilai
+					</button>
+					<button onclick="bukaModalKelas()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-bold flex items-center gap-2 border border-indigo-500 shadow-lg">
+						<i data-lucide="plus"></i> Buat Kelas
+					</button>
+				</div>
+			</div>
+		</header>
 
-        <main class="flex-1 overflow-y-auto p-8">
-            <div class="max-w-6xl mx-auto">
-                <div class="mb-8">
-                    <input type="text" placeholder="Cari kelas..." oninput="renderDashboard(this.value)" class="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                </div>
-                <div id="class-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-                <div id="dashboard-empty" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
-                    <i data-lucide="folder-open" size="64" class="mb-4 text-slate-400"></i>
-                    <p class="text-xl font-bold text-slate-500">Belum ada kelas.</p>
-                </div>
-            </div>
-        </main>
-    </div>
+		<main class="flex-1 overflow-y-auto p-8">
+			<div class="max-w-6xl mx-auto">
+				<div class="mb-8">
+					<input type="text" placeholder="Cari kelas..." oninput="renderDashboard(this.value)" class="w-full max-w-md px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+				</div>
+				<div id="class-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+				<div id="dashboard-empty" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+					<i data-lucide="folder-open" size="64" class="mb-4 text-slate-400"></i>
+					<p class="text-xl font-bold text-slate-500">Belum ada kelas.</p>
+				</div>
+			</div>
+		</main>
+	</div>
 
-    <div id="view-grading" class="h-full flex flex-col hidden">
+	<div id="view-grading" class="h-full flex flex-col hidden">
 		<header class="bg-indigo-800 text-white p-4 shadow-md flex justify-between items-center z-10">
 			<div class="flex items-center gap-4">
 				<button onclick="backToDashboard()" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors" title="Kembali ke Dashboard">
@@ -88,7 +119,7 @@
 			</div>
 		</header>
 
-        <div class="flex flex-1 overflow-hidden flex-col md:flex-row">
+		<div class="flex flex-1 overflow-hidden flex-col md:flex-row">
 			
 			<aside class="w-full h-[30%] md:w-1/4 md:h-auto bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col shadow-lg z-0">
 				<div class="p-4 border-b border-slate-100 bg-slate-50 space-y-2">
@@ -155,7 +186,7 @@
 				</div>
 			</main>
 		</div>
-    </div>
+	</div>
 
     <dialog id="newClassModal" class="rounded-2xl shadow-2xl p-0 w-full max-w-md backdrop:bg-slate-900/50">
         <div class="bg-indigo-700 text-white p-4 flex justify-between items-center">
@@ -236,6 +267,10 @@
 			</div>
 		</div>
 	</dialog>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
 
 	<script>
         // ==========================================
