@@ -5,7 +5,7 @@
  */
 
 const SESSION_KEY = 'aries_global_session_ts'; // Kunci penyimpanan waktu
-const SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 Jam (dalam milidetik)
+const SESSION_DURATION = 4 * 60 * 60 * 1000; // 24 Jam (dalam milidetik)
 
 function initSessionManager(saveCallback = null) {
     // 1. Cek kapan terakhir buka
