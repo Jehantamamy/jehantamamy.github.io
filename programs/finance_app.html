@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'G-2BL3DSGJ4Z');
+	</script>
+	<link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<title>Aries FinFlow - Utilitas Keuangan Pribadi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class', theme: { extend: { colors: { slate: { 950: '#0f172a' } } } } }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.6.0/jspdf.plugin.autotable.min.js"></script>
+	<meta name="description" content="Aries FinFlow: Aplikasi pencatat keuangan pribadi gratis, aman (data lokal), dan tanpa internet. Fitur lengkap: Multi-buku, analisis grafik, dan ekspor laporan ke Excel/PDF.">
+    <meta name="keywords" content="aplikasi keuangan gratis, catat pengeluaran, manajemen uang, finance app, local storage, aries tech labs, pembukuan pribadi, export excel">
+    <meta name="author" content="Aries Jehan Tamamy">
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" href="https://ariestechlab.com/programs/finance_app.html">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ariestechlab.com/programs/finance_app.html">
+    <meta property="og:title" content="Aries FinFlow - Kelola Keuangan Gratis & Aman">
+    <meta property="og:description" content="Catat pemasukan dan pengeluaran tanpa ribet. Data 100% aman di perangkat sendiri. Lengkap dengan laporan PDF & Excel.">
+    <meta property="og:image" content="https://ariestechlab.com/assets/finflow_thumbnail.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:domain" content="ariestechlab.com">
+    <meta name="twitter:url" content="https://ariestechlab.com/programs/finance_app.html">
+    <meta name="twitter:title" content="Aries FinFlow - Utilitas Keuangan Pribadi">
+    <meta name="twitter:description" content="Kelola keuanganmu dengan mudah. Data tersimpan lokal, privasi terjaga. Coba sekarang!">
+    <meta name="twitter:image" content="https://ariestechlab.com/assets/finflow_thumbnail.jpg">
+	
+    <style>
+        /* Custom Scrollbar agar rapi */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        /* Input Date Calendar Dark Mode Fix */
+        ::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </div>
+                <span class="text-sm font-bold">Back to Dashboard</span>
+            </a>
+            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
+                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
+            </div>
+			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
+				<span class="text-lg">🍕</span> <div class="text-left">
+					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+					<span class="block text-xs font-bold">Pizza / Kopi</span>
+				</div>
+			</a>
+        </div>
+    </nav>
+	<div class="w-full bg-slate-950 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            
+            <div class="w-full h-[50px] md:h-[90px] bg-slate-900 border border-slate-700/50 border-dashed rounded-lg flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-slate-800 transition-colors">
+                
+                <div class="absolute top-0 right-0 bg-slate-800 text-[9px] text-slate-500 px-1.5 py-0.5 rounded-bl-lg border-l border-b border-slate-700">
+                    AD
+                </div>
+
+                <div class="flex flex-col items-center justify-center text-center">
+                    <span class="text-xs md:text-sm font-bold text-slate-500 group-hover:text-slate-300">
+                        <i class="fa-solid fa-star text-emerald-500 mr-1"></i>
+                        Premium Banner Spot
+                    </span>
+                    <span class="text-[10px] text-slate-600 hidden md:inline">
+                        728 x 90 Leaderboard
+                    </span>
+					<a href="mailto:tammyjehan@gmail.com" class="text-xs text-indigo-400 hover:text-indigo-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+						Contact us to place your ad &rarr;
+					</a>
+                </div>
+
+                </div>
+
+        </div>
+    </div>
+	<div class="w-full max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+		<div class="flex items-center gap-3">
+			<div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+				<i class="fa-solid fa-wallet text-xl"></i>
+			</div>
+			<div>
+				<h1 class="text-xl font-extrabold tracking-tight text-white leading-none">FinFlow</h1>
+				<span class="text-[10px] text-slate-400 font-mono tracking-wider uppercase">Aries Utility</span>
+			</div>
+		</div>
+		
+		<div class="flex items-center gap-3">
+			<select id="bookSelector" class="bg-slate-800 text-sm border border-slate-700 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 outline-none">
+				</select>
+			<button onclick="createNewBook()" title="Buat Buku Baru" class="p-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors">
+				<i class="fa-solid fa-plus text-emerald-400"></i>
+			</button>
+			
+		</div>
+	</div>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <div class="lg:col-span-4 space-y-6 flex flex-col">
+            <div class="grid grid-cols-2 gap-4 shrink-0">
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 backdrop-blur">
+                    <span class="text-xs text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-trend-up"></i> Pemasukan
+                    </span>
+                    <div id="totalIncomeDisplay" class="text-xl font-mono font-bold text-white mt-1">Rp 0</div>
+                </div>
+                <div class="bg-slate-800/50 p-4 rounded-2xl border border-slate-700/50 backdrop-blur">
+                    <span class="text-xs text-rose-400 font-bold uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-trend-down"></i> Pengeluaran
+                    </span>
+                    <div id="totalExpenseDisplay" class="text-xl font-mono font-bold text-white mt-1">Rp 0</div>
+                </div>
+                <div class="col-span-2 bg-gradient-to-r from-slate-800 to-slate-900 p-5 rounded-2xl border border-slate-700 shadow-xl">
+                    <span class="text-sm text-slate-400 font-bold uppercase tracking-wider">Saldo Saat Ini</span>
+                    <div id="balanceDisplay" class="text-3xl font-mono font-black text-white mt-1">Rp 0</div>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-lg shrink-0">
+                <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-pen-to-square text-indigo-400"></i> Catat Transaksi Baru
+                </h3>
+                <form id="transactionForm" class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-slate-800 rounded-xl">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="type" value="in" class="peer sr-only" checked>
+                            <div class="text-center py-2 rounded-lg text-xs font-bold text-slate-400 peer-checked:bg-emerald-600 peer-checked:text-white transition-all">
+                                <i class="fa-solid fa-plus mr-1"></i> Pemasukan
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="type" value="out" class="peer sr-only">
+                            <div class="text-center py-2 rounded-lg text-xs font-bold text-slate-400 peer-checked:bg-rose-600 peer-checked:text-white transition-all">
+                                <i class="fa-solid fa-minus mr-1"></i> Pengeluaran
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                             <label class="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Jumlah (Rp)</label>
+                            <input type="number" id="inputAmount" required min="1" placeholder="Contoh: 50000" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none font-mono">
+                        </div>
+                         <div>
+                             <label class="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Tanggal</label>
+                            <input type="date" id="inputDate" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Kategori</label>
+                        <select id="inputCategory" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            </select>
+                    </div>
+
+                    <div>
+                        <input type="text" id="inputNote" placeholder="Catatan (Opsional)..." class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i> Simpan Transaksi
+                    </button>
+                </form>
+            </div>
+            
+            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 shadow-lg grow flex flex-col">
+                 <h3 class="text-sm font-bold text-white mb-2 flex items-center gap-2 shrink-0">
+                    <i class="fa-solid fa-chart-pie text-amber-400"></i> Analisis Pengeluaran Bulan Ini
+                </h3>
+                <div class="relative grow min-h-[200px] flex items-center justify-center p-2">
+                    <canvas id="expenseChart"></canvas>
+                     <div id="chartEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-500 hidden">
+                        <i class="fa-solid fa-chart-simple text-4xl mb-2 opacity-50"></i>
+                        <span class="text-xs">Belum ada data pengeluaran</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+		<div class="lg:col-span-8 bg-slate-900 rounded-2xl border border-slate-800 shadow-lg flex flex-col h-[600px] lg:h-auto overflow-hidden">
+            <div class="p-5 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-center gap-4 shrink-0">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-list-ul text-slate-400"></i> Riwayat Transaksi
+                </h3>
+                
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="relative">
+                        <input type="month" id="exportMonthPicker" class="bg-slate-800 text-slate-200 text-xs border border-slate-700 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-emerald-500 outline-none h-[34px]" title="Pilih Bulan Laporan">
+                    </div>
+
+                    <button onclick="exportToExcel()" class="px-3 py-1.5 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/40 border border-emerald-600/50 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 h-[34px]">
+                        <i class="fa-solid fa-file-excel"></i> <span class="hidden sm:inline">Excel</span>
+                    </button>
+                    <button onclick="exportToPDF()" class="px-3 py-1.5 bg-rose-600/20 text-rose-400 hover:bg-rose-600/40 border border-rose-600/50 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 h-[34px]">
+                        <i class="fa-solid fa-file-pdf"></i> <span class="hidden sm:inline">PDF</span>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-slate-700 mx-1"></div>
+
+                    <button onclick="clearCurrentBookData()" title="Hapus Semua Data Buku Ini" class="px-3 py-1.5 bg-slate-800 text-slate-400 hover:bg-rose-900/50 hover:text-rose-400 border border-slate-700 rounded-lg text-xs font-bold transition-colors h-[34px]">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grow overflow-auto">
+                <table class="w-full text-left text-sm text-slate-400">
+                    <thead class="text-xs uppercase bg-slate-950/50 text-slate-500 sticky top-0 z-10 backdrop-blur">
+                        <tr>
+                            <th class="px-5 py-3 font-bold tracking-wider">Tanggal</th>
+                            <th class="px-5 py-3 font-bold tracking-wider">Kategori & Catatan</th>
+                            <th class="px-5 py-3 font-bold tracking-wider text-right">Jumlah (Rp)</th>
+                            <th class="px-5 py-3 font-bold tracking-wider text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody" class="divide-y divide-slate-800/50">
+                        <tr id="emptyRowState">
+                            <td colspan="4" class="px-5 py-12 text-center text-slate-500 italic flex flex-col items-center justify-center gap-2">
+                                <i class="fa-solid fa-inbox text-3xl opacity-50"></i>
+                                Belum ada transaksi di buku ini.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+	<div class="max-w-7xl mx-auto px-4 mt-16 mb-8">
+        <div class="w-full h-[120px] md:h-[100px] bg-slate-900/30 border-2 border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center text-center hover:border-slate-500 hover:bg-slate-800/50 transition-all cursor-pointer group relative overflow-hidden">
+            
+            <div class="z-10 flex flex-col items-center gap-1">
+                <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-slate-600 group-hover:text-emerald-400 transition-colors">
+                    <i class="fa-solid fa-rectangle-ad mr-1"></i> Advertisement Space
+                </span>
+                <span class="text-sm font-bold text-slate-500 group-hover:text-slate-300">
+                    Your Banner Here (728 x 90)
+                </span>
+                <a href="mailto:tammyjehan@gmail.com" class="text-xs text-indigo-400 hover:text-indigo-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Contact us to place your ad &rarr;
+                </a>
+            </div>
+
+            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#475569_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        </div>
+    </div>
+	
+	<section class="max-w-7xl mx-auto px-4 py-16 lg:py-24 border-t border-slate-800 mt-12 bg-slate-950 relative overflow-hidden">
+        
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-900/10 to-transparent pointer-events-none"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                <div class="text-left mb-8">
+                    <span class="text-emerald-400 font-mono text-xs uppercase tracking-widest mb-3 block">Financial Literacy 101</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
+                        The Psychology of <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">Wealth Building.</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm leading-relaxed text-justify">
+                        Managing money is 20% math and 80% behavior. Understanding the "Why" behind your spending is more important than the "What".
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-emerald-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                            <i class="fa-solid fa-scale-balanced text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">The 50/30/20 Rule</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        A classic budgeting framework: Allocate <strong>50%</strong> of income to Needs (rent, food), <strong>30%</strong> to Wants (hobbies, dining out), and <strong>20%</strong> to Savings/Debt repayment.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-teal-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-400">
+                            <i class="fa-solid fa-eye text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">The Observer Effect</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        In physics, observing a system changes it. In finance, simply <em>tracking</em> your expenses often reduces spending by 15-20% without active effort.
+                    </p>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8 bg-slate-900/20 p-6 md:p-8 rounded-3xl border border-slate-800/50 backdrop-blur-sm">
+                <article class="prose prose-invert prose-slate max-w-none">
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-emerald-500">#1</span> Why Does "Tracking" Make You Richer?
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Most people believe that to save money, they need to earn more. While increasing income helps, the true foundation of wealth is <strong>Cash Flow Management</strong>. This is where tools like <strong>Aries FinFlow</strong> come into play. It is not just a digital notebook; it is a mirror for your financial habits.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify">
+                            There is a psychological phenomenon known as the <em>Observer Effect</em> (or Hawthorne Effect). When you know a behavior is being measured, you subconsciously improve that behavior. By manually entering a transaction for "Coffee - Rp 25.000" every morning, your brain moves that expense from the "unconscious habit" zone to the "conscious decision" zone. Suddenly, that daily coffee feels like a choice, not a routine.
+                        </p>
+                    </div>
+
+                    <div class="w-full h-px bg-slate-800 my-8"></div>
+
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-teal-500">#2</span> Digital "Envelope System"
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Our grandparents used a simple method: they put cash into physical envelopes labeled "Rent", "Groceries", and "Fun". When an envelope was empty, spending stopped. In the digital age, we swipe cards and scan QR codes, making money feel abstract and infinite.
+                        </p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm text-emerald-400 uppercase tracking-wider">Context Switching</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    Keeping "Personal" and "Business" expenses in one list creates chaos. Separating them into different books allows for accurate Profit & Loss analysis.
+                                </p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm text-teal-400 uppercase tracking-wider">Leakage Detection</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    Small, recurring expenses (subscriptions, fees) are "wealth leaks". Our visualization charts expose these leaks instantly.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-indigo-500">#3</span> Data Sovereignty: Owning Your Financial Life
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            In the world of "FinTech", user data is the new oil. Most free apps sell your transaction history to advertisers to build a profile of your purchasing power. <strong>Aries Tech Labs takes a different stance.</strong> We believe financial data is as sensitive as medical records.
+                        </p>
+                        
+                        <ul class="space-y-3 my-6">
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1.5"></i>
+                                <span class="text-slate-300 text-sm leading-relaxed text-justify"><strong>No Cloud Sync:</strong> Your bank balance is stored in your browser's encrypted LocalStorage.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1.5"></i>
+                                <span class="text-slate-300 text-sm leading-relaxed text-justify"><strong>Offline Capability:</strong> Manage your budget on a plane, in a remote village, or without a data plan.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-check text-emerald-500 mt-1.5"></i>
+                                <span class="text-slate-300 text-sm leading-relaxed text-justify"><strong>Portability:</strong> You are not locked in. Use the Excel Export feature to migrate your data anytime.</span>
+                            </li>
+                        </ul>
+                        
+                        <p class="text-slate-300 leading-loose text-justify mt-6">
+                            True financial independence starts with independence from data tracking. Take control of your numbers, and the wealth will follow.
+                        </p>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </section>
+	<div class="max-w-7xl mx-auto px-4 mb-16 lg:mb-24">
+        <div class="text-xs text-slate-600 font-mono mb-2 uppercase tracking-widest text-center">Sponsored Content</div>
+        
+        <div class="w-full h-[250px] bg-slate-900/30 border-2 border-dashed border-slate-700 rounded-2xl flex flex-col items-center justify-center text-center hover:border-slate-500 hover:bg-slate-800/50 transition-all cursor-pointer group relative overflow-hidden">
+            
+            <div class="z-10 flex flex-col items-center gap-2">
+                
+                <h4 class="text-lg font-bold text-slate-500 group-hover:text-white transition-colors">
+                    Space Available for Sponsors
+                </h4>
+                <a href="mailto:tammyjehan@gmail.com" class="text-xs text-indigo-400 hover:text-indigo-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    Contact us to place your ad &rarr;
+                </a>                
+            </div>
+
+            <div class="absolute inset-0 border-t border-slate-800/50 top-1/2"></div>
+            <div class="absolute inset-0 border-l border-slate-800/50 left-1/2"></div>
+        </div>
+    </div>
+	<footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+        &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+        <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+    </footer>
+    <script>
+        // =========================================
+        // 1. INISIALISASI STATE & KONSTANTA
+        // =========================================
+        const STORAGE_KEY = 'ariesFinFlowData_v1';
+        let appData = {
+            books: [
+                { id: 'book_default', name: 'Dompet Utama' }
+            ],
+            activeBookId: 'book_default',
+            transactions: []
+        };
+
+        const CATEGORIES = {
+            'in': ['Gaji', 'Bonus/Tunjangan', 'Penjualan', 'Investasi', 'Lainnya Masuk'],
+            'out': ['Makan & Minum', 'Transportasi', 'Tempat Tinggal', 'Tagihan & Utilitas', 'Belanja Kebutuhan', 'Hiburan', 'Kesehatan', 'Pendidikan', 'Amal/Donasi', 'Lainnya Keluar']
+        };
+
+        let expenseChartInstance = null;
+
+        // =========================================
+        // 2. FUNGSI UTILITAS (Helper)
+        // =========================================
+        const formatIDR = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(num);
+        const getTodayDateString = () => new Date().toISOString().split('T')[0];
+        const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+
+        // =========================================
+        // 3. CORE DATA FUNCTIONS (LocalStorage)
+        // =========================================
+        function loadData() {
+            const storedJson = localStorage.getItem(STORAGE_KEY);
+            if (storedJson) {
+                try {
+                    appData = JSON.parse(storedJson);
+                    // Validasi struktur dasar
+                    if(!appData.books || !appData.transactions) throw new Error("Struktur data tidak valid");
+                    
+                    // --- PERBAIKAN UTAMA DI SINI ---
+                    // Setelah data berhasil dimuat, langsung update tampilan!
+                    updateUI(); 
+                    // -------------------------------
+
+                } catch (e) {
+                    console.error("Data korup, reset ke default:", e);
+                    saveData(); // Reset jika error (saveData sudah memanggil updateUI)
+                }
+            } else {
+                saveData(); // Simpan default pertama kali (saveData sudah memanggil updateUI)
+            }
+        }
+
+        // =========================================
+        // LOGIKA TRAFFIC: SESI 24 JAM
+        // =========================================
+        const SESSION_DURATION = 4 * 60 * 60 * 1000; // 24 Jam dalam milidetik
+
+        function checkSessionValidity() {
+            // 1. Cek kapan terakhir kali user buka/refresh halaman ini
+            let lastSession = localStorage.getItem('aries_session_timestamp');
+            const now = new Date().getTime();
+
+            // Jika belum ada timestamp (baru pertama buka), set sekarang
+            if (!lastSession) {
+                lastSession = now;
+                localStorage.setItem('aries_session_timestamp', now);
+            }
+
+            // 2. Hitung selisih waktu
+            const timeDiff = now - parseInt(lastSession);
+
+            // 3. Jika sudah lewat 24 jam (Session Expired)
+            if (timeDiff > SESSION_DURATION) {
+                // Tampilkan pesan paksaan halus
+                if(confirm("⚠️ SESI BERAKHIR\n\nDemi keamanan data dan pembaruan sistem, aplikasi perlu dimuat ulang setiap 24 jam.\n\nKlik OK untuk Refresh halaman sekarang.")) {
+                    // Reset waktu dan reload halaman (Nambah Traffic!)
+                    localStorage.setItem('aries_session_timestamp', now);
+                    location.reload(); 
+                }
+                return false; // Blokir aksi simpan
+            }
+
+            // Jika masih dalam periode 24 jam, update timestamp agar sesi diperpanjang
+            // ATAU: Jangan update timestamp jika ingin strict 24 jam hard limit.
+            // Di sini kita pilih opsi Strict: User WAJIB refresh besoknya.
+            
+            return true; // Lanjut boleh simpan
+        }
+
+        // =========================================
+        // MODIFIKASI FUNGSI SAVE DATA
+        // =========================================
+        function saveData() {
+            // Cek Sesi Dulu!
+            if (!checkSessionValidity()) {
+                return; // Berhenti di sini kalau sesi habis
+            }
+
+            // Jika sesi aman, lanjut simpan
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            
+            // Update UI seperti biasa
+            updateUI(); 
+            
+            // Opsional: Feedback visual kecil
+            // alert("Data tersimpan!"); 
+        }
+
+        
+        function getActiveTransactions() {
+            return appData.transactions
+                .filter(tx => tx.bookId === appData.activeBookId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+
+        // =========================================
+        // 4. UI UPDATES & RENDERING
+        // =========================================
+        function updateUI() {
+            // 1. Update Book Selector
+            const bookSelector = document.getElementById('bookSelector');
+            bookSelector.innerHTML = appData.books.map(book => 
+                `<option value="${book.id}" ${book.id === appData.activeBookId ? 'selected' : ''}>📘 ${book.name}</option>`
+            ).join('');
+
+            // 2. Hitung Saldo
+            const currentTx = getActiveTransactions();
+            let totalIn = 0, totalOut = 0;
+            currentTx.forEach(tx => {
+                tx.type === 'in' ? totalIn += Number(tx.amount) : totalOut += Number(tx.amount);
+            });
+
+            document.getElementById('totalIncomeDisplay').innerText = formatIDR(totalIn);
+            document.getElementById('totalExpenseDisplay').innerText = formatIDR(totalOut);
+            document.getElementById('balanceDisplay').innerText = formatIDR(totalIn - totalOut);
+
+            // 3. Render Tabel & Chart
+            renderTable(currentTx);
+            renderExpenseChart(currentTx);
+        }
+
+        function renderTable(transactions) {
+            const tableBody = document.getElementById('transactionTableBody');
+            const emptyState = document.getElementById('emptyRowState');
+
+            if (transactions.length === 0) {
+                tableBody.innerHTML = '';
+                tableBody.appendChild(emptyState);
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tableBody.innerHTML = transactions.map(tx => {
+                const isIncome = tx.type === 'in';
+                const amountClass = isIncome ? 'text-emerald-400' : 'text-rose-400';
+                const iconClass = isIncome ? 'fa-arrow-down-long text-emerald-500' : 'fa-arrow-up-long text-rose-500';
+                const formattedDate = new Date(tx.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: '2-digit' });
+
+                return `
+                    <tr class="hover:bg-slate-800/30 transition-colors group">
+                        <td class="px-5 py-3 font-mono text-xs whitespace-nowrap">${formattedDate}</td>
+                        <td class="px-5 py-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
+                                    <i class="fa-solid ${iconClass} text-xs"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-200">${tx.category}</div>
+                                    ${tx.note ? `<div class="text-xs text-slate-500 italic truncate max-w-[200px]">${tx.note}</div>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-5 py-3 text-right font-mono font-bold ${amountClass}">
+                            ${isIncome ? '+' : '-'} ${formatIDR(tx.amount).replace('Rp', '')}
+                        </td>
+                         <td class="px-5 py-3 text-center">
+                            <button onclick="deleteTransaction('${tx.id}')" class="text-slate-600 hover:text-rose-500 transition-colors p-2 rounded hover:bg-rose-500/10 opacity-0 group-hover:opacity-100" title="Hapus Transaksi">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function renderExpenseChart(transactions) {
+            const chartCanvas = document.getElementById('expenseChart');
+            const emptyState = document.getElementById('chartEmptyState');
+
+            const now = new Date();
+            const expenseTx = transactions.filter(tx => {
+                const txDate = new Date(tx.date);
+                return tx.type === 'out' && txDate.getMonth() === now.getMonth() && txDate.getFullYear() === now.getFullYear();
+            });
+
+            if (expenseTx.length === 0) {
+                chartCanvas.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                if(expenseChartInstance) expenseChartInstance.destroy();
+                return;
+            }
+
+            chartCanvas.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            const categoryTotals = {};
+            expenseTx.forEach(tx => categoryTotals[tx.category] = (categoryTotals[tx.category] || 0) + Number(tx.amount));
+
+            if (expenseChartInstance) expenseChartInstance.destroy();
+
+            expenseChartInstance = new Chart(chartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryTotals),
+                    datasets: [{
+                        data: Object.values(categoryTotals),
+                        backgroundColor: ['#f43f5e', '#ec4899', '#d946ef', '#a855f7', '#8b5cf6', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6'],
+                        borderWidth: 0, hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 }, boxWidth: 12 } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${formatIDR(ctx.raw)}` } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        function updateCategoryOptions() {
+            const type = document.querySelector('input[name="type"]:checked').value;
+            document.getElementById('inputCategory').innerHTML = CATEGORIES[type].map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        // =========================================
+        // 5. EVENT HANDLERS & ACTIONS
+        // =========================================
+        document.getElementById('bookSelector').addEventListener('change', (e) => {
+            appData.activeBookId = e.target.value;
+            saveData(); // Simpan preference buku terakhir dan update UI
+        });
+
+        document.querySelectorAll('input[name="type"]').forEach(radio => {
+            radio.addEventListener('change', updateCategoryOptions);
+        });
+
+        document.getElementById('transactionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const amountElem = document.getElementById('inputAmount');
+            const dateElem = document.getElementById('inputDate');
+            if (!amountElem.value || !dateElem.value) return alert("Jumlah dan Tanggal wajib diisi!");
+
+            appData.transactions.unshift({
+                id: generateId(),
+                bookId: appData.activeBookId,
+                type: document.querySelector('input[name="type"]:checked').value,
+                amount: Number(amountElem.value),
+                date: dateElem.value,
+                category: document.getElementById('inputCategory').value,
+                note: document.getElementById('inputNote').value.trim()
+            });
+
+            saveData();
+            e.target.reset();
+            dateElem.value = getTodayDateString();
+            updateCategoryOptions();
+        });
+
+        function createNewBook() {
+            const bookName = prompt("Nama buku baru:");
+            if (bookName && bookName.trim() !== "") {
+                const newId = generateId();
+                appData.books.push({ id: newId, name: bookName.trim() });
+                appData.activeBookId = newId;
+                saveData();
+            }
+        }
+
+        function deleteTransaction(id) {
+            if(confirm("Hapus transaksi ini?")) {
+                appData.transactions = appData.transactions.filter(tx => tx.id !== id);
+                saveData();
+            }
+        }
+
+        function clearCurrentBookData() {
+            if(confirm("Hapus SEMUA data di buku ini?")) {
+                appData.transactions = appData.transactions.filter(tx => tx.bookId !== appData.activeBookId);
+                saveData();
+            }
+        }
+
+        // =========================================
+        // 6. EXPORT FUNCTIONS (Updated)
+        // =========================================
+        
+        // Helper: Filter data berdasarkan Picker Bulan
+        function getFilteredExportData() {
+            let transactions = getActiveTransactions(); // Ambil semua data buku aktif
+            const monthPicker = document.getElementById('exportMonthPicker').value; // Format: "YYYY-MM"
+
+            if (transactions.length === 0) {
+                alert("Tidak ada data transaksi di buku ini.");
+                return null;
+            }
+
+            // Jika user memilih bulan, filter datanya
+            let periodeLabel = "Semua Periode";
+            if (monthPicker) {
+                const [year, month] = monthPicker.split('-');
+                transactions = transactions.filter(tx => {
+                    const d = new Date(tx.date);
+                    return d.getFullYear() === parseInt(year) && (d.getMonth() + 1) === parseInt(month);
+                });
+                
+                // Format label bulan (misal: "Februari 2026")
+                const dateObj = new Date(year, month - 1);
+                periodeLabel = dateObj.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+                if (transactions.length === 0) {
+                    alert(`Tidak ada data transaksi pada periode ${periodeLabel}.`);
+                    return null;
+                }
+            }
+
+            // Hitung Ringkasan (Total)
+            let totalIn = 0, totalOut = 0;
+            transactions.forEach(tx => {
+                if (tx.type === 'in') totalIn += Number(tx.amount);
+                else totalOut += Number(tx.amount);
+            });
+
+            return { transactions, periodeLabel, totalIn, totalOut, balance: totalIn - totalOut };
+        }
+
+        // Export Excel (Lengkap dengan Total)
+        function exportToExcel() {
+            const data = getFilteredExportData();
+            if (!data) return;
+
+            const { transactions, periodeLabel, totalIn, totalOut, balance } = data;
+
+            // 1. Format Data Utama
+            const excelRows = transactions.map(tx => ({
+                Tanggal: tx.date,
+                Tipe: tx.type === 'in' ? 'Pemasukan' : 'Pengeluaran',
+                Kategori: tx.category,
+                Catatan: tx.note || '-',
+                Jumlah: tx.amount
+            }));
+
+            // 2. Tambahkan Baris Kosong & Ringkasan di Bawah
+            excelRows.push(
+                { Tanggal: '', Tipe: '', Kategori: '', Catatan: '', Jumlah: '' }, // Spasi
+                { Tanggal: 'RINGKASAN', Tipe: '', Kategori: '', Catatan: 'Total Pemasukan', Jumlah: totalIn },
+                { Tanggal: '', Tipe: '', Kategori: '', Catatan: 'Total Pengeluaran', Jumlah: totalOut },
+                { Tanggal: '', Tipe: '', Kategori: '', Catatan: 'SISA SALDO', Jumlah: balance }
+            );
+
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            
+            // Auto-width kolom sederhana
+            const wscols = [{wch:12}, {wch:12}, {wch:20}, {wch:30}, {wch:15}];
+            worksheet['!cols'] = wscols;
+
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
+
+            // Nama file dinamis
+            const safeName = appData.books.find(b => b.id === appData.activeBookId).name.replace(/\s+/g, '_');
+            const safePeriode = periodeLabel.replace(/\s+/g, '_');
+            XLSX.writeFile(workbook, `FinFlow_${safeName}_${safePeriode}.xlsx`);
+        }
+
+        // Export PDF (Desain Laporan Resmi)
+        function exportToPDF() {
+            const data = getFilteredExportData();
+            if (!data) return;
+
+            const { transactions, periodeLabel, totalIn, totalOut, balance } = data;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const bookName = appData.books.find(b => b.id === appData.activeBookId).name;
+
+            // --- HEADER LAPORAN ---
+            doc.setFillColor(15, 23, 42); // Warna Slate-900 header block
+            doc.rect(0, 0, 210, 40, 'F');
+            
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text(`Laporan Keuangan: ${bookName}`, 14, 18);
+            
+            doc.setFontSize(10);
+            doc.setTextColor(148, 163, 184); // Slate-400
+            doc.text(`Periode Laporan: ${periodeLabel}`, 14, 26);
+            doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 32);
+
+            // --- KOTAK RINGKASAN (SUMMARY BOX) ---
+            let startY = 50;
+            
+            // Pemasukan
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.text("Total Pemasukan", 14, startY);
+            doc.setTextColor(16, 185, 129); // Emerald
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(formatIDR(totalIn), 14, startY + 6);
+
+            // Pengeluaran
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.text("Total Pengeluaran", 80, startY);
+            doc.setTextColor(244, 63, 94); // Rose
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(formatIDR(totalOut), 80, startY + 6);
+
+            // Saldo
+            doc.setFont(undefined, 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(10);
+            doc.text("Saldo Akhir", 150, startY);
+            doc.setTextColor(67, 56, 202); // Indigo
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text(formatIDR(balance), 150, startY + 6);
+
+            // --- TABEL TRANSAKSI ---
+            doc.autoTable({
+                head: [["Tanggal", "Tipe", "Kategori", "Catatan", "Jumlah"]],
+                body: transactions.map(tx => [
+                    tx.date, 
+                    tx.type === 'in' ? 'Masuk' : 'Keluar', 
+                    tx.category, 
+                    tx.note || '', 
+                    formatIDR(tx.amount).replace('Rp', '').trim()
+                ]),
+                startY: startY + 15,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 3 },
+                headStyles: { fillColor: [30, 41, 59], textColor: 255 }, // Slate-800
+                columnStyles: { 4: { halign: 'right', fontStyle: 'bold' } },
+                didParseCell: function (data) {
+                    // Mewarnai teks tipe transaksi
+                    if (data.section === 'body' && data.column.index === 1) {
+                        data.cell.styles.textColor = data.cell.raw === 'Masuk' ? [16, 185, 129] : [244, 63, 94];
+                    }
+                }
+            });
+
+            // Footer
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(`Halaman 1 dari ${pageCount} | Dibuat dengan Aries FinFlow`, 14, doc.internal.pageSize.height - 10);
+
+            doc.save(`Laporan_${bookName}_${periodeLabel.replace(/\s+/g, '_')}.pdf`);
+        }
+
+        // =========================================
+        // 7. MAIN ENTRY POINT
+        // =========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('inputDate').value = getTodayDateString();
+            updateCategoryOptions();
+            loadData(); // <-- FUNGSI INI SEKARANG SUDAH MEMANGGIL updateUI() DI DALAMNYA
+			localStorage.setItem('aries_session_timestamp', new Date().getTime());
+        });
+    </script>
+</body>
+</html>

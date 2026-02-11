@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +20,7 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-    
+    <script src="../assets/session-manager.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
@@ -74,7 +74,32 @@
 			</a>
         </div>
     </nav>
+	<div class="w-full bg-slate-950 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            
+            <div class="w-full h-[50px] md:h-[90px] bg-slate-900 border border-slate-700/50 border-dashed rounded-lg flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-slate-800 transition-colors">
+                
+                <div class="absolute top-0 right-0 bg-slate-800 text-[9px] text-slate-500 px-1.5 py-0.5 rounded-bl-lg border-l border-b border-slate-700">
+                    AD
+                </div>
 
+                <div class="flex flex-col items-center justify-center text-center">
+                    <span class="text-xs md:text-sm font-bold text-slate-500 group-hover:text-slate-300">
+                        <i class="fa-solid fa-star text-emerald-500 mr-1"></i>
+                        Premium Banner Spot
+                    </span>
+                    <span class="text-[10px] text-slate-600 hidden md:inline">
+                        728 x 90 Leaderboard
+                    </span>
+					<a href="mailto:tammyjehan@gmail.com" class="text-xs text-indigo-400 hover:text-indigo-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+						Contact us to place your ad &rarr;
+					</a>
+                </div>
+
+                </div>
+
+        </div>
+    </div>
     <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
         
         <div class="w-full max-w-5xl bg-slate-900/90 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
@@ -139,93 +164,124 @@
         </div>
     </main>
 
-    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
+    <section class="max-w-7xl mx-auto px-4 py-16 lg:py-24 border-t border-slate-800 mt-12 bg-slate-950 relative overflow-hidden">
         
         <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
-            [AdSense Slot: Leaderboard]
+            [AdSense Slot: Leaderboard 728x90]
         </div>
+		<div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-900/10 to-transparent pointer-events-none"></div>
 
-        <div class="border-b border-slate-800 pb-8 mb-8">
-            <h2 class="text-3xl font-bold text-white mb-4">Free Custom QR Code Generator - WiFi, vCard & URLs</h2>
-            <p class="leading-relaxed">
-                Create professional, high-resolution QR Codes instantly with <strong>Insta-Connect QR</strong>. 
-                Whether you need a <span class="text-amber-400 font-bold">WiFi Login QR</span> for your cafe, a <span class="text-amber-400 font-bold">Digital Business Card (vCard)</span> for networking, or a simple Website Link, we've got you covered. 
-                Customize colors, shapes, and download in PNG or SVG formats. 
-                <strong>100% Free & No Expiry (Static QR).</strong>
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📶</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">WiFi Auto-Connect</h3>
-                <p class="text-xs text-slate-400">
-                    Stop spelling out complex passwords! Create a QR code containing your WiFi SSID and Password. Guests scan it and connect instantly.
-                </p>
-            </div>
-
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📇</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">vCard (Contact)</h3>
-                <p class="text-xs text-slate-400">
-                    Share your contact details (Name, Phone, Email) with a single scan. The user's phone will automatically prompt to "Save Contact".
-                </p>
-            </div>
-
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-amber-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🎨</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">Custom Branding</h3>
-                <p class="text-xs text-slate-400">
-                    Ditch the boring black-and-white squares. Change colors, dot styles, and corner markers to match your brand identity.
-                </p>
-            </div>
-        </div>
-
-        <div class="bg-slate-900/50 border-l-4 border-amber-500 pl-6 py-6 mb-10">
-            <h3 class="text-xl font-bold text-white mb-4 mt-0">Why use "Static" QR Codes?</h3>
-            <p class="text-sm mb-4">
-                Many online generators create "Dynamic" QR codes that expire after a trial period or require a monthly subscription. 
-                <strong>Insta-Connect QR generates Static Codes.</strong>
-            </p>
-            <ul class="space-y-2 list-none pl-0 text-sm">
-                <li class="flex items-center gap-2">
-                    <span class="text-emerald-400">✅</span> <strong>Forever Free:</strong> Your QR code will work forever.
-                </li>
-                <li class="flex items-center gap-2">
-                    <span class="text-emerald-400">✅</span> <strong>Direct Data:</strong> The information (Link, WiFi Pass) is stored directly in the image pattern, not on a redirect server.
-                </li>
-                <li class="flex items-center gap-2">
-                    <span class="text-emerald-400">✅</span> <strong>Scanning Speed:</strong> Faster scanning because it doesn't need to ping an external server first.
-                </li>
-            </ul>
-        </div>
-
-        <div class="space-y-6">
-            <h3 class="text-2xl font-bold text-white">Frequently Asked Questions</h3>
-            
-            <div class="space-y-4">
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">Is it safe to type my WiFi Password here?</h4>
-                    <p class="text-xs">Yes. This tool runs <strong>Client-Side</strong>. Your WiFi password is converted into the QR pattern directly in your browser. It is never sent to our servers or stored anywhere.</p>
-                </div>
-                
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">What is SVG format?</h4>
-                    <p class="text-xs">SVG (Scalable Vector Graphics) allows you to resize the QR code to any size (even billboard size) without it becoming blurry/pixelated. Perfect for print designers.</p>
+            <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                <div class="text-left mb-8">
+                    <span class="text-cyan-400 font-mono text-xs uppercase tracking-widest mb-3 block">Data Encoding 101</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
+                        The Language of <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Squares & Patterns.</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm leading-relaxed text-justify">
+                        QR Codes are everywhere, from restaurant menus to crypto wallets. But how does a simple grid of pixels store complex information instantly?
+                    </p>
                 </div>
 
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">Can I change the link later?</h4>
-                    <p class="text-xs">No. Since this is a Static QR Code, the data is hard-coded into the image. If you change your website URL or WiFi password, you must generate a new QR code.</p>
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-cyan-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                            <i class="fa-solid fa-qrcode text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">2D vs 1D Barcodes</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        Traditional barcodes (UPC) only store data horizontally (1D). QR Codes are <strong>2-Dimensional</strong>, storing data both vertically and horizontally, allowing them to hold 100x more information.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-blue-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <i class="fa-solid fa-shield-cat text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Reed-Solomon</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        This mathematical algorithm allows a QR Code to be scanned even if up to <strong>30%</strong> of it is damaged, ripped, or covered by a logo.
+                    </p>
                 </div>
             </div>
-        </div>
-        
-        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
-            [AdSense Slot: Rectangle]
-        </div>
 
+            <div class="lg:col-span-8 bg-slate-900/20 p-6 md:p-8 rounded-3xl border border-slate-800/50 backdrop-blur-sm">
+                <article class="prose prose-invert prose-slate max-w-none">
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-cyan-500">#1</span> Anatomy of a "Quick Response" Code
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Invented in 1994 by Denso Wave, the QR (Quick Response) Code was designed to track automotive parts at high speed. Unlike standard barcodes that require a perfect laser line, QR codes can be scanned from any angle. This is made possible by the three distinctive squares in the corners, known as <strong>Finder Patterns</strong>.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify">
+                            When your phone camera sees these three squares, it instantly calculates the orientation and size of the grid. The rest of the "noise" (the small black and white dots) is actually binary data (0s and 1s) representing your text or URL.
+                        </p>
+                    </div>
+
+                    <div class="w-full h-px bg-slate-800 my-8"></div>
+
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-blue-500">#2</span> The Magic of Error Correction
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Have you ever wondered why some QR codes have a logo in the middle, yet they still work? They aren't "designed" around the logo; the logo is literally destroying part of the data. This is possible thanks to <strong>Error Correction Levels</strong> (L, M, Q, H).
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Low Redundancy (Level L)
+                                </h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    Stores less backup data (7% recovery), but the dots are less dense. Best for long URLs where you need the code to look cleaner.
+                                </p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> High Redundancy (Level H)
+                                </h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    Sacrifices density for durability (30% recovery). Essential if you plan to put a logo in the center or print the code on a wrinkled T-shirt.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-sky-500">#3</span> Why Use Aries QR Studio?
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Many "free" online QR generators are actually data traps. They create "Dynamic QR Codes" that redirect through their own servers first (tracking who scans it) before sending users to your link. If their server goes down, your printed QR code dies.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            <strong>Aries QR Studio is different.</strong> We generate <strong>Static QR Codes</strong> directly in your browser using JavaScript.
+                        </p>
+                        
+                        <ul class="space-y-3 my-6 pl-4 border-l-2 border-cyan-500/30">
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-cyan-400">Direct Linking:</strong> The URL is embedded directly into the pattern. It works forever, even if this website disappears.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-blue-400">Privacy First:</strong> We do not track who creates the code or who scans it. Your data remains yours.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-sky-400">High Resolution:</strong> Download crisp PNGs ready for professional printing, from business cards to billboards.
+                            </li>
+                        </ul>
+                    </div>
+
+                </article>
+            </div>
+        </div>
     </section>
 
     <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
@@ -435,6 +491,14 @@
         link.href = image;
         link.click();
     }
+	document.addEventListener('DOMContentLoaded', () => {
+
+		// PANGGIL SESSION MANAGER (TANPA AUTO SAVE)
+		// User akan dapat peringatan biasa.
+		initSessionManager();
+
+		// ... inisialisasi tool lainnya ...
+	});
 
     init();
 

@@ -15,7 +15,7 @@
 	<title>PDF Forge - Merge, Convert & Optimize (Client-Side) - Aries Techlab</title>
     <link rel="icon" type="image/png" href="../favicon.png?v=2">
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="../assets/session-manager.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.8/download.min.js"></script>
@@ -64,7 +64,32 @@
 			</a>
         </div>
     </nav>
+	<div class="w-full bg-slate-950 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            
+            <div class="w-full h-[50px] md:h-[90px] bg-slate-900 border border-slate-700/50 border-dashed rounded-lg flex items-center justify-center relative overflow-hidden group cursor-pointer hover:bg-slate-800 transition-colors">
+                
+                <div class="absolute top-0 right-0 bg-slate-800 text-[9px] text-slate-500 px-1.5 py-0.5 rounded-bl-lg border-l border-b border-slate-700">
+                    AD
+                </div>
 
+                <div class="flex flex-col items-center justify-center text-center">
+                    <span class="text-xs md:text-sm font-bold text-slate-500 group-hover:text-slate-300">
+                        <i class="fa-solid fa-star text-emerald-500 mr-1"></i>
+                        Premium Banner Spot
+                    </span>
+                    <span class="text-[10px] text-slate-600 hidden md:inline">
+                        728 x 90 Leaderboard
+                    </span>
+					<a href="mailto:tammyjehan@gmail.com" class="text-xs text-indigo-400 hover:text-indigo-300 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+						Contact us to place your ad &rarr;
+					</a>
+                </div>
+
+                </div>
+
+        </div>
+    </div>
     <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
         
         <div class="w-full max-w-4xl bg-slate-900/95 backdrop-blur-xl border border-slate-700 rounded-3xl shadow-2xl overflow-hidden flex flex-col min-h-[700px]">
@@ -140,86 +165,124 @@
             </div>
         </div>
     </main>
-
-    <section class="max-w-4xl mx-auto px-6 py-16 prose prose-invert prose-sm text-slate-300">
         
+
+    <section class="max-w-7xl mx-auto px-4 py-16 lg:py-24 border-t border-slate-800 mt-12 bg-slate-950 relative overflow-hidden">
         <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
             [AdSense Slot: Leaderboard]
         </div>
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-rose-900/10 to-transparent pointer-events-none"></div>
 
-        <div class="border-b border-slate-800 pb-8 mb-8">
-            <h2 class="text-3xl font-bold text-white mb-4">PDF Forge: The Secure Way to Merge & Convert Files</h2>
-            <p class="leading-relaxed">
-                Most online PDF tools force you to upload your private documents to their servers. <strong>PDF Forge</strong> is different. 
-                We use advanced <span class="text-rose-400 font-bold">Client-Side Technology (WebAssembly)</span> to process your files directly on your device. 
-                Whether you need to combine multiple reports into one, convert photos to PDF, or clean up file metadata—everything happens locally. 
-                <strong>Your data never leaves your computer.</strong>
-            </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">📑</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">PDF Merger</h3>
-                <p class="text-xs text-slate-400">
-                    Combine multiple PDF files into a single document. Perfect for compiling reports, ebooks, or administrative documents. Drag and drop to reorder pages effortlessly.
-                </p>
-            </div>
-
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🖼️</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">Image to PDF</h3>
-                <p class="text-xs text-slate-400">
-                    Convert JPG or PNG images into a PDF file. Essential for creating digital portfolios, submitting ID cards (KTP/SIM), or turning scanned receipts into a report.
-                </p>
-            </div>
-
-            <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 hover:border-rose-500/50 transition-colors">
-                <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center text-xl mb-3">🚀</div>
-                <h3 class="text-white font-bold text-base mb-2 mt-0">PDF Optimizer</h3>
-                <p class="text-xs text-slate-400">
-                    Reduce file clutter by removing unused objects and metadata. This "re-saving" process often results in a smaller, cleaner file without quality loss.
-                </p>
-            </div>
-        </div>
-
-        <div class="bg-slate-900/50 border-l-4 border-rose-500 pl-6 py-6 mb-10">
-            <h3 class="text-xl font-bold text-white mb-4 mt-0">How to Merge PDF Files?</h3>
-            <ol class="space-y-3 list-decimal pl-5 marker:text-rose-500 text-sm">
-                <li>Click the <strong>"Merge PDF"</strong> tab above.</li>
-                <li>Drag & Drop your PDF files into the upload zone.</li>
-                <li><strong class="text-white">Reorder:</strong> Drag the files in the list to arrange them in the correct sequence (e.g., Cover Page first, Chapter 1 second).</li>
-                <li>Click the <strong>Preview (👁️)</strong> button if you need to check the content.</li>
-                <li>Hit <strong>"Merge Files Now"</strong> to instantly download your combined document.</li>
-            </ol>
-        </div>
-
-        <div class="space-y-6">
-            <h3 class="text-2xl font-bold text-white">Frequently Asked Questions</h3>
-            
-            <div class="space-y-4">
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">Is it safe for sensitive documents?</h4>
-                    <p class="text-xs">Yes. Unlike other websites, we do not upload your files to a cloud server. All processing is done by your own browser using JavaScript libraries. It works even if you disconnect from the internet after loading the page.</p>
-                </div>
-                
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">Is there a file size limit?</h4>
-                    <p class="text-xs">Technically, no. However, since the processing happens on your device, very large files (e.g., 500MB+) might be slower depending on your computer's RAM.</p>
+            <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                <div class="text-left mb-8">
+                    <span class="text-rose-400 font-mono text-xs uppercase tracking-widest mb-3 block">Document Architecture 101</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
+                        The Science of <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-500">Digital Paper.</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm leading-relaxed text-justify">
+                        PDF is not just a file format; it is a fixed-layout document standard that preserves fonts, images, and layout regardless of the software used.
+                    </p>
                 </div>
 
-                <div>
-                    <h4 class="text-white font-bold text-sm mb-1">Can I merge encrypted/password-protected PDFs?</h4>
-                    <p class="text-xs">For security reasons, browser-based tools cannot bypass PDF passwords. You must unlock the file first before merging.</p>
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-rose-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400">
+                            <i class="fa-solid fa-vector-square text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Vector vs Raster</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        Unlike a JPEG image, a PDF text is stored as mathematical vectors. This allows you to zoom in 5000% on a letter 'A' and it will remain perfectly sharp, not pixelated.
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-orange-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400">
+                            <i class="fa-solid fa-font text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Font Subsetting</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        To save space, smart PDF compressors remove unused characters from a font file. If your document only uses "Hello", the PDF deletes 'A', 'B', 'C', etc. from the embedded font.
+                    </p>
                 </div>
             </div>
-        </div>
-        
-        <div class="w-full h-64 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mt-12 text-slate-600 text-xs">
-            [AdSense Slot: Rectangle]
-        </div>
 
+            <div class="lg:col-span-8 bg-slate-900/20 p-6 md:p-8 rounded-3xl border border-slate-800/50 backdrop-blur-sm">
+                <article class="prose prose-invert prose-slate max-w-none">
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-rose-500">#1</span> Why PDF Became the Global Standard?
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Before 1993, sharing documents was a nightmare. If you wrote a report in Word and sent it to a friend who didn't have the same font installed, the layout would explode. Adobe solved this with the <strong>Portable Document Format (PDF)</strong>.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Technically, a PDF is a descendant of the <strong>PostScript</strong> language. It is a container that holds explicit instructions for a printer (or screen) on exactly where to place every drop of ink. It doesn't say "Put text here"; it says "Draw vector shape 'H' at coordinate X:50, Y:100".  This "Fixed-Layout" nature guarantees that what you see on your phone is exactly what will come out of a printer in Tokyo.
+                        </p>
+                    </div>
+
+                    <div class="w-full h-px bg-slate-800 my-8"></div>
+
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-orange-500">#2</span> The Mechanics of Compression
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Many people struggle with bloated PDF files. When <strong>Aries PDF Forge</strong> compresses a document, it doesn't just lower quality. It performs a surgical cleanup of the file structure.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-rose-500"></span> Stream Compression
+                                </h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    It applies Flate/Zip algorithms to the raw text data streams inside the PDF, removing whitespace and redundant code.
+                                </p>
+                            </div>
+                            <div class="bg-slate-950 p-5 rounded-xl border border-slate-800">
+                                <h4 class="font-bold text-white mb-2 text-sm flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-orange-500"></span> Image Downsampling
+                                </h4>
+                                <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                                    It identifies images printed at 300 DPI (Print Quality) and intelligently resamples them to 144 DPI (Screen Quality) without visible blurring.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-pink-500">#3</span> Security: Why Local Processing is Critical
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            PDFs are often used for contracts, bank statements, and legal IDs. The biggest risk with online PDF tools is <strong>Data Leakage</strong>. When you upload a file to a cloud server to "Merge" or "Split" it, you are trusting that server with your secrets.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify">
+                            <strong>Aries PDF Forge is built on a Zero-Trust architecture.</strong>
+                        </p>
+                        <ul class="space-y-3 my-6 pl-4 border-l-2 border-rose-500/30">
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-rose-400">Client-Side Library:</strong> We use advanced JavaScript libraries (like pdf-lib) to manipulate the binary data directly in your browser's memory.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-orange-400">No Server Upload:</strong> Your contract never leaves your computer. Even if the internet goes down, the tool keeps working.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-pink-400">Metadata Stripping:</strong> Our tools can help remove hidden metadata (author name, creation date) that might compromise your privacy.
+                            </li>
+                        </ul>
+                    </div>
+
+                </article>
+            </div>
+        </div>
     </section>
 
     <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
@@ -496,6 +559,15 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`;
     }
+	document.addEventListener('DOMContentLoaded', () => {
+
+		// PANGGIL SESSION MANAGER (TANPA AUTO SAVE)
+		// User akan dapat peringatan biasa.
+		initSessionManager();
+
+		// ... inisialisasi tool lainnya ...
+	});
+
 </script>
 </body>
 </html>
