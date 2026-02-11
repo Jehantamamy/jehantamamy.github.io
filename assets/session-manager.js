@@ -38,7 +38,7 @@ function initSessionManager(saveCallback = null) {
 
         // --- TAMPILKAN PESAN ---
         // Pesan beda tergantung apakah ada saveCallback atau tidak
-        let msg = "🔄 SYSTEM UPDATE REQUIRED\n\nSesi 24 jam Anda telah berakhir.\n";
+        let msg = "🔄 SYSTEM UPDATE REQUIRED\n\nSesi 4 jam Anda telah berakhir.\n";
         
         if (saveCallback) {
             msg += "Data Anda SUDAH DISIMPAN secara otomatis.\n";
