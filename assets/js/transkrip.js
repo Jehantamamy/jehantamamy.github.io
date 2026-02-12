@@ -3,7 +3,7 @@
 	// SECURITY: DOMAIN LOCK SYSTEM
 	// Mencegah program dijalankan di luar domain resmi
 	// =============================================
-	///*
+	/*
 	(function() {
 		// 1. Tentukan Domain Resmi Kamu
 		const allowedDomains = ["ariestechlab.com", "www.ariestechlab.com"];

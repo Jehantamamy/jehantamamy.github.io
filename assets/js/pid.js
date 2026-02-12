@@ -1,4 +1,4 @@
-        ///*
+        /*
 		(function() {
 			// 1. Tentukan Domain Resmi Kamu
 			const allowedDomains = ["ariestechlab.com", "www.ariestechlab.com"];
