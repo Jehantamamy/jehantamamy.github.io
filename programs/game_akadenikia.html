@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademikia: Path to Professor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ANIMASI BERJALAN */
+        @keyframes walk {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .walking-char { animation: walk 0.5s infinite ease-in-out; }
+        
+        /* ANIMASI BACKGROUND BERGERAK */
+        @keyframes scrollBg {
+            from { background-position: 0 0; }
+            to { background-position: -100% 0; }
+        }
+        .scrolling-bg { animation: scrollBg 10s linear infinite; }
+
+        /* EFEK GETAR (HIT) */
+        .shake { animation: shake 0.5s; }
+        .shake-hard { animation: shake 0.8s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        
+        .bar-transition { transition: width 0.3s ease-out; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-200 font-sans select-none overflow-hidden">
+
+    <div class="max-w-md mx-auto h-screen flex flex-col relative bg-slate-800 border-x border-slate-700 shadow-2xl">
+
+        <div class="bg-slate-950 p-3 border-b border-slate-700 z-20">
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <h2 id="playerName" class="font-bold text-yellow-400 text-lg">Si Maba</h2>
+                    <div class="text-xs text-slate-400" id="playerLevel">Loading...</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-emerald-400 font-mono font-bold" id="playerMoney">Rp 0</div>
+                </div>
+            </div>
+            
+            <div class="relative w-full h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-600 mb-1">
+                <div id="hpBar" class="absolute top-0 left-0 h-full bg-red-500 bar-transition" style="width: 100%"></div>
+                <div class="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-white drop-shadow-md">
+                    FOKUS: <span id="hpText">0/0</span>
+                </div>
+            </div>
+            
+            <div class="relative w-full h-2 bg-slate-800 rounded-full overflow-hidden border border-slate-600">
+                <div id="expBar" class="absolute top-0 left-0 h-full bg-blue-500 bar-transition" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="gameScene" class="flex-1 relative overflow-hidden bg-cover bg-center transition-all duration-500">
+            
+            <div class="absolute inset-0 bg-slate-900/30"></div>
+
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 px-4 py-1 rounded-full text-xs font-bold border border-white/20 z-10">
+                📍 <span id="areaName">Loading...</span>
+            </div>
+
+            <div id="exploreMode" class="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300">
+                <div class="text-center mb-8 animate-pulse text-sm text-yellow-200 bg-black/50 px-3 py-1 rounded">
+                    Sedang berjalan ke sekolah...
+                </div>
+                <img src="https://placehold.co/150x150/png?text=Player" id="playerSprite" class="w-32 h-32 walking-char filter drop-shadow-lg">
+            </div>
+
+            <div id="battleMode" class="absolute inset-0 hidden flex-col justify-between p-6 bg-black/80 backdrop-blur-sm transition-opacity duration-300 z-20">
+                
+                <div class="flex flex-col items-center mt-4">
+                    <div class="text-red-400 font-bold text-lg mb-1" id="enemyName">Monster PR</div>
+                    
+                    <div id="enemyHpWrapper" class="w-32 h-2 bg-slate-700 rounded-full mb-2 overflow-hidden border border-slate-600 transition-opacity">
+                        <div id="enemyHpBar" class="h-full bg-red-600 bar-transition" style="width: 100%"></div>
+                    </div>
+
+                    <img src="https://placehold.co/120x120/red/white?text=Enemy" id="enemySprite" class="w-24 h-24 animate-bounce">
+                </div>
+
+                <div id="battleLog" class="h-24 overflow-y-auto text-xs font-mono text-slate-300 bg-black/50 p-2 rounded border border-slate-700 mb-4">
+                    Game dimulai...
+                </div>
+
+                <div id="battleButtons" class="grid grid-cols-2 gap-2">
+                    <button onclick="Game.playerAttack()" class="bg-red-600 hover:bg-red-500 text-white py-3 rounded font-bold border-b-4 border-red-800 active:border-b-0 active:translate-y-1">
+                        <i class="fa-solid fa-gavel"></i> Jawab (Atk)
+                    </button>
+                    <button onclick="Game.runAway()" class="bg-yellow-600 hover:bg-yellow-500 text-white py-3 rounded font-bold border-b-4 border-yellow-800 active:border-b-0 active:translate-y-1">
+                        <i class="fa-solid fa-person-running"></i> Kabur
+                    </button>
+                </div>
+            </div>
+            
+            <div id="notification" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-black font-bold px-6 py-4 rounded-xl shadow-2xl transform scale-0 transition-transform duration-300 z-50 text-center border-4 border-white">
+                <div id="notifText">LEVEL UP!</div>
+                <button onclick="UI.closeNotif()" class="mt-2 bg-black text-white px-4 py-1 rounded text-sm">OK</button>
+            </div>
+
+        </div>
+		
+		<div id="shopModal" class="absolute inset-0 z-50 hidden bg-black/95 flex flex-col p-4 animate-fade-in text-sm">
+        
+			<div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
+				<h3 class="text-yellow-400 font-bold text-lg"><i class="fa-solid fa-store mr-2"></i>Toko Sekolah</h3>
+				<button onclick="Shop.close()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark fa-lg"></i></button>
+			</div>
+
+			<div class="flex gap-2 mb-4">
+				<button onclick="Shop.switchTab('food')" id="tabFood" class="flex-1 py-2 bg-yellow-600 text-white rounded font-bold border border-yellow-500">Kantin (Makanan)</button>
+				<button onclick="Shop.switchTab('gear')" id="tabGear" class="flex-1 py-2 bg-slate-700 text-slate-300 rounded font-bold border border-slate-600">Koperasi (Alat)</button>
+			</div>
+			
+			<div id="shopFoodContent" class="flex-1 overflow-y-auto space-y-2">
+				<div onclick="Shop.buyFood('gorengan')" class="flex justify-between items-center bg-slate-800 p-3 rounded border border-slate-700 hover:border-yellow-500 cursor-pointer">
+					<div class="flex items-center gap-3">
+						<div class="text-2xl">🥟</div>
+						<div>
+							<div class="font-bold text-white">Gorengan</div>
+							<div class="text-[10px] text-green-400">Pulihkan 30 Fokus</div>
+						</div>
+					</div>
+					<div class="font-mono text-yellow-400">Rp 500</div>
+				</div>
+				<div onclick="Shop.buyFood('esteh')" class="flex justify-between items-center bg-slate-800 p-3 rounded border border-slate-700 hover:border-yellow-500 cursor-pointer">
+					<div class="flex items-center gap-3">
+						<div class="text-2xl">🧊</div>
+						<div>
+							<div class="font-bold text-white">Es Teh Manis</div>
+							<div class="text-[10px] text-green-400">Pulihkan 100 Fokus</div>
+						</div>
+					</div>
+					<div class="font-mono text-yellow-400">Rp 2.000</div>
+				</div>
+				<div onclick="Shop.buyFood('kopi')" class="flex justify-between items-center bg-slate-800 p-3 rounded border border-slate-700 hover:border-yellow-500 cursor-pointer">
+					<div class="flex items-center gap-3">
+						<div class="text-2xl">☕</div>
+						<div>
+							<div class="font-bold text-white">Kopi Sachet</div>
+							<div class="text-[10px] text-blue-400">Buff: Serangan Critical</div>
+						</div>
+					</div>
+					<div class="font-mono text-yellow-400">Rp 10.000</div>
+				</div>
+			</div>
+
+			<div id="shopGearContent" class="hidden flex-1 overflow-y-auto space-y-2">
+				<div class="text-center text-slate-500 mt-10">Memuat data koperasi...</div>
+			</div>
+			
+			<div class="mt-2 pt-2 border-t border-slate-700 text-center text-xs text-slate-500 flex justify-between items-center px-2">
+				<span>Sisa Uang Saku:</span>
+				<span id="shopMoney" class="text-emerald-400 font-bold text-lg">Rp 0</span>
+			</div>
+		</div>
+        <div class="bg-slate-900 p-3 border-t border-slate-700 h-auto">
+            
+            <div class="mb-3 flex items-center gap-2">
+                <label class="text-xs text-slate-400">Lokasi:</label>
+                <select id="areaSelect" onchange="Game.changeArea(this.value)" class="flex-1 bg-slate-800 text-white text-xs p-2 rounded border border-slate-600 outline-none">
+                    </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 bg-slate-800 p-2 rounded border border-slate-700 mb-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-pen-fancy text-blue-400"></i>
+                    <span id="weaponName">-</span>
+                    <span class="text-blue-400 ml-auto" id="weaponStat">+0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-shirt text-green-400"></i>
+                    <span id="armorName">-</span>
+                    <span class="text-green-400 ml-auto" id="armorStat">+0</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button id="btnSave" onclick="SaveSystem.save()" class="flex-1 bg-blue-700 hover:bg-blue-600 text-white text-xs py-2 rounded border border-blue-500">
+                    <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan
+                </button>
+                <button onclick="SaveSystem.reset()" class="flex-1 bg-red-900 hover:bg-red-800 text-red-200 text-xs py-2 rounded border border-red-700">
+                    <i class="fa-solid fa-trash mr-1"></i> Reset
+                </button>
+				<button onclick="Shop.open()" class="flex-1 bg-yellow-700 hover:bg-yellow-600 text-white text-xs py-2 rounded border border-yellow-500">
+                    <i class="fa-solid fa-utensils mr-1"></i> Kantin
+                </button>
+          
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        /* ============================
+           1. DATABASE (STAGES & ITEMS)
+           ============================ */
+        const DB = {
+            stages: [
+                { id: 0, name: "Playgroup & TK", minLvl: 1, bg: "bg-yellow-100", enemies: [
+                    { name: "Rebutan Mainan", hp: 30, atk: 3, exp: 15, gold: 500 },
+                    { name: "Sayur Bayam", hp: 40, atk: 5, exp: 25, gold: 700 },
+                    { name: "Ngompol di Celana", hp: 50, atk: 8, exp: 35, gold: 800 },
+                    { name: "BOSS: Suntik Imunisasi", hp: 120, atk: 12, exp: 150, gold: 2000, isBoss: true }
+                ]},
+                { id: 1, name: "SD (Sekolah Dasar)", minLvl: 5, bg: "bg-red-100", enemies: [
+                    { name: "PR Matematika", hp: 80, atk: 10, exp: 50, gold: 1500 },
+                    { name: "Razia Kuku", hp: 100, atk: 15, exp: 70, gold: 2000 },
+                    { name: "BOSS: Ujian Nasional SD", hp: 400, atk: 35, exp: 500, gold: 10000, isBoss: true }
+                ]},
+                { id: 2, name: "SMP (Masa Puber)", minLvl: 10, bg: "bg-blue-100", enemies: [
+                    { name: "Cinta Monyet", hp: 250, atk: 30, exp: 150, gold: 5000 },
+                    { name: "Guru BK Killer", hp: 350, atk: 40, exp: 200, gold: 7000 },
+                    { name: "BOSS: Ujian Praktek", hp: 800, atk: 70, exp: 1000, gold: 25000, isBoss: true }
+                ]},
+                { id: 3, name: "SMA (Masa Depan)", minLvl: 20, bg: "bg-gray-200", enemies: [
+                    { name: "Remedial MTK", hp: 700, atk: 70, exp: 450, gold: 18000 },
+                    { name: "Try Out Akbar", hp: 1000, atk: 90, exp: 600, gold: 25000 },
+                    { name: "BOSS: SBMPTN / UTBK", hp: 2500, atk: 150, exp: 5000, gold: 100000, isBoss: true }
+                ]},
+                { id: 4, name: "S1 (Mahasiswa)", minLvl: 35, bg: "bg-green-100", enemies: [
+                    { name: "Dosen Kilat", hp: 1500, atk: 120, exp: 1000, gold: 40000 },
+                    { name: "Revisi Skripsi", hp: 3000, atk: 200, exp: 2000, gold: 60000 },
+                    { name: "BOSS: Sidang Skripsi", hp: 6000, atk: 400, exp: 10000, gold: 500000, isBoss: true }
+                ]},
+                { id: 5, name: "S2 (Master)", minLvl: 50, bg: "bg-purple-100", enemies: [
+                    { name: "Jurnal Predator", hp: 6000, atk: 350, exp: 3500, gold: 120000 },
+                    { name: "Tesis Macet", hp: 8000, atk: 500, exp: 5000, gold: 200000 },
+                    { name: "BOSS: Thesis Defense", hp: 15000, atk: 800, exp: 20000, gold: 1000000, isBoss: true }
+                ]},
+                { id: 6, name: "S3 (Doctoral)", minLvl: 70, bg: "bg-slate-300", enemies: [
+                    { name: "Imposter Syndrome", hp: 12000, atk: 600, exp: 8000, gold: 300000 },
+                    { name: "Promotor Ghosting", hp: 15000, atk: 700, exp: 10000, gold: 400000 },
+                    { name: "BOSS: Sidang Terbuka", hp: 50000, atk: 2000, exp: 100000, gold: 5000000, isBoss: true }
+                ]}
+            ],
+            items: {
+                weapons: [
+                    { name: "Krayon Patah", val: 5, chance: 0.3, stage: 0 },
+                    { name: "Pensil Inul", val: 15, chance: 0.2, stage: 1 },
+                    { name: "Pulpen Hi-Tec", val: 40, chance: 0.2, stage: 2 },
+                    { name: "Kalkulator", val: 120, chance: 0.2, stage: 3 },
+                    { name: "Laptop Bekas", val: 300, chance: 0.3, stage: 4 },
+                    { name: "iPad Pro", val: 800, chance: 0.2, stage: 5 },
+                    { name: "Macbook M3", val: 2500, chance: 0.05, stage: 6 }
+                ],
+                armors: [
+                    { name: "Bedak Bayi", val: 5, chance: 0.3, stage: 0 },
+                    { name: "Seragam SD", val: 20, chance: 0.2, stage: 1 },
+                    { name: "Jaket Denim", val: 80, chance: 0.1, stage: 2 },
+                    { name: "Kopi Sachet", val: 200, chance: 0.2, stage: 3 },
+                    { name: "Jaket Himpunan", val: 400, chance: 0.2, stage: 4 },
+                    { name: "Blazer Formal", val: 1000, chance: 0.3, stage: 5 },
+                    { name: "Toga Wisuda", val: 5000, chance: 0.01, stage: 6 }
+                ]
+            },
+            events: [
+                { name: "Jam Kosong", text: "Guru rapat! Tidur siang dulu.", type: "HEAL", val: 0.5 },
+                { name: "Ibu Masak Enak", text: "Hati senang perut kenyang.", type: "HEAL", val: 0.3 },
+                { name: "Traktiran Teman", text: "Makan gratis di kantin!", type: "HEAL", val: 0.2 },
+                { name: "Bocoran Soal", text: "Kamu siap 100%! (Atk x2.5)", type: "BUFF", val: "CRIT" },
+                { name: "Nemu Uang", text: "Rejeki anak soleh!", type: "GOLD", val: 50 },
+                { name: "Baca Buku Bagus", text: "Wawasan bertambah.", type: "EXP", val: 30 }
+            ]
+        };
+
+        /* ============================
+           2. STATE (PLAYER DATA)
+           ============================ */
+        const Player = {
+            name: "Mahasiswa Abadi",
+            level: 1,
+            exp: 0,
+            expNext: 100,
+            money: 0,
+            baseHp: 50,
+            baseAtk: 5,
+            baseDef: 0,
+            currentHp: 50,
+            weapon: { name: "Tangan Kosong", val: 0 },
+            armor: { name: "Kaos Kutang", val: 0 },
+            currentStageId: 0,
+            maxStageUnlocked: 0,
+            activeBuff: null
+        };
+
+        let BattleState = { active: false, enemy: null };
+        let walkTimer = null;
+
+        /* ============================
+           3. SAVE SYSTEM (LOCAL STORAGE)
+           ============================ */
+        const SaveSystem = {
+            key: 'aries_rpg_master_v1',
+            save: () => {
+                localStorage.setItem(SaveSystem.key, JSON.stringify(Player));
+                const btn = document.getElementById('btnSave');
+                if(btn) {
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = `<i class="fa-solid fa-check"></i> Saved!`;
+                    setTimeout(() => btn.innerHTML = originalText, 1000);
+                }
+            },
+            load: () => {
+                const data = localStorage.getItem(SaveSystem.key);
+                if (data) {
+                    try {
+                        const savedData = JSON.parse(data);
+                        Object.assign(Player, savedData);
+                        console.log("Data loaded successfully");
+                    } catch (e) { console.error("Corrupt Save"); }
+                }
+            },
+            reset: () => {
+                if(confirm("Yakin reset? Semua progres hilang.")) {
+                    localStorage.removeItem(SaveSystem.key);
+                    location.reload();
+                }
+            }
+        };
+
+        /* ============================
+           4. UI CONTROLLER
+           ============================ */
+        const UI = {
+            updateStats: () => {
+                document.getElementById('playerName').innerText = Player.name;
+                document.getElementById('playerLevel').innerText = `Lv.${Player.level} - ${DB.stages[Player.currentStageId].name}`;
+                document.getElementById('playerMoney').innerText = `Rp ${Player.money.toLocaleString()}`;
+                
+                const maxHp = Player.baseHp + Player.armor.val;
+                const hpPct = (Player.currentHp / maxHp) * 100;
+                document.getElementById('hpBar').style.width = `${Math.max(0, hpPct)}%`;
+                document.getElementById('hpText').innerText = `${Math.floor(Player.currentHp)}/${maxHp}`;
+
+                const expPct = (Player.exp / Player.expNext) * 100;
+                document.getElementById('expBar').style.width = `${expPct}%`;
+
+                document.getElementById('weaponName').innerText = Player.weapon.name;
+                document.getElementById('weaponStat').innerText = `+${Player.weapon.val}`;
+                document.getElementById('armorName').innerText = Player.armor.name;
+                document.getElementById('armorStat').innerText = `+${Player.armor.val}`;
+            },
+            log: (msg, color = 'text-slate-300') => {
+                const box = document.getElementById('battleLog');
+                box.innerHTML += `<div class="${color} mb-1 border-b border-slate-800 pb-1">> ${msg}</div>`;
+                box.scrollTop = box.scrollHeight;
+            },
+            toggleScene: (mode) => {
+                const explore = document.getElementById('exploreMode');
+                const battle = document.getElementById('battleMode');
+                const bg = document.getElementById('gameScene');
+
+                if (mode === 'battle') {
+                    explore.classList.add('hidden');
+                    battle.classList.remove('hidden');
+                    battle.classList.add('flex');
+                    bg.classList.remove('scrolling-bg');
+                } else {
+                    explore.classList.remove('hidden');
+                    battle.classList.add('hidden');
+                    battle.classList.remove('flex');
+                    bg.classList.add('scrolling-bg');
+                    
+                    // Reset UI Battle Elements (Penting biar gak bug stlh Event)
+                    document.getElementById('enemyHpWrapper').style.opacity = '1';
+                    document.getElementById('battleButtons').style.display = 'grid';
+                    document.getElementById('enemyName').className = "text-red-400 font-bold text-lg mb-1";
+                }
+            },
+            showNotif: (msg) => {
+                const notif = document.getElementById('notification');
+                document.getElementById('notifText').innerHTML = msg;
+                notif.classList.remove('scale-0');
+            },
+            closeNotif: () => {
+                document.getElementById('notification').classList.add('scale-0');
+            },
+            renderAreaSelect: () => {
+                const sel = document.getElementById('areaSelect');
+                sel.innerHTML = '';
+                DB.stages.forEach(stage => {
+                    if (stage.id <= Player.maxStageUnlocked) {
+                        const opt = document.createElement('option');
+                        opt.value = stage.id;
+                        opt.text = stage.name;
+                        if (stage.id === Player.currentStageId) opt.selected = true;
+                        sel.appendChild(opt);
+                    }
+                });
+            }
+        };
+		
+		/* ============================
+           SHOP SYSTEM (KANTIN & KOPERASI)
+           ============================ */
+        const Shop = {
+            open: () => {
+                // ATURAN 1: GABISA BELANJA PAS UJIAN
+                if(BattleState.active) {
+                    UI.showNotif("GABISA KE KANTIN!<br>Selesaikan ujian dulu!");
+                    return;
+                }
+
+                // Pause Walking
+                if(walkTimer) clearTimeout(walkTimer);
+                document.getElementById('exploreMode').classList.add('hidden');
+                
+                document.getElementById('shopModal').classList.remove('hidden');
+                Shop.updateMoneyUI();
+                
+                // Default buka tab kantin
+                Shop.switchTab('food');
+            },
+
+            close: () => {
+                document.getElementById('shopModal').classList.add('hidden');
+                document.getElementById('exploreMode').classList.remove('hidden');
+                Game.startWalking();
+            },
+
+            updateMoneyUI: () => {
+                document.getElementById('shopMoney').innerText = `Rp ${Player.money.toLocaleString()}`;
+            },
+
+            switchTab: (tab) => {
+                const contentFood = document.getElementById('shopFoodContent');
+                const contentGear = document.getElementById('shopGearContent');
+                const btnFood = document.getElementById('tabFood');
+                const btnGear = document.getElementById('tabGear');
+
+                if (tab === 'food') {
+                    contentFood.classList.remove('hidden');
+                    contentGear.classList.add('hidden');
+                    btnFood.className = "flex-1 py-2 bg-yellow-600 text-white rounded font-bold border border-yellow-500";
+                    btnGear.className = "flex-1 py-2 bg-slate-700 text-slate-300 rounded font-bold border border-slate-600";
+                } else {
+                    contentFood.classList.add('hidden');
+                    contentGear.classList.remove('hidden');
+                    btnFood.className = "flex-1 py-2 bg-slate-700 text-slate-300 rounded font-bold border border-slate-600";
+                    btnGear.className = "flex-1 py-2 bg-blue-600 text-white rounded font-bold border border-blue-500";
+                    
+                    // Render Barang Koperasi
+                    Shop.renderGear();
+                }
+            },
+
+            // --- LOGIKA KANTIN ---
+            buyFood: (item) => {
+                let cost = 0;
+                let success = false;
+                const maxHp = Player.baseHp + Player.armor.val;
+
+                if (item === 'gorengan') {
+                    cost = 500;
+                    if(Player.money >= cost) {
+                        Player.money -= cost;
+                        Player.currentHp = Math.min(Player.currentHp + 30, maxHp);
+                        UI.showNotif("Nyam.. Gorengan enak!");
+                        success = true;
+                    }
+                } 
+                else if (item === 'esteh') {
+                    cost = 2000;
+                    if(Player.money >= cost) {
+                        Player.money -= cost;
+                        Player.currentHp = Math.min(Player.currentHp + 100, maxHp);
+                        UI.showNotif("Segerrr..!");
+                        success = true;
+                    }
+                }
+                else if (item === 'kopi') {
+                    cost = 10000;
+                    if(Player.money >= cost) {
+                        Player.money -= cost;
+                        Player.activeBuff = 'CRIT';
+                        UI.showNotif("Mata Melek! (Next Atk Crit)");
+                        success = true;
+                    }
+                }
+
+                if(success) {
+                    UI.updateStats();
+                    Shop.updateMoneyUI();
+                    SaveSystem.save();
+                } else {
+                    UI.showNotif("Uang jajan kurang!");
+                }
+            },
+
+            // --- LOGIKA KOPERASI ---
+            renderGear: () => {
+                const container = document.getElementById('shopGearContent');
+                container.innerHTML = '';
+
+                // Gabungkan Senjata & Armor yang sesuai Stage Player
+                const availableWeapons = DB.items.weapons.filter(i => i.stage <= Player.currentStageId);
+                const availableArmors = DB.items.armors.filter(i => i.stage <= Player.currentStageId);
+
+                // Helper render function
+                const renderItem = (item, type) => {
+                    // Rumus Harga Otomatis: Stat * 500 (Misal power 10 = Rp 5000)
+                    const price = item.val * 500;
+                    
+                    // Cek apakah item ini lebih bagus dari yg dipakai?
+                    const currentVal = type === 'weapon' ? Player.weapon.val : Player.armor.val;
+                    const isBetter = item.val > currentVal;
+                    const colorClass = isBetter ? 'text-green-400' : 'text-slate-500';
+                    const icon = type === 'weapon' ? 'fa-pen-fancy' : 'fa-shirt';
+
+                    return `
+                    <div onclick="Shop.buyGear('${type}', '${item.name}', ${item.val}, ${price})" class="flex justify-between items-center bg-slate-800 p-3 rounded border border-slate-700 hover:border-blue-500 cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-slate-900 rounded flex items-center justify-center text-slate-300">
+                                <i class="fa-solid ${icon}"></i>
+                            </div>
+                            <div>
+                                <div class="font-bold text-white text-xs">${item.name}</div>
+                                <div class="text-[10px] ${colorClass}">
+                                    ${type === 'weapon' ? 'Logika' : 'Mental'} +${item.val} 
+                                    ${isBetter ? '(UP!)' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="font-mono text-yellow-400 text-xs">Rp ${price.toLocaleString()}</div>
+                    </div>`;
+                };
+
+                // Render ke layar
+                if(availableWeapons.length === 0 && availableArmors.length === 0) {
+                    container.innerHTML = '<div class="text-center text-slate-500">Koperasi tutup (Belum ada barang level ini).</div>';
+                    return;
+                }
+
+                availableWeapons.forEach(w => container.innerHTML += renderItem(w, 'weapon'));
+                availableArmors.forEach(a => container.innerHTML += renderItem(a, 'armor'));
+            },
+
+            buyGear: (type, name, val, price) => {
+                if(Player.money >= price) {
+                    if(confirm(`Beli ${name} seharga Rp ${price.toLocaleString()}?`)) {
+                        Player.money -= price;
+                        
+                        if(type === 'weapon') {
+                            Player.weapon = { name: name, val: val };
+                            UI.showNotif(`Senjata baru: ${name}!`);
+                        } else {
+                            Player.armor = { name: name, val: val };
+                            UI.showNotif(`Outfit baru: ${name}!`);
+                        }
+
+                        UI.updateStats();
+                        Shop.updateMoneyUI();
+                        Shop.renderGear(); // Re-render biar indikator (UP!) hilang
+                        SaveSystem.save();
+                    }
+                } else {
+                    UI.showNotif("Uang tabungan belum cukup!");
+                }
+            }
+        };
+        /* ============================
+           5. GAME ENGINE
+           ============================ */
+        const Game = {
+            init: () => {
+                SaveSystem.load();
+                // Fix: Pastikan HP tidak 0 saat load
+                if(Player.currentHp <= 0) Player.currentHp = Player.baseHp;
+                
+                UI.renderAreaSelect();
+                Game.changeArea(Player.currentStageId); // Ini akan mentrigger startWalking
+                
+                // Auto save loop
+                setInterval(SaveSystem.save, 30000);
+            },
+
+            changeArea: (id) => {
+                Player.currentStageId = parseInt(id);
+                const stage = DB.stages[id];
+                
+                document.getElementById('areaName').innerText = stage.name;
+                
+                // Ganti Background (Safety Check)
+                const scene = document.getElementById('gameScene');
+                scene.style.backgroundImage = `url('https://placehold.co/600x400/1e293b/FFF?text=${stage.name}')`;
+                
+                UI.updateStats();
+                UI.log(`Pindah ke: ${stage.name}`);
+                Game.startWalking();
+            },
+
+            startWalking: () => {
+                if (BattleState.active) return;
+                
+                UI.toggleScene('explore');
+                if (walkTimer) clearTimeout(walkTimer);
+
+                // Random time 2s - 4s
+                const time = Math.floor(Math.random() * 2000) + 2000;
+                
+                walkTimer = setTimeout(() => {
+                    // Ratio: 30% Event, 70% Battle
+                    if (Math.random() < 0.3) {
+                        Game.triggerEvent();
+                    } else {
+                        Game.triggerBattle();
+                    }
+                }, time);
+            },
+
+            triggerBattle: () => {
+                BattleState.active = true;
+                const stage = DB.stages[Player.currentStageId];
+                const enemyTemplate = stage.enemies[Math.floor(Math.random() * stage.enemies.length)];
+                
+                BattleState.enemy = { ...enemyTemplate, currentHp: enemyTemplate.hp };
+                
+                document.getElementById('enemyName').innerText = BattleState.enemy.name;
+                document.getElementById('enemyHpBar').style.width = '100%';
+                document.getElementById('battleLog').innerHTML = ''; 
+                document.getElementById('enemySprite').src = "https://placehold.co/120x120/red/white?text=Musuh";
+                document.getElementById('enemySprite').className = "w-24 h-24 animate-bounce";
+
+                if(BattleState.enemy.isBoss) UI.log(`⚠️ PERINGATAN! BOSS DATANG!`, 'text-red-500 font-bold');
+                else UI.log(`Musuh muncul: ${BattleState.enemy.name}`);
+
+                UI.toggleScene('battle');
+            },
+
+            triggerEvent: () => {
+                // UI Setup untuk Event
+                BattleState.active = true; // Pause walking
+                UI.toggleScene('battle');
+                
+                // Sembunyikan elemen perang
+                document.getElementById('enemyHpWrapper').style.opacity = '0';
+                document.getElementById('battleButtons').style.display = 'none';
+
+                // Ambil Event Random
+                const ev = DB.events[Math.floor(Math.random() * DB.events.length)];
+                
+                document.getElementById('enemyName').innerText = "MOMEN HOKI!";
+                document.getElementById('enemyName').className = "text-emerald-400 font-bold text-lg mb-1";
+                document.getElementById('enemySprite').src = "https://placehold.co/120x120/green/white?text=Lucky";
+                document.getElementById('battleLog').innerHTML = '';
+
+                let msg = "";
+                if (ev.type === "HEAL") {
+                    const heal = Math.floor((Player.baseHp + Player.armor.val) * ev.val);
+                    Player.currentHp = Math.min(Player.currentHp + heal, Player.baseHp + Player.armor.val);
+                    msg = `+${heal} Fokus`;
+                } else if (ev.type === "BUFF") {
+                    Player.activeBuff = ev.val;
+                    msg = "Buff Aktif!";
+                } else if (ev.type === "GOLD") {
+                    const gold = ev.val * (Player.currentStageId + 1) * 5;
+                    Player.money += gold;
+                    msg = `+Rp ${gold}`;
+                } else if (ev.type === "EXP") {
+                    const exp = ev.val * (Player.currentStageId + 1);
+                    Player.exp += exp;
+                    msg = `+${exp} Exp`;
+                }
+
+                UI.log(`${ev.name}: ${ev.text} (${msg})`, "text-emerald-300 font-bold");
+                UI.updateStats();
+                SaveSystem.save();
+
+                // Balik jalan setelah 2.5 detik
+                setTimeout(() => {
+                    if (Player.exp >= Player.expNext) Game.levelUp();
+                    BattleState.active = false;
+                    Game.startWalking();
+                }, 2500);
+            },
+
+            playerAttack: () => {
+                if (!BattleState.active || !BattleState.enemy) return;
+
+                let totalAtk = Player.baseAtk + Player.weapon.val;
+                let isCrit = false;
+
+                // Cek Buff
+                if (Player.activeBuff === 'CRIT') {
+                    totalAtk *= 3;
+                    isCrit = true;
+                    Player.activeBuff = null;
+                    UI.log("BOCORAN SOAL! Serangan Critical!", "text-yellow-400 font-bold");
+                }
+
+                const dmg = Math.floor(totalAtk * (0.9 + Math.random() * 0.2));
+                
+                // Animasi
+                const sprite = document.getElementById('enemySprite');
+                sprite.classList.add(isCrit ? 'shake-hard' : 'shake');
+                setTimeout(() => sprite.classList.remove(isCrit ? 'shake-hard' : 'shake'), 500);
+
+                BattleState.enemy.currentHp -= dmg;
+                const hpPct = (BattleState.enemy.currentHp / BattleState.enemy.hp) * 100;
+                document.getElementById('enemyHpBar').style.width = `${Math.max(0, hpPct)}%`;
+
+                UI.log(`Kamu menjawab soal! Musuh kena ${dmg} dmg.`, 'text-yellow-300');
+
+                if (BattleState.enemy.currentHp <= 0) {
+                    Game.winBattle();
+                } else {
+                    setTimeout(Game.enemyAttack, 800);
+                }
+            },
+
+            enemyAttack: () => {
+                if (!BattleState.active || !BattleState.enemy) return;
+
+                const reduction = Math.floor(Player.armor.val / 2);
+                let dmg = Math.max(1, BattleState.enemy.atk - reduction);
+                
+                Player.currentHp -= dmg;
+                UI.log(`${BattleState.enemy.name} menyerang! (-${dmg} Fokus)`, 'text-red-400');
+                
+                document.body.classList.add('shake');
+                setTimeout(() => document.body.classList.remove('shake'), 500);
+
+                UI.updateStats();
+
+                if (Player.currentHp <= 0) {
+                    Game.gameOver();
+                }
+            },
+
+            winBattle: () => {
+                const enemy = BattleState.enemy;
+                UI.log(`MENANG! (+${enemy.exp} EXP, +Rp ${enemy.gold})`, 'text-emerald-400 font-bold');
+                
+                Player.exp += enemy.exp;
+                Player.money += enemy.gold;
+                Game.checkLoot();
+
+                if (Player.exp >= Player.expNext) Game.levelUp();
+
+                // Unlock Stage
+                if (enemy.isBoss && Player.currentStageId === Player.maxStageUnlocked) {
+                    if (Player.maxStageUnlocked < DB.stages.length - 1) {
+                        Player.maxStageUnlocked++;
+                        UI.showNotif(`LULUS UJIAN!<br>Jenjang ${DB.stages[Player.maxStageUnlocked].name} Terbuka!`);
+                        UI.renderAreaSelect();
+                    }
+                }
+
+                BattleState.active = false;
+                SaveSystem.save();
+
+                setTimeout(() => {
+                    Game.startWalking();
+                    UI.updateStats();
+                }, 1500);
+            },
+
+            checkLoot: () => {
+                if (Math.random() < 0.3) {
+                    const stageDrops = DB.items.weapons.filter(i => i.stage === Player.currentStageId)
+                                      .concat(DB.items.armors.filter(i => i.stage === Player.currentStageId));
+                    
+                    if(stageDrops.length > 0) {
+                        const item = stageDrops[Math.floor(Math.random() * stageDrops.length)];
+                        // Auto Equip Logic Simple
+                        if (DB.items.weapons.includes(item)) {
+                            if (item.val > Player.weapon.val) {
+                                Player.weapon = item;
+                                UI.log(`DROP: ${item.name}! (Dipakai)`, 'text-purple-400');
+                            }
+                        } else {
+                            if (item.val > Player.armor.val) {
+                                Player.armor = item;
+                                UI.log(`DROP: ${item.name}! (Dipakai)`, 'text-purple-400');
+                            }
+                        }
+                    }
+                }
+            },
+
+            levelUp: () => {
+                Player.level++;
+                Player.exp -= Player.expNext;
+                Player.expNext = Math.floor(Player.expNext * 1.5);
+                Player.baseHp += 10;
+                Player.currentHp = Player.baseHp + Player.armor.val; 
+                Player.baseAtk += 2;
+                UI.showNotif(`NAIK LEVEL ${Player.level}!`);
+                SaveSystem.save();
+            },
+
+            gameOver: () => {
+                BattleState.active = false;
+                UI.log(`GAMEOVER! Kamu pingsan...`, 'text-red-600 font-bold');
+                setTimeout(() => {
+                    Player.currentHp = Player.baseHp + Player.armor.val;
+                    UI.showNotif("Kamu Pingsan...<br>Bangkit lagi!");
+                    UI.updateStats();
+                    Game.startWalking();
+                }, 2000);
+            },
+            
+            runAway: () => {
+                if(Math.random() > 0.5) {
+                    BattleState.active = false;
+                    UI.log("Berhasil kabur!", 'text-blue-400');
+                    setTimeout(Game.startWalking, 1000);
+                } else {
+                    UI.log("Gagal kabur!", 'text-red-400');
+                    setTimeout(Game.enemyAttack, 500);
+                }
+            }
+        };
+
+        // Mulai Game
+        Game.init();
+
+    </script>
+</body>
+</html>

@@ -58,85 +58,41 @@
 <body class="bg-slate-950 text-slate-200 font-sans min-h-screen flex flex-col">
 
     <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
-                <div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                </div>
-                <span class="text-sm font-bold">Back to Dashboard</span>
-            </a>
-            <div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
-                <div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20">A</div>
-                <span class="text-xl font-extrabold tracking-tight text-white uppercase italic">Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span></span>
-            </div>
-			<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit">
-				<span class="text-lg">🍕</span> <div class="text-left">
-					<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
-					<span class="block text-xs font-bold">Pizza / Kopi</span>
-				</div>
-			</a>
-        </div>
-    </nav>
-	<div class="w-full bg-slate-950 border-b border-slate-800">
-        
-		<div class="max-w-7xl mx-auto px-4 mb-8">
-			<div class="flex items-center justify-between mb-2 px-1">
-				<span class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-					<i class="fa-solid fa-bolt text-yellow-500 mr-1"></i> Gear Recommendations
-				</span>
-				<span class="text-[9px] text-slate-600">Sponsored Links</span>
+		<div class="max-w-7xl mx-auto px-4 h-16 flex items-center">
+			
+			<div class="flex-1 flex justify-start min-w-0">
+				<a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+					<div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors shrink-0">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+					</div>
+					<span class="text-sm font-bold hidden md:block whitespace-nowrap">Back to Dashboard</span>
+				</a>
 			</div>
 
-			<div class="w-full bg-slate-950 border border-slate-800 rounded-xl p-2 shadow-lg shadow-black/20">
-				<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-
+			<div class="shrink-0 flex justify-center mx-4">
+				<div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+					<div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20 shrink-0">A</div>
 					
-					<a href="https://s.shopee.co.id/8fMqNhHChh" target="_blank" rel="nofollow noopener" class="group flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 border border-transparent hover:border-[#EE4D2D]/50 transition-all">
-						<div class="w-10 h-10 md:w-12 md:h-12 bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-700 group-hover:border-[#EE4D2D] transition-colors">
-							<img src="https://down-id.img.susercontent.com/file/id-11134207-7rbk2-m8vd41v3zeald1" alt="Bawang putih tunggal/Bawang Lanang Tunggal/Bawang Tunggal Pi" class="w-full h-full object-cover">
-						</div>
-						<div class="flex-1 min-w-0">
-							<h4 class="text-slate-300 text-[10px] md:text-xs font-bold truncate group-hover:text-white transition-colors">Bawang putih tunggal/Bawang Lanang Tunggal/Bawang Tunggal Pi</h4>
-							<div class="text-[#EE4D2D] text-[10px] font-bold mt-0.5 flex items-center gap-1">Cek Harga <i class="fa-solid fa-chevron-right text-[8px]"></i></div>
-						</div>
-					</a>
-
-					
-					<a href="https://s.shopee.co.id/8zzgmfcSse" target="_blank" rel="nofollow noopener" class="group flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 border border-transparent hover:border-[#EE4D2D]/50 transition-all">
-						<div class="w-10 h-10 md:w-12 md:h-12 bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-700 group-hover:border-[#EE4D2D] transition-colors">
-							<img src="https://down-id.img.susercontent.com/file/id-11134207-81ztm-mfakxmwrw5qn32" alt="Tumbler Minum Stainless Jumbo Hook 890ml - Custom Grafir Ter" class="w-full h-full object-cover">
-						</div>
-						<div class="flex-1 min-w-0">
-							<h4 class="text-slate-300 text-[10px] md:text-xs font-bold truncate group-hover:text-white transition-colors">Tumbler Minum Stainless Jumbo Hook 890ml - Custom Grafir Ter</h4>
-							<div class="text-[#EE4D2D] text-[10px] font-bold mt-0.5 flex items-center gap-1">Cek Harga <i class="fa-solid fa-chevron-right text-[8px]"></i></div>
-						</div>
-					</a>
-
-					
-					<a href="https://s.shopee.co.id/9pYnffye0y" target="_blank" rel="nofollow noopener" class="group flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 border border-transparent hover:border-[#EE4D2D]/50 transition-all">
-						<div class="w-10 h-10 md:w-12 md:h-12 bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-700 group-hover:border-[#EE4D2D] transition-colors">
-							<img src="https://down-id.img.susercontent.com/file/ed8fc57bee6c65bfc07d79ac85833152" alt="NODEMCU AMICA LUA CP2102 ESP8266 WIFI DEVELOPMENT BOARD inte" class="w-full h-full object-cover">
-						</div>
-						<div class="flex-1 min-w-0">
-							<h4 class="text-slate-300 text-[10px] md:text-xs font-bold truncate group-hover:text-white transition-colors">NODEMCU AMICA LUA CP2102 ESP8266 WIFI DEVELOPMENT BOARD inte</h4>
-							<div class="text-[#EE4D2D] text-[10px] font-bold mt-0.5 flex items-center gap-1">Cek Harga <i class="fa-solid fa-chevron-right text-[8px]"></i></div>
-						</div>
-					</a>
-
-					
-					<a href="https://s.shopee.co.id/5L6OJSpY2x" target="_blank" rel="nofollow noopener" class="group flex items-center gap-3 p-2 rounded-lg hover:bg-slate-900 border border-transparent hover:border-[#EE4D2D]/50 transition-all">
-						<div class="w-10 h-10 md:w-12 md:h-12 bg-slate-800 rounded-md overflow-hidden flex-shrink-0 border border-slate-700 group-hover:border-[#EE4D2D] transition-colors">
-							<img src="https://down-id.img.susercontent.com/file/d12af78ea9329d153109cee675bc43a2" alt="OLED 0,96 0.96 inch inchi 0.96" yellow blue LCD module high " class="w-full h-full object-cover">
-						</div>
-						<div class="flex-1 min-w-0">
-							<h4 class="text-slate-300 text-[10px] md:text-xs font-bold truncate group-hover:text-white transition-colors">OLED 0,96 0.96 inch inchi 0.96" yellow blue LCD module high </h4>
-							<div class="text-[#EE4D2D] text-[10px] font-bold mt-0.5 flex items-center gap-1">Cek Harga <i class="fa-solid fa-chevron-right text-[8px]"></i></div>
-						</div>
-					</a>
-
+					<span class="text-lg md:text-xl font-extrabold tracking-tight text-white uppercase italic whitespace-nowrap">
+						Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span>
+					</span>
 				</div>
 			</div>
+
+			<div class="flex-1 flex justify-end min-w-0">
+				<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-3 md:px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit shrink-0">
+					<span class="text-lg">🍕</span> 
+					<div class="text-left hidden md:block whitespace-nowrap">
+						<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+						<span class="block text-xs font-bold">Pizza / Kopi</span>
+					</div>
+				</a>
+			</div>
+
 		</div>
+	</nav>
+	<div class="w-full bg-slate-950 border-b border-slate-800">
+        <div id="shopee-dynamic-banner" class="max-w-7xl mx-auto px-4 mb-8"></div>
 
     </div>
 	<div class="w-full max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
@@ -450,7 +406,8 @@
         &copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
         <span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
     </footer>
-    <script src="../assets/js/financem.js">
+    <script src="../assets/js/smart_banner.js"></script>
+	<script src="../assets/js/financem.js">
 
     </script>
 </body>
