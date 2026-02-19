@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aries DJ Synth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- VISUAL PIRINGAN HITAM --- */
+        .vinyl-container {
+            position: relative;
+            transition: all 0.3s;
+        }
+        .vinyl-disc {
+            width: 280px; height: 280px;
+            background: radial-gradient(#111 0%, #1a1a1a 15%, #000 16%, #000 18%, #222 19%, #000 21%, #111 100%);
+            border-radius: 50%;
+            border: 4px solid #333;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+        }
+        /* Alur Piringan (Grooves) */
+        .vinyl-grooves {
+            position: absolute; inset: 10px; border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.05);
+            background: repeating-radial-gradient( #111 0, #111 2px, #222 3px, #222 4px );
+        }
+        /* Label Tengah */
+        .vinyl-label {
+            width: 90px; height: 90px; border-radius: 50%; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 10px; color: rgba(255,255,255,0.8);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        /* ANIMASI PUTAR */
+        .spin { animation: spin 2s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* JARUM (TONEARM) */
+        .tonearm {
+            width: 100px; height: 10px; background: #64748b;
+            position: absolute; top: 20px; right: -20px;
+            transform-origin: 90% 50%; transform: rotate(-30deg);
+            transition: transform 0.5s ease; z-index: 20;
+            border-radius: 5px; box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+        .tonearm::before { /* Kepala Jarum */
+            content: ''; position: absolute; left: -10px; top: -5px;
+            width: 25px; height: 20px; background: #94a3b8;
+            transform: rotate(15deg); border-radius: 2px;
+        }
+        .tonearm.active { transform: rotate(15deg); } /* Jarum turun ke piringan */
+
+        /* UI CONTROLS */
+        input[type=range] { -webkit-appearance: none; background: transparent; cursor: pointer; }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%;
+            background: #fff; margin-top: -6px; border: 2px solid #555;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; background: #475569; border-radius: 2px;
+        }
+        .slider-vertical { transform: rotate(-90deg); width: 150px; }
+    </style>
+</head>
+<body class="bg-zinc-900 text-slate-200 min-h-screen flex flex-col font-mono select-none overflow-hidden">
+
+    <nav class="bg-zinc-950 border-b border-zinc-800 p-3 flex justify-between items-center z-50">
+        <a href="../index.html" class="text-xs hover:text-white"><i class="fa-solid fa-chevron-left"></i> Dashboard</a>
+        <div class="text-sm font-bold tracking-[0.3em] text-emerald-500 animate-pulse">ARIES<span class="text-white">SYNTH</span></div>
+        <div class="w-20"></div>
+    </nav>
+
+    <div class="flex-grow flex flex-col md:flex-row items-stretch p-4 gap-6 justify-center">
+
+        <div class="flex-1 bg-zinc-800/50 rounded-2xl border border-zinc-700 p-4 flex flex-col items-center relative overflow-hidden group">
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500 to-transparent opacity-50"></div>
+            
+            <div class="w-full flex justify-between items-end mb-4 border-b border-zinc-700 pb-2">
+                <div>
+                    <div class="text-[10px] text-sky-500 font-bold">DECK A</div>
+                    <div id="title-a" class="text-xs font-bold truncate w-32 md:w-48 text-white">No Track</div>
+                </div>
+                <button onclick="document.getElementById('file-a').click()" class="text-[10px] bg-zinc-700 px-2 py-1 rounded hover:bg-zinc-600">LOAD MP3</button>
+                <input type="file" id="file-a" accept="audio/*" class="hidden" onchange="loadTrack('a', this)">
+            </div>
+
+            <div class="vinyl-container">
+                <div id="tonearm-a" class="tonearm"></div>
+                <div id="vinyl-a" class="vinyl-disc">
+                    <div class="vinyl-grooves"></div>
+                    <div class="vinyl-label bg-sky-700 shadow-inner">
+                        <i class="fa-solid fa-music text-2xl opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full mt-6 flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px]">SLOW</span>
+                    <input type="range" min="0.5" max="1.5" step="0.01" value="1" class="flex-grow accent-sky-500" oninput="changeSpeed('a', this.value)">
+                    <span class="text-[10px]">FAST</span>
+                </div>
+                
+                <div class="flex justify-center gap-4">
+                    <button onclick="togglePlay('a')" id="btn-play-a" class="w-14 h-14 rounded-full border-2 border-sky-500 text-sky-500 hover:bg-sky-500 hover:text-white transition flex items-center justify-center text-xl shadow-[0_0_15px_rgba(14,165,233,0.2)]">
+                        <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                    <button onclick="cue('a')" class="w-14 h-14 rounded-full border-2 border-zinc-600 text-zinc-400 hover:bg-white hover:text-black transition flex items-center justify-center text-xs font-bold">
+                        CUE
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="w-full md:w-40 bg-zinc-950 rounded-xl border border-zinc-800 p-3 flex flex-col items-center gap-6 z-10">
+            
+            <div class="w-full">
+                <div class="text-[8px] text-center text-zinc-500 mb-2 font-bold tracking-widest">SFX SYNTHESIZER</div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onmousedown="playSynth('horn')" class="aspect-square bg-yellow-600 rounded shadow-lg hover:bg-yellow-500 active:translate-y-1 transition flex flex-col items-center justify-center gap-1">
+                        <i class="fa-solid fa-bullhorn text-white"></i>
+                        <span class="text-[8px] font-bold text-black/50">HORN</span>
+                    </button>
+                    <button onmousedown="playSynth('siren')" onmouseup="stopSiren()" onmouseleave="stopSiren()" class="aspect-square bg-rose-600 rounded shadow-lg hover:bg-rose-500 active:translate-y-1 transition flex flex-col items-center justify-center gap-1">
+                        <i class="fa-solid fa-bell text-white"></i>
+                        <span class="text-[8px] font-bold text-black/50">SIREN</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-grow flex items-center justify-center gap-4">
+                <div class="h-40 flex items-center"><input type="range" min="0" max="100" value="100" class="slider-vertical accent-sky-500" oninput="setVolume('a', this.value)"></div>
+                <div class="h-40 flex items-center"><input type="range" min="0" max="100" value="100" class="slider-vertical accent-rose-500" oninput="setVolume('b', this.value)"></div>
+            </div>
+
+            <div class="w-full bg-zinc-900 p-2 rounded border border-zinc-800">
+                <input type="range" min="0" max="100" value="50" class="w-full accent-emerald-500 h-8" oninput="setCrossfader(this.value)">
+                <div class="flex justify-between text-[8px] text-zinc-600 px-1 font-bold">
+                    <span>A</span><span>CROSSFADER</span><span>B</span>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="flex-1 bg-zinc-800/50 rounded-2xl border border-zinc-700 p-4 flex flex-col items-center relative overflow-hidden group">
+            <div class="absolute top-0 right-0 w-full h-1 bg-gradient-to-l from-rose-500 to-transparent opacity-50"></div>
+
+            <div class="w-full flex justify-between items-end mb-4 border-b border-zinc-700 pb-2">
+                <div>
+                    <div class="text-[10px] text-rose-500 font-bold">DECK B</div>
+                    <div id="title-b" class="text-xs font-bold truncate w-32 md:w-48 text-white">No Track</div>
+                </div>
+                <button onclick="document.getElementById('file-b').click()" class="text-[10px] bg-zinc-700 px-2 py-1 rounded hover:bg-zinc-600">LOAD MP3</button>
+                <input type="file" id="file-b" accept="audio/*" class="hidden" onchange="loadTrack('b', this)">
+            </div>
+
+            <div class="vinyl-container">
+                <div id="tonearm-b" class="tonearm"></div>
+                <div id="vinyl-b" class="vinyl-disc">
+                    <div class="vinyl-grooves"></div>
+                    <div class="vinyl-label bg-rose-700 shadow-inner">
+                        <i class="fa-solid fa-music text-2xl opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full mt-6 flex flex-col gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px]">SLOW</span>
+                    <input type="range" min="0.5" max="1.5" step="0.01" value="1" class="flex-grow accent-rose-500" oninput="changeSpeed('b', this.value)">
+                    <span class="text-[10px]">FAST</span>
+                </div>
+                
+                <div class="flex justify-center gap-4">
+                    <button onclick="togglePlay('b')" id="btn-play-b" class="w-14 h-14 rounded-full border-2 border-rose-500 text-rose-500 hover:bg-rose-500 hover:text-white transition flex items-center justify-center text-xl shadow-[0_0_15px_rgba(244,63,94,0.2)]">
+                        <i class="fa-solid fa-play ml-1"></i>
+                    </button>
+                    <button onclick="cue('b')" class="w-14 h-14 rounded-full border-2 border-zinc-600 text-zinc-400 hover:bg-white hover:text-black transition flex items-center justify-center text-xs font-bold">
+                        CUE
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <audio id="audio-a" loop></audio>
+    <audio id="audio-b" loop></audio>
+
+    <script>
+        // --- SETUP AUDIO CONTEXT (Untuk Efek Suara Synth) ---
+        let audioCtx;
+        let sirenOsc, sirenGain; // Variabel untuk siren supaya bisa distop
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // --- SYNTHESIZER ENGINE (Bikin suara pakai kodingan) ---
+        function playSynth(type) {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'horn') {
+                // EFEK AIRHORN (Sawtooth Wave + Pitch Drop)
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.5); // Pitch turun cepat
+                
+                gainNode.gain.setValueAtTime(0.5, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5); // Fade out
+
+                osc.start(now);
+                osc.stop(now + 0.5);
+            } 
+            else if (type === 'siren') {
+                // EFEK SIREN (Sine Wave + LFO Manual)
+                // Kita simpan di variabel global biar bisa distop saat mouse lepas
+                if (sirenOsc) stopSiren(); // Reset kalau ada sisa
+                
+                sirenOsc = audioCtx.createOscillator();
+                sirenGain = audioCtx.createGain();
+                sirenOsc.type = 'square'; // Suara agak kasar kayak alarm
+                
+                sirenOsc.connect(sirenGain);
+                sirenGain.connect(audioCtx.destination);
+                
+                // Modulasi Pitch (Naik turun)
+                sirenOsc.frequency.setValueAtTime(600, now);
+                sirenOsc.frequency.linearRampToValueAtTime(900, now + 0.3); // Naik
+                
+                sirenGain.gain.value = 0.3;
+                sirenOsc.start(now);
+            }
+        }
+
+        function stopSiren() {
+            if (sirenOsc) {
+                const now = audioCtx.currentTime;
+                // Fade out biar gak 'pop'
+                sirenGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                sirenOsc.stop(now + 0.5);
+                sirenOsc = null;
+            }
+        }
+
+
+        // --- DECK LOGIC (Lagu MP3 User) ---
+        const players = {
+            a: { audio: document.getElementById('audio-a'), vol: 1 },
+            b: { audio: document.getElementById('audio-b'), vol: 1 }
+        };
+        let crossfader = 0.5;
+
+        function loadTrack(deck, input) {
+            const file = input.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                players[deck].audio.src = url;
+                document.getElementById(`title-${deck}`).innerText = file.name;
+                // Reset Visual
+                resetVisuals(deck);
+            }
+        }
+
+        function togglePlay(deck) {
+            initAudio();
+            const p = players[deck].audio;
+            const btn = document.getElementById(`btn-play-${deck}`);
+            const vinyl = document.getElementById(`vinyl-${deck}`);
+            const arm = document.getElementById(`tonearm-${deck}`);
+
+            if (p.paused) {
+                if(!p.src) return alert("Load MP3 dulu, Bro!");
+                
+                p.play();
+                // Visual ON
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+                btn.classList.add(deck === 'a' ? 'bg-sky-500' : 'bg-rose-500', 'text-white');
+                vinyl.classList.add('spin'); // Piringan muter
+                arm.classList.add('active'); // Jarum turun
+            } else {
+                p.pause();
+                // Visual OFF
+                btn.innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
+                btn.classList.remove(deck === 'a' ? 'bg-sky-500' : 'bg-rose-500', 'text-white');
+                vinyl.classList.remove('spin'); // Piringan stop
+                arm.classList.remove('active'); // Jarum naik
+            }
+        }
+
+        function cue(deck) {
+            const p = players[deck].audio;
+            p.currentTime = 0;
+            if (p.paused) togglePlay(deck);
+            
+            // Visual Stutter Effect
+            const vinyl = document.getElementById(`vinyl-${deck}`);
+            vinyl.style.transform = "scale(0.95)";
+            setTimeout(() => vinyl.style.transform = "scale(1)", 100);
+        }
+
+        function changeSpeed(deck, val) {
+            const p = players[deck].audio;
+            p.playbackRate = val;
+            
+            // Update kecepatan putaran piringan
+            const vinyl = document.getElementById(`vinyl-${deck}`);
+            // Normal 2s per putaran. Kalau 1.5x speed, jadi 2/1.5 = 1.33s
+            if(p.playbackRate > 0) {
+                vinyl.style.animationDuration = (2 / p.playbackRate) + 's';
+            }
+        }
+
+        function resetVisuals(deck) {
+            const vinyl = document.getElementById(`vinyl-${deck}`);
+            const arm = document.getElementById(`tonearm-${deck}`);
+            vinyl.classList.remove('spin');
+            arm.classList.remove('active');
+            document.getElementById(`btn-play-${deck}`).innerHTML = '<i class="fa-solid fa-play ml-1"></i>';
+        }
+
+        // --- MIXER LOGIC ---
+        function updateVolume() {
+            let gainA = 1, gainB = 1;
+
+            // Crossfader Calculation
+            if (crossfader > 0.5) gainA = 1 - ((crossfader - 0.5) * 2); // A turun
+            if (crossfader < 0.5) gainB = crossfader * 2; // B naik
+
+            players.a.audio.volume = players.a.vol * gainA;
+            players.b.audio.volume = players.b.vol * gainB;
+        }
+
+        function setVolume(deck, val) {
+            players[deck].vol = val / 100;
+            updateVolume();
+        }
+
+        function setCrossfader(val) {
+            crossfader = val / 100;
+            updateVolume();
+        }
+
+        // Keyboard Shortcut
+        document.addEventListener('keydown', (e) => {
+            if(e.code === 'KeyA') togglePlay('a');
+            if(e.code === 'KeyB') togglePlay('b');
+        });
+
+    </script>
+</body>
+</html>
