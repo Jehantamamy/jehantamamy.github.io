@@ -1,4 +1,39 @@
+	/*
+		(function() {
+			// 1. Tentukan Domain Resmi Kamu
+			const allowedDomains = ["ariestechlab.com", "www.ariestechlab.com"];
+			
+			// 2. Cek Hostname saat ini
+			const currentDomain = window.location.hostname;
 
+			// PENGECUALIAN: Izinkan 'localhost' atau '127.0.0.1' biar kamu tetap bisa ngoding/testing
+			if (currentDomain === "localhost" || currentDomain === "127.0.0.1" || currentDomain === "") {
+				// Jika kosong (biasanya file://), kita anggap ilegal
+				if(window.location.protocol === "file:") {
+					 bloackAccess();
+				}
+				return; // Lanjut, ini mode developer
+			}
+
+			// 3. Jika domain tidak terdaftar
+			if (!allowedDomains.includes(currentDomain)) {
+				bloackAccess();
+			}
+
+			function bloackAccess() {
+				// Hapus seluruh tampilan HTML (Program Jadi Putih Polos)
+				document.body.innerHTML = `
+					<div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; background:#0f172a; color:white; font-family:sans-serif; text-align:center;">
+						<h1 style="font-size:3rem; color:#ef4444;">⛔ AKSES DITOLAK</h1>
+						<p style="font-size:1.2rem; margin-top:1rem;">Aplikasi ini dilindungi Hak Cipta dan hanya dapat digunakan melalui website resmi.</p>
+						<a href="https://ariestechlab.com" style="margin-top:2rem; padding:10px 20px; background:#10b981; color:white; text-decoration:none; border-radius:8px; font-weight:bold;">Buka Aries Tech Labs</a>
+					</div>
+				`;
+				
+				// Hentikan eksekusi script selanjutnya
+				throw new Error("Illegal execution environment detected.");
+			}
+		})();/**/
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyd2uLg7i5PCr23Lw0c7EHdRU6iBCzeTu3s4ilX8P13idY90sFvbW2v9vRY7GwxW1-RuQ/exec";
 
         let activeMeeting = null;
