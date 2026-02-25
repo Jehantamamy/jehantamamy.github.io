@@ -166,37 +166,52 @@
         // ==========================================
         function generateMeetingCode() {
             const btn = document.querySelector('#view-admin button[onclick="generateMeetingCode()"]');
-            btn.innerText = "Menyimpan ke Database... ⏳"; btn.disabled = true;
+            btn.innerText = "Membuat Link Pendek... ⏳"; 
+            btn.disabled = true;
 
             const timeCode = Date.now().toString(36).slice(-3).toUpperCase();
             const randCode1 = Math.random().toString(36).substring(2, 5).toUpperCase();
             const randCode2 = Math.random().toString(36).substring(2, 5).toUpperCase();
 
+            // Rangkai magic link panjang dari URL website kamu saat ini
+            const baseUrl = window.location.href.split('?')[0].split('#')[0];
+            const longMagicLink = `${baseUrl}?join=JOIN-${randCode1}${timeCode}`;
+
             const payload = { 
                 action: "createMeeting",
                 code: "JOIN-" + randCode1 + timeCode,       
                 adminCode: "ADMIN-" + randCode2 + timeCode, 
+                longLink: longMagicLink, // <--- KIRIM LINK PANJANG KE SERVER
                 name: document.getElementById('agendaName').value || "Rapat Internal",
-                location: document.getElementById('agendaLocation').value || "-", // TAMBAHAN TEMPAT
+                location: document.getElementById('agendaLocation').value || "-", 
                 date: document.getElementById('agendaDate').value || "-", 
                 time: document.getElementById('agendaTime').value || "-",
                 quickFields: {
-                    instansi: document.getElementById('fieldInstansi').checked, dept: document.getElementById('fieldDept').checked,
-                    phone: document.getElementById('fieldPhone').checked, signature: document.getElementById('fieldSignature').checked
+                    instansi: document.getElementById('fieldInstansi').checked, 
+                    dept: document.getElementById('fieldDept').checked,
+                    phone: document.getElementById('fieldPhone').checked, 
+                    signature: document.getElementById('fieldSignature').checked
                 },
                 customFields: [...customFields] 
             };
 
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-            .then(res => res.json()).then(data => {
+            .then(res => res.json())
+            .then(data => {
                 activeMeeting = payload;
-                const baseUrl = window.location.href.split('?')[0].split('#')[0];
-                const magicLink = `${baseUrl}?join=${payload.code}`;
                 
-                document.getElementById('display-magic-link').value = magicLink;
+                // Gunakan link pendek dari server, kalau gagal/kosong, pakai link panjang
+                const finalLinkToDisplay = data.shortLink || longMagicLink;
+                
+                document.getElementById('display-magic-link').value = finalLinkToDisplay;
                 document.getElementById('display-admin-code').innerText = payload.adminCode;
                 document.getElementById('code-result').classList.replace('hidden', 'flex');
-            }).catch(err => alert("Gagal konek ke Server! Pastikan URL Web App benar.")).finally(() => { btn.innerText = "Generate Ruangan Rapat"; btn.disabled = false; });
+            })
+            .catch(err => alert("Gagal konek ke Server! Pastikan URL Web App benar."))
+            .finally(() => { 
+                btn.innerText = "Generate Ruangan Rapat"; 
+                btn.disabled = false; 
+            });
         }
 
         function copyCode(eId, btnId, isInput = false) {
@@ -248,7 +263,7 @@
             const code = document.getElementById(inputId).value.toUpperCase().trim();
             if(!code) return alert("Masukkan kode dulu!");
 
-            const origText = btn.innerText; btn.innerText = "Mencari Ruangan... ⏳"; btn.disabled = true;
+            const origText = btn.innerText; btn.innerText = "Mencari Presensi... ⏳"; btn.disabled = true;
 
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: 'getMeeting', code: code }) })
             .then(res => res.json()).then(res => {
@@ -263,7 +278,7 @@
                         if(code !== activeMeeting.code) return alert("Itu kode Laporan Admin, bukan kode Join!");
                         renderFormPeserta();
                     }
-                } else { alert("Kode Ruangan tidak ditemukan di database!"); }
+                } else { alert("Kode Presensi tidak ditemukan di database!"); }
             }).catch(e => alert("Gagal konek ke Server!")).finally(() => { btn.innerText = origText; btn.disabled = false; });
         }
 

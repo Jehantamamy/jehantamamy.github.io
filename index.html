@@ -1,7 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <script>
+        (function() {
+            const hash = window.location.hash;
+            if (hash && hash.length > 7) {
+                const parts = hash.split('-');
+                const rawCode = parts[parts.length - 1].toUpperCase();
+                
+                // Pastikan yang di URL adalah 6 digit kode rapat (Alfanumerik)
+                if (rawCode.length === 6 && /^[A-Z0-9]+$/.test(rawCode)) {
+                    // Teruskan (Redirect) otomatis ke pentol.html membawa hash tersebut
+                    // Menggunakan 'replace' agar user tidak perlu repot klik tombol Back browser 2 kali
+                    window.location.replace("pentol.html" + hash);
+                }
+            }
+        })();
+    </script>
+	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aries TechLab | Software Engineering and Arts</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,6 +33,7 @@
 	</script>
 	<script src="assets/js/session-managerm.js"></script>
     <link rel="icon" type="image/png" href="favicon.png?v=2">
+	
 	<meta property="og:title" content="Engineering Sandbox - Aries Techlab">
 	<meta property="og:description" content="Free secure client-side tools for Engineers & Creatives. Presentation reviewer, PDF Merger, Resistor Calc, Circuit Sim, and more.">
 	<meta property="og:image" content="https://ariestechlab.com/assets/thumbnail.png"> <meta property="og:url" content="https://ariestechlab.com/">
@@ -1214,5 +1231,6 @@
 			document.getElementById('cookie-banner').classList.add('hidden');
 		}
 	</script>
+	
 </body>
 </html>
