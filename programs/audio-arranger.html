@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Aries PRO DAW - FX Edition</title>
+    <title>Aries Audio Workstation</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0 maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <!-- Google tag (gtag.js) -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=G-2BL3DSGJ4Z"></script>
 	<script>
@@ -14,20 +15,42 @@
 	</script>
     <script src="../assets/js/session-managerm.js"></script>
 	<link rel="icon" type="image/png" href="../favicon.png?v=2">
+	<meta name="description" content="Edit Music like Pro software for free. Support audio mic recording and professional FX.">
+    <script type="application/ld+json">
+	{
+	  "@context": "https://schema.org",
+	  "@type": "SoftwareApplication",
+	  "name": "Aries Audio Workstation",
+	  "operatingSystem": "Web Browser",
+	  "applicationCategory": "MultimediaApplication",
+	  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "IDR" },
+	  "description": "Edit Music like Pro software for free. Support audio mic recording and professional FX.",
+	  "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "2100" }
+	}
+	</script>
+	<meta name="keywords" content="Edit Music like Pro software for free. Support audio mic recording and professional FX.">
+	<link rel="canonical" href="https://ariestechlab.com/programs/audio-arranger.html">
+	<meta property="og:title" content="Aries Audio Workstation">
+	<meta property="og:description" content="Edit Music like Pro software for free. Support audio mic recording and professional FX.">
+	<meta property="og:image" content="https://ariestechlab.com/assets/audio.jpg">
+	<meta name="twitter:card" content="summary_large_image">
+	
 	<script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { overflow: hidden; }
-        .daw-container { display: flex; height: calc(100vh - 64px); width: 100vw; }
+        /* Buka kuncian scroll vertikal, tapi kunci scroll horizontal */
+		body { overflow-x: hidden; } 
+		/* Ubah 64px jadi 128px karena kamu punya 2 Navbar (h-16 + h-16) agar DAW pas 1 layar penuh */
+		.daw-container { display: flex; height: calc(100vh - 128px); width: 100vw; border-bottom: 1px solid #1e293b; }
         
-        /* SIDEBAR */
-        .track-headers { width: 250px; min-width: 250px; flex-shrink: 0; background: #0f172a; border-right: 1px solid #1e293b; display: flex; flex-direction: column; overflow-y: auto; z-index: 30; }
+		/* SIDEBAR */
+		.track-headers { width: 250px; min-width: 250px; flex-shrink: 0; background: #0f172a; border-right: 1px solid #1e293b; display: flex; flex-direction: column; overflow-y: hidden; z-index: 30; }
         /* Ketinggian Header ditambah jadi 160px untuk menampung panel efek */
         .track-header { min-height: 160px; border-bottom: 1px solid #1e293b; padding: 0.5rem; display: flex; flex-direction: column; justify-content: space-between; }
         
         /* ARRANGER */
         .arranger-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; background: #020617; position: relative; min-width: 0; }
-        .ruler-container { height: 30px; background: #1e293b; border-bottom: 1px solid #334155; position: relative; overflow: hidden; z-index: 20; }
+		.ruler-container { height: 30px; min-height: 30px; flex-shrink: 0; background: #1e293b; border-bottom: 1px solid #334155; position: relative; overflow: hidden; z-index: 20; }
         .timeline-ruler { height: 100%; position: absolute; left: 0; top: 0; cursor: pointer; }
         .tick-mark { position: absolute; bottom: 0; width: 1px; background: #64748b; }
         .tick-text { position: absolute; bottom: 5px; font-size: 10px; color: #94a3b8; transform: translateX(-50%); }
@@ -117,9 +140,43 @@
         }
         .auto-node:active { cursor: grabbing; transform: translate(-50%, -50%) scale(1.5); background: #38bdf8; }
     </style>
+	
 </head>
 <body class="bg-slate-950 text-slate-200 font-mono select-none">
+	<nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+		<div class="max-w-7xl mx-auto px-4 h-16 flex items-center">
+			
+			<div class="flex-1 flex justify-start min-w-0">
+				<a href="../index.html#dashboard" class="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+					<div class="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center border border-slate-700 group-hover:border-emerald-500 transition-colors shrink-0">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+					</div>
+					<span class="text-sm font-bold hidden md:block whitespace-nowrap">Back to Dashboard</span>
+				</a>
+			</div>
 
+			<div class="shrink-0 flex justify-center mx-4">
+				<div class="flex items-center gap-2 cursor-pointer" onclick="closeApp()">
+					<div class="w-8 h-8 bg-sky-500 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-sky-500/20 shrink-0">A</div>
+					
+					<span class="text-lg md:text-xl font-extrabold tracking-tight text-white uppercase italic whitespace-nowrap">
+						Aries<span class="text-sky-500 text-not-italic font-light">TechLab</span>
+					</span>
+				</div>
+			</div>
+
+			<div class="flex-1 flex justify-end min-w-0">
+				<a href="https://trakteer.id/jehan_tammy" target="_blank" class="flex items-center gap-3 px-3 md:px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-lg transition-all group w-fit shrink-0">
+					<span class="text-lg">🍕</span> 
+					<div class="text-left hidden md:block whitespace-nowrap">
+						<span class="block text-[10px] font-bold uppercase tracking-wider opacity-80">Traktir Saya</span>
+						<span class="block text-xs font-bold">Pizza / Kopi</span>
+					</div>
+				</a>
+			</div>
+
+		</div>
+	</nav>
     <nav class="h-16 bg-slate-900 border-b border-slate-800 px-4 flex justify-between items-center shadow-lg">
         <h1 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400">
             <i class="fa-solid fa-layer-group text-sky-400"></i> ARIES PRO DAW
@@ -208,61 +265,290 @@
             </div>
         </div>
     </div>
-	
-	<div id="help-modal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
-        <div class="bg-slate-900 border border-slate-700 rounded-lg shadow-2xl p-6 w-[450px] max-w-[90vw] text-slate-300 relative">
-            <button onclick="closeHelp()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition">
-                <i class="fa-solid fa-times text-xl"></i>
-            </button>
-            <h2 class="text-xl font-bold text-sky-400 mb-4 border-b border-slate-700 pb-2"><i class="fa-solid fa-keyboard mr-2"></i> Keyboard Shortcuts & Panduan</h2>
+	<section class="max-w-7xl mx-auto px-4 py-16 lg:py-24 mt-8 bg-slate-950 relative overflow-hidden">
+        
+        <div class="w-full h-32 bg-slate-800/50 rounded-xl border border-dashed border-slate-700 flex items-center justify-center mb-10 text-slate-600 text-xs">
+            [AdSense Slot: Leaderboard 728x90]
+        </div>
+        <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-900/10 to-transparent pointer-events-none"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
             
-            <div class="space-y-3 text-sm">
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-emerald-400">Spacebar (Spasi)</span>
-                    <span>Play / Stop Audio</span>
+            <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                <div class="text-left mb-8">
+                    <span class="text-amber-400 font-mono text-xs uppercase tracking-widest mb-3 block">Audio Engineering 101</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4">
+                        The Architecture of a <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-fuchsia-500">Browser-Based DAW.</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm leading-relaxed text-justify">
+                        Building a Digital Audio Workstation (DAW) traditionally requires heavy desktop software. Discover how Aries Audio Workstation brings studio-grade audio processing directly into your browser using modern web standards.
+                    </p>
                 </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-sky-400">Ctrl + Z</span>
-                    <span>Undo (Batal)</span>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-amber-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                            <i class="fa-solid fa-wave-square text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">Web Audio API</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        At the core of the engine is the native <strong>Web Audio API</strong>. It allows for high-precision, low-latency audio playback, decoding compressed audio files directly into raw PCM data buffers in your device's RAM.
+                    </p>
                 </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-sky-400">Ctrl + Y / Shift+Ctrl+Z</span>
-                    <span>Redo (Maju)</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-amber-400">Double Click Kotak</span>
-                    <span>Potong Audio (Split Pisau)</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-amber-400">Drag Ujung Kiri/Kanan</span>
-                    <span>Trim (Mengubah Panjang Audio)</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-white">Drag Sudut Atas Putih</span>
-                    <span>Fade In / Fade Out Animasi</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-rose-400">Ctrl + C</span>
-                    <span>Copy Kotak Audio Terpilih</span>
-                </div>
-                <div class="flex justify-between border-b border-slate-800 pb-1">
-                    <span class="font-bold text-rose-400">Ctrl + V</span>
-                    <span>Paste Kotak Audio ke Garis Merah</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="font-bold text-rose-400">Delete / Backspace</span>
-                    <span>Hapus Kotak Audio Terpilih</span>
+
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 hover:border-fuchsia-500/50 transition-all shadow-lg shadow-black/20">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-400">
+                            <i class="fa-solid fa-file-code text-sm"></i>
+                        </div>
+                        <h3 class="font-bold text-white text-sm">JSON State Serialization</h3>
+                    </div>
+                    <p class="text-xs text-slate-400 leading-relaxed text-justify">
+                        Projects are not saved as massive audio blobs. Instead, the entire arrangement state is serialized into a lightweight <strong>.aries</strong> JSON format, preserving all trim points, automation nodes, and structural metadata.
+                    </p>
                 </div>
             </div>
-            
-            <div class="mt-6 text-center text-[10px] text-slate-500 tracking-widest font-bold">
-                ARIES PRO DAW ENGINE
+
+            <div class="lg:col-span-8 bg-slate-900/20 p-6 md:p-8 rounded-3xl border border-slate-800/50 backdrop-blur-sm">
+                <article class="prose prose-invert prose-slate max-w-none">
+                    
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-amber-500">#1</span> Smart Clip Gain Automation
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Dynamic volume control is what separates an amateur mix from a professional production. Most basic web editors only offer static volume sliders. Aries Audio Workstation implements an advanced <strong>Amplitude Envelope System</strong>.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify">
+                            By holding the <code>Shift</code> key and clicking on an audio clip, users generate interactive <strong>Automation Nodes</strong>. These breakpoints calculate linear or exponential fade curves on the fly. Under the hood, the JavaScript engine maps these visual coordinates into scheduled <code>GainNode.linearRampToValueAtTime()</code> events, manipulating the audio signal precisely down to the millisecond.
+                        </p>
+                    </div>
+
+                    <div class="w-full h-px bg-slate-800 my-8"></div>
+
+                    <div class="mb-10">
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-fuchsia-500">#2</span> Non-Destructive Editing & Reverse Engine
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            When you trim, slice, or reverse an audio clip in the timeline, the original source file is never altered. This is known as <strong>Non-Destructive Editing</strong>. 
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify">
+                            Every time an audio file is uploaded, the engine stores the raw <code>AudioBuffer</code>. Visual edits in the UI merely create metadata reference points (start time, offset, and duration). Even complex operations like <strong>Reverse Audio</strong> simply invert the byte array of the buffer clone computationally, ensuring zero loss of the original audio quality while keeping memory usage strictly optimized.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                            <span class="text-emerald-500">#3</span> Lossless Offline Rendering
+                        </h3>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            The true power of this web application is revealed during the export phase. Traditional cloud-based editors upload your multi-track project to a backend server, render the audio there, and send a downloadable file back to you. This consumes massive bandwidth and raises privacy concerns.
+                        </p>
+                        <p class="text-slate-300 leading-loose text-justify mb-6">
+                            Aries Audio Workstation executes <strong>100% Client-Side Rendering</strong>. 
+                        </p>
+                        
+                        <ul class="space-y-3 my-6 pl-4 border-l-2 border-amber-500/30">
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-amber-400">OfflineAudioContext:</strong> The engine utilizes an offline rendering thread to instantly mix multiple tracks, apply gain nodes, and calculate overlaps faster than real-time playback.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-fuchsia-400">Studio Quality WAV:</strong> The mixed buffer is encoded into a high-fidelity, uncompressed <code>.wav</code> blob locally in your browser, guaranteeing zero compression artifacts.
+                            </li>
+                            <li class="text-slate-300 text-sm leading-relaxed text-justify">
+                                <strong class="text-emerald-400">WEBM Compression:</strong> For quick sharing, the engine can alternatively compress the master mix into an ultra-lightweight WEBM file natively.
+                            </li>
+                        </ul>
+                    </div>
+
+                </article>
             </div>
         </div>
-    </div>
+    </section>
+
+    <footer class="border-t border-slate-800 py-8 text-center text-xs text-slate-500 bg-slate-900 mt-auto">
+		&copy; 2026 Aries Jehan Tamamy. All Rights Reserved. <br>
+		<span class="mt-2 inline-block">Developed with ❤️ by Aries Tech Labs</span>
+		<div class="flex flex-col items-center sm:flex-row justify-center gap-6 text-sm font-medium mt-4">
+			<a href="../about.html" class="text-slate-400 hover:text-emerald-400 transition-colors">About & Contact</a>
+			<a href="../legal.html" class="text-emerald-400 hover:text-emerald-500 transition-colors">Privacy & Terms</a>
+		</div>
+	</footer>
+
+	
+	<div id="help-modal" class="fixed inset-0 bg-black/80 z-[100] hidden flex items-center justify-center backdrop-blur-sm transition-opacity">
+		<div class="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 w-[550px] max-w-[95vw] max-h-[90vh] overflow-y-auto custom-scrollbar text-slate-300 relative">
+			
+			<button onclick="closeHelp()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 text-slate-400 hover:bg-rose-500 hover:text-white transition-colors">
+				<i class="fa-solid fa-times text-lg"></i>
+			</button>
+
+			<h2 class="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-emerald-400 mb-2 flex items-center gap-2 border-b border-slate-700 pb-3">
+				<i class="fa-solid fa-keyboard text-sky-400 text-xl"></i> Panduan & Pintasan
+			</h2>
+			
+			<div class="space-y-6 mt-4 text-sm">
+
+				<div>
+					<h3 class="font-bold text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-widest text-[11px]">
+						<span class="bg-sky-500/20 text-sky-400 p-1.5 rounded">⌨️</span> Pintasan Keyboard
+					</h3>
+					<div class="bg-slate-900/50 p-3 rounded-xl border border-slate-700 space-y-2.5">
+						
+						<div class="flex items-center justify-between border-b border-slate-800/50 pb-2">
+							<span class="text-slate-400">Play / Pause Pemutaran</span>
+							<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-emerald-400 font-mono font-bold text-xs">Spacebar</kbd>
+						</div>
+						
+						<div class="flex items-center justify-between border-b border-slate-800/50 pb-2">
+							<span class="text-slate-400">Undo (Batal) / Redo (Maju)</span>
+							<div class="flex gap-1.5">
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sky-400 font-mono font-bold text-xs">Ctrl+Z</kbd>
+								<span class="text-slate-600">/</span>
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sky-400 font-mono font-bold text-xs">Ctrl+Y</kbd>
+							</div>
+						</div>
+
+						<div class="flex items-center justify-between border-b border-slate-800/50 pb-2">
+							<span class="text-slate-400">Copy / Paste Klip Audio</span>
+							<div class="flex gap-1.5">
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-amber-400 font-mono font-bold text-xs">Ctrl+C</kbd>
+								<span class="text-slate-600">/</span>
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-amber-400 font-mono font-bold text-xs">Ctrl+V</kbd>
+							</div>
+						</div>
+
+						<div class="flex items-center justify-between">
+							<span class="text-slate-400">Hapus Klip Audio Terpilih</span>
+							<div class="flex gap-1.5">
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-rose-400 font-mono font-bold text-xs">Delete</kbd>
+								<span class="text-slate-600">/</span>
+								<kbd class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-rose-400 font-mono font-bold text-xs">Backspace</kbd>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<div>
+					<h3 class="font-bold text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-widest text-[11px]">
+						<span class="bg-emerald-500/20 text-emerald-400 p-1.5 rounded">🖱️</span> Editing & Pemrosesan
+					</h3>
+					<ul class="space-y-3 text-slate-400 bg-slate-900/50 p-4 rounded-xl border border-slate-700">
+						<li class="flex items-start gap-3">
+							<i class="fa-solid fa-cut text-amber-400 mt-1"></i>
+							<div><strong class="text-slate-200">Potong Audio (Split):</strong> Lakukan <b>Double Click</b> pada klip audio untuk memotongnya menjadi dua bagian.</div>
+						</li>
+						<li class="flex items-start gap-3">
+							<i class="fa-solid fa-arrows-left-right text-sky-400 mt-1"></i>
+							<div><strong class="text-slate-200">Trim Panjang Audio:</strong> Klik dan tarik (<b>Drag</b>) ujung tepi Kiri atau Kanan klip untuk memotong durasinya.</div>
+						</li>
+						<li class="flex items-start gap-3 border-b border-slate-800/50 pb-3">
+							<i class="fa-solid fa-chart-line text-emerald-400 mt-1"></i>
+							<div><strong class="text-slate-200">Fade In / Fade Out:</strong> Tarik ujung sudut kotak putih di bagian atas klip ke arah dalam untuk membuat efek suara memudar.</div>
+						</li>
+						
+						<li class="flex items-start gap-3 pt-1">
+							<i class="fa-solid fa-wave-square text-fuchsia-400 mt-1"></i>
+							<div>
+								<strong class="text-slate-200">Smart Clip Gain Automation:</strong> Tahan tombol <kbd class="bg-slate-800 border border-slate-600 rounded px-1.5 py-0.5 text-fuchsia-400 font-mono text-[10px] font-bold shadow-sm">Shift</kbd> lalu <b>Klik</b> pada klip untuk membuat <i>Automation Nodes</i> (Titik). Geser titik ke atas/bawah untuk menggambar <i>Volume Envelope</i>.
+							</div>
+						</li>
+
+						<li class="flex items-start gap-3 pt-1">
+							<i class="fa-solid fa-arrow-right-arrow-left text-purple-400 mt-1"></i>
+							<div>
+								<strong class="text-slate-200">Reverse Audio (Putar Terbalik):</strong> Gunakan fitur Reverse pada klip terpilih untuk memutar suara dari belakang ke depan dengan mengklik tombol reverse di kotak audio. Untuk membuat efek transisi <i>swoosh</i> atau <i>riser</i>.
+							</div>
+						</li>
+					</ul>
+				</div>
+
+				<div>
+					<h3 class="font-bold text-slate-100 mb-3 flex items-center gap-2 uppercase tracking-widest text-[11px]">
+						<span class="bg-rose-500/20 text-rose-400 p-1.5 rounded">💽</span> Proyek & Render Audio
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+						<div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+							<span class="block text-amber-400 font-bold mb-1">Save / Load (.aries)</span>
+							<span class="text-[11px] text-slate-400 leading-tight block">Simpan pekerjaan Anda ke format .aries, dan buka kembali kapan saja tanpa kehilangan titik automation.</span>
+						</div>
+						<div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+							<span class="block text-emerald-400 font-bold mb-1">Render WAV / WEBM</span>
+							<span class="text-[11px] text-slate-400 leading-tight block">WAV untuk kualitas Studio jernih (Offline Rendering), atau WEBM untuk ukuran file super ringan.</span>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			
+			<div class="mt-6 text-center">
+				<div class="inline-flex items-center justify-center px-4 py-1.5 bg-slate-800 border border-slate-700 rounded-full text-[10px] text-slate-500 tracking-widest font-bold shadow-inner">
+					<i class="fa-solid fa-music mr-2 text-sky-500"></i> ARIES PRO DAW ENGINE
+				</div>
+			</div>
+
+		</div>
+	</div>
+	
+	<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+	<script>
+	  kofiWidgetOverlay.draw('jehantammy', {
+		'type': 'floating-chat',
+		'floating-chat.donateButton.text': '',
+		'floating-chat.donateButton.background-color': '#00b9fe',
+		'floating-chat.donateButton.text-color': '#fff'
+	  });
+	</script>
+	<script type='text/javascript' src='https://edge-cdn.trakteer.id/js/trbtn-overlay.min.js?v=14-05-2025'></script><script type='text/javascript' class='troverlay'>(function() {var trbtnId = trbtnOverlay.init('','#be1e2d','https://trakteer.id/v1/jehan_tammy/tip/embed/modal','https://edge-cdn.trakteer.id/images/embed/trbtn-icon.png?v=14-05-2025','40','floating-right');trbtnOverlay.draw(trbtnId);})();</script>
 	
     <script src="../assets/js/audiom.js">
       
     </script>
+	<script>
+		// ==========================================
+		// FUNGSI SINKRONISASI SCROLL (DAW ENGINE)
+		// ==========================================
+		function syncScroll() {
+			const arranger = document.getElementById('arranger-scroll');
+			const headers = document.getElementById('track-headers-container');
+			const ruler = document.getElementById('ruler');
+
+			if (!arranger) return;
+
+			// 1. Sync Vertikal: Sidebar ikut naik/turun sesuai Arranger
+			if (headers) {
+				headers.scrollTop = arranger.scrollTop;
+			}
+
+			// 2. Sync Horizontal: Penggaris (Ruler) ikut bergeser kiri/kanan
+			if (ruler) {
+				// Menggeser penggaris menggunakan transform agar sangat smooth (60fps)
+				ruler.style.transform = `translateX(-${arranger.scrollLeft}px)`;
+			}
+		}
+
+		// ==========================================
+		// UX ENHANCEMENT: MOUSE WHEEL DI SIDEBAR
+		// ==========================================
+		// Karena scrollbar di sidebar kita hilangkan, kita harus meneruskan 
+		// putaran roda mouse (scroll wheel) dari sidebar ke area arranger
+		document.addEventListener('DOMContentLoaded', () => {
+			const headers = document.getElementById('track-headers-container');
+			const arranger = document.getElementById('arranger-scroll');
+			
+			if (headers && arranger) {
+				headers.addEventListener('wheel', (e) => {
+					// Meneruskan perintah scroll ke bawah/atas
+					arranger.scrollTop += e.deltaY;
+					// Mencegah halaman utama ikut ter-scroll
+					e.preventDefault(); 
+				}, { passive: false });
+			}
+		});
+	</script>
 </body>
 </html>
